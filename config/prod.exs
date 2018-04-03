@@ -59,6 +59,19 @@ config :logger, level: :info
 #     config :bijakhq, BijakhqWeb.Endpoint, server: true
 #
 
+config :libcluster,
+  topologies: [
+    gossip: [
+      strategy: Cluster.Strategy.Gossip,
+      config: [
+        port: 45892,
+        if_addr: {0,0,0,0},
+        multicast_addr: {230,1,1,251},
+        # a TTL of 1 remains on the local network,
+        # use this to change the number of jumps the
+        # multicast packets will make
+        multicast_ttl: 1]]]
+
 # Finally import the config/prod.secret.exs
 # which should be versioned separately.
 import_config "prod.secret.exs"
