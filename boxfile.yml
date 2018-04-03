@@ -45,8 +45,8 @@ data.storage:             #| Storage Component
 
 web.main:
   start: node-start mix phx.server
-  writable_dirs:
-    - _build/prod/lib/
+  writable_dirs:          # Timex and TZData need to write into its priv/ folder
+    - priv
   network_dirs:           #| Network Dirs Config
     data.storage:         #| Storage Component Designation
       - shared/uploads    #| Network Directory  
