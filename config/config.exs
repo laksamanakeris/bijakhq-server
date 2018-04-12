@@ -17,6 +17,15 @@ config :bijakhq, BijakhqWeb.Endpoint,
   pubsub: [name: Bijakhq.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
+# Phauxth authentication configuration
+config :phauxth,
+  token_salt: "CPTV+oxZ",
+  endpoint: BijakhqWeb.Endpoint
+
+# Mailer configuration
+config :bijakhq, Bijakhq.Mailer,
+  adapter: Bamboo.LocalAdapter
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
