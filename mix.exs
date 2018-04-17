@@ -7,7 +7,7 @@ defmodule Bijakhq.Mixfile do
       version: "0.0.1",
       elixir: "~> 1.4",
       elixirc_paths: elixirc_paths(Mix.env),
-      compilers: [:phoenix, :gettext] ++ Mix.compilers,
+      compilers: [:phoenix, :gettext, :phoenix_swagger] ++ Mix.compilers,
       start_permanent: Mix.env == :prod,
       aliases: aliases(),
       deps: deps()
@@ -44,6 +44,8 @@ defmodule Bijakhq.Mixfile do
       {:bcrypt_elixir, "~> 1.0"},
       {:bamboo, "~> 0.8"},
       {:cowboy, "~> 1.0"},
+      {:phoenix_swagger, "~> 0.8"},
+      {:ex_json_schema, "~> 0.5"}, # optional
       {:libcluster, "~> 2.1", only: :prod}
     ]
   end
