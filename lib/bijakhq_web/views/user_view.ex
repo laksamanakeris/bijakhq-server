@@ -12,6 +12,9 @@ defmodule BijakhqWeb.UserView do
 
   def render("user.json", %{user: user}) do
     %{id: user.id,
-      email: user.email}
+      email: user.email,
+      username: user.username,
+      profile_picture: user.profile_picture
+    }
   end
 end
