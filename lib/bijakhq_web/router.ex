@@ -23,7 +23,8 @@ defmodule BijakhqWeb.Router do
     post "/password_resets", PasswordResetController, :create
     put "/password_resets/update", PasswordResetController, :update
 
-    resources "/categories", QuizCategoryController
+    resources "/categories", QuizCategoryController, except: [:new, :edit]
+    resources "/questions", QuizQuestionController, except: [:new, :edit]
   end
 
   scope "/", BijakhqWeb do
