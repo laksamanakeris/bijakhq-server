@@ -12,7 +12,7 @@ defmodule Bijakhq.Quizzes.QuizQuestion do
     field :question, :string
     # field :category_id, :id
 
-    belongs_to :category, QuizCategory
+    belongs_to :category, QuizCategory, foreign_key: :category_id
 
     timestamps()
   end
