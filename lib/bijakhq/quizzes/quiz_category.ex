@@ -2,10 +2,15 @@ defmodule Bijakhq.Quizzes.QuizCategory do
   use Ecto.Schema
   import Ecto.Changeset
 
+  # alias Rajin.Posts.{JobCategory, Job}
+  alias Bijakhq.Quizzes.QuizQuestion
+
 
   schema "quiz_categories" do
     field :description, :string
     field :title, :string
+
+    has_many :questions, QuizQuestion, foreign_key: :category_id
 
     timestamps()
   end
