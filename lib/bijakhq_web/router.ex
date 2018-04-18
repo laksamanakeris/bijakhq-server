@@ -11,6 +11,19 @@ defmodule BijakhqWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug Phauxth.Authenticate, method: :token
+  end
+
+  scope "/api", BijakhqWeb do
+    pipe_through :api
+
+    post "/sessions", SessionController, :create
+    resources "/users", UserController, except: [:new, :edit]
+    get "/confirm", ConfirmController, :index
+    post "/password_resets", PasswordResetController, :create
+    put "/password_resets/update", PasswordResetController, :update
+
+    resources "/categories", QuizCategoryController
   end
 
   scope "/", BijakhqWeb do
@@ -19,8 +32,20 @@ defmodule BijakhqWeb.Router do
     get "/", PageController, :index
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", BijakhqWeb do
-  #   pipe_through :api
-  # end
+  def swagger_info do
+    %{
+      info: %{
+        version: "1.0",
+        title: "Bijak HQ"
+      }
+    }
+  end
+
+  scope "/swagger" do
+    forward "/", PhoenixSwagger.Plug.SwaggerUI,
+      otp_app: :bijakhq,
+      swagger_file: "swagger.json",
+      disable_validator: true
+  end
+
 end

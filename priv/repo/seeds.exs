@@ -2,10 +2,15 @@
 #
 #     mix run priv/repo/seeds.exs
 #
-# Inside the script, you can read and write to any of your
-# repositories directly:
+# It is also run when you use the command `mix ecto.setup`
 #
-#     Bijakhq.Repo.insert!(%Bijakhq.SomeSchema{})
-#
-# We recommend using the bang functions (`insert!`, `update!`
-# and so on) as they will fail if something goes wrong.
+
+users = [
+  %{email: "jane.doe@example.com", password: "password", username: "janedoe"},
+  %{email: "john.smith@example.org", password: "password", username: "johnsmith"}
+]
+
+for user <- users do
+  {:ok, user} = Bijakhq.Accounts.create_user(user)
+  Bijakhq.Accounts.confirm_user(user)
+end

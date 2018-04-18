@@ -17,10 +17,27 @@ config :bijakhq, BijakhqWeb.Endpoint,
   pubsub: [name: Bijakhq.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
+# Phauxth authentication configuration
+config :phauxth,
+  token_salt: "CPTV+oxZ",
+  endpoint: BijakhqWeb.Endpoint
+
+# Mailer configuration
+config :bijakhq, Bijakhq.Mailer,
+  adapter: Bamboo.LocalAdapter
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
+
+config :bijakhq, :phoenix_swagger,
+  swagger_files: %{
+    "priv/static/swagger.json" => [
+      router: BijakhqWeb.Router,     # phoenix routes will be converted to swagger paths
+      endpoint: BijakhqWeb.Endpoint  # (optional) endpoint config used to set host, port and https schemes.
+    ]
+  }
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
