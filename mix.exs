@@ -44,8 +44,6 @@ defmodule Bijakhq.Mixfile do
       {:bcrypt_elixir, "~> 1.0"},
       {:bamboo, "~> 0.8"},
       {:cowboy, "~> 1.0"},
-      {:phoenix_swagger, "~> 0.8"},
-      {:ex_json_schema, "~> 0.5"}, # optional
       {:libcluster, "~> 2.1", only: :prod}
     ]
   end

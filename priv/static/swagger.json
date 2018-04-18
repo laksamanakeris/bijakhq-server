@@ -2,9 +2,9 @@
   "swagger": "2.0",
   "paths": {},
   "info": {
-    "version": "1.0",
-    "title": "Bijak HQ"
+    "version": "0.0.1",
+    "title": "<enter your title>"
   },
-  "host": "bijak.local:8080",
+  "host": "localhost:4000",
   "definitions": {}
 }
