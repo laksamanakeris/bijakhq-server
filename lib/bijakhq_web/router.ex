@@ -32,21 +32,4 @@ defmodule BijakhqWeb.Router do
 
     get "/", PageController, :index
   end
-
-  def swagger_info do
-    %{
-      info: %{
-        version: "1.0",
-        title: "Bijak HQ"
-      }
-    }
-  end
-
-  scope "/swagger" do
-    forward "/", PhoenixSwagger.Plug.SwaggerUI,
-      otp_app: :bijakhq,
-      swagger_file: "swagger.json",
-      disable_validator: true
-  end
-
 end

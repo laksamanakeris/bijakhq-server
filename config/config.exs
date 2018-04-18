@@ -31,14 +31,6 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
-config :bijakhq, :phoenix_swagger,
-  swagger_files: %{
-    "priv/static/swagger.json" => [
-      router: BijakhqWeb.Router,     # phoenix routes will be converted to swagger paths
-      endpoint: BijakhqWeb.Endpoint  # (optional) endpoint config used to set host, port and https schemes.
-    ]
-  }
-
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"
