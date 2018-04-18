@@ -12,6 +12,7 @@ defmodule BijakhqWeb.QuizQuestionView do
 
   def render("quiz_question.json", %{quiz_question: quiz_question}) do
     %{id: quiz_question.id,
+      category_id: quiz_question.category_id,
       question: quiz_question.question,
       answer: quiz_question.answer,
       optionB: quiz_question.optionB,
