@@ -1,4 +1,4 @@
-defmodule BijakhqWeb.Api.QuizCategoryController do
+defmodule BijakhqWeb.QuizCategoryController do
   use BijakhqWeb, :controller
 
   alias Bijakhq.Quizzes
@@ -15,7 +15,7 @@ defmodule BijakhqWeb.Api.QuizCategoryController do
     with {:ok, %QuizCategory{} = quiz_category} <- Quizzes.create_quiz_category(quiz_category_params) do
       conn
       |> put_status(:created)
-      |> put_resp_header("location", api_quiz_category_path(conn, :show, quiz_category))
+      |> put_resp_header("location", quiz_category_path(conn, :show, quiz_category))
       |> render("show.json", quiz_category: quiz_category)
     end
   end
