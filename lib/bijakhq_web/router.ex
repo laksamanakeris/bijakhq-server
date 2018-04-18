@@ -22,6 +22,8 @@ defmodule BijakhqWeb.Router do
     get "/confirm", ConfirmController, :index
     post "/password_resets", PasswordResetController, :create
     put "/password_resets/update", PasswordResetController, :update
+
+    resources "/quiz_categories", QuizCategoryController
   end
 
   scope "/", BijakhqWeb do
