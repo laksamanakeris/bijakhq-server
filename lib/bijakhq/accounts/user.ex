@@ -14,6 +14,8 @@ defmodule Bijakhq.Accounts.User do
     field :confirmed_at, :utc_datetime
     field :reset_sent_at, :utc_datetime
 
+    field :role, :string, default: "user"
+
     timestamps()
   end
 
