@@ -1,6 +1,9 @@
 defmodule BijakhqWeb.Router do
   use BijakhqWeb, :router
 
+  # Set token max to 1 year
+  @max_age 365 * 24 * 60 * 60
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -11,7 +14,7 @@ defmodule BijakhqWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
-    plug Phauxth.Authenticate, method: :token
+    plug Phauxth.Authenticate, method: :token, max_age: @max_age
   end
 
   scope host: "api.", alias: BijakhqWeb.Api, as: :api do
