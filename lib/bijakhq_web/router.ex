@@ -20,6 +20,10 @@ defmodule BijakhqWeb.Router do
   scope host: "api.", alias: BijakhqWeb.Api, as: :api do
     pipe_through :api
 
+    scope "/admin" do
+      resources "/users", UserController, except: [:new, :edit]
+    end
+
     post "/sessions", SessionController, :create
     resources "/users", UserController, except: [:new, :edit]
     get "/confirm", ConfirmController, :index
