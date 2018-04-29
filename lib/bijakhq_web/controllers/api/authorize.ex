@@ -1,4 +1,4 @@
-defmodule BijakhqWeb.Authorize do
+defmodule BijakhqWeb.Api.Authorize do
 
   import Plug.Conn
   import Phoenix.Controller
@@ -32,7 +32,7 @@ defmodule BijakhqWeb.Authorize do
 
   def guest_check(%Plug.Conn{assigns: %{current_user: _current_user}} = conn, _opts) do
     put_status(conn, :unauthorized)
-    |> render(BijakhqWeb.AuthView, "logged_in.json", [])
+    |> render(BijakhqWeb.Api.AuthView, "logged_in.json", [])
     |> halt
   end
 
@@ -51,7 +51,7 @@ defmodule BijakhqWeb.Authorize do
 
   def error(conn, status, code) do
     put_status(conn, status)
-    |> put_view(BijakhqWeb.AuthView)
+    |> put_view(BijakhqWeb.Api.AuthView)
     |> render("#{code}.json", [])
     |> halt
   end

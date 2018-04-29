@@ -17,6 +17,10 @@ defmodule Bijakhq.Accounts do
     Repo.get_by(User, email: email)
   end
 
+  def get_by(%{"username" => username}) do
+    Repo.get_by(User, username: username)
+  end
+
   def create_user(attrs) do
     %User{}
     |> User.create_changeset(attrs)

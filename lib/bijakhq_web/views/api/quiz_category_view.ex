@@ -1,4 +1,4 @@
-defmodule BijakhqWeb.QuizCategoryView do
+defmodule BijakhqWeb.Api.QuizCategoryView do
   use BijakhqWeb, :view
   alias BijakhqWeb.Api.QuizCategoryView
 

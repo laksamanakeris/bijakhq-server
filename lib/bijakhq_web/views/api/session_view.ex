@@ -1,4 +1,4 @@
-defmodule BijakhqWeb.SessionView do
+defmodule BijakhqWeb.Api.SessionView do
   use BijakhqWeb, :view
 
   def render("info.json", %{info: token}) do

@@ -1,4 +1,4 @@
-defmodule BijakhqWeb.ChangesetView do
+defmodule BijakhqWeb.Api.ChangesetView do
   use BijakhqWeb, :view
 
   @doc """

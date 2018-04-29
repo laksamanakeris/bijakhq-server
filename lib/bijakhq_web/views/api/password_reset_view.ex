@@ -1,4 +1,4 @@
-defmodule BijakhqWeb.PasswordResetView do
+defmodule BijakhqWeb.Api.PasswordResetView do
   use BijakhqWeb, :view
 
   def render("error.json", %{error: message}) do

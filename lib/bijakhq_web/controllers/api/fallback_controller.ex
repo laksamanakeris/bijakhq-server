@@ -1,4 +1,4 @@
-defmodule BijakhqWeb.FallbackController do
+defmodule BijakhqWeb.Api.FallbackController do
   @moduledoc """
   Translates controller action results into valid `Plug.Conn` responses.
 
@@ -9,14 +9,14 @@ defmodule BijakhqWeb.FallbackController do
   def call(conn, {:error, %Ecto.Changeset{} = changeset}) do
     conn
     |> put_status(:unprocessable_entity)
-    |> put_view(BijakhqWeb.ChangesetView)
+    |> put_view(BijakhqWeb.Api.ChangesetView)
     |> render("error.json", changeset: changeset)
   end
 
   def call(conn, {:error, :not_found}) do
     conn
     |> put_status(:not_found)
-    |> put_view(BijakhqWeb.ErrorView)
+    |> put_view(BijakhqWeb.Api.ErrorView)
     |> render(:"404")
   end
 end

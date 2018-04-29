@@ -1,11 +1,11 @@
-defmodule BijakhqWeb.UserController do
+defmodule BijakhqWeb.Api.UserController do
   use BijakhqWeb, :controller
 
-  import BijakhqWeb.Authorize
+  import BijakhqWeb.Api.Authorize
   alias Phauxth.Log
   alias Bijakhq.Accounts
 
-  action_fallback BijakhqWeb.FallbackController
+  action_fallback BijakhqWeb.Api.FallbackController
 
   # the following plugs are defined in the controllers/authorize.ex file
   plug :user_check when action in [:index, :show]
@@ -25,7 +25,7 @@ defmodule BijakhqWeb.UserController do
       Accounts.Message.confirm_request(email, key)
       conn
       |> put_status(:created)
-      |> put_resp_header("location", user_path(conn, :show, user))
+      |> put_resp_header("location", api_user_path(conn, :show, user))
       |> render("show.json", user: user)
     end
   end
