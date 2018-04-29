@@ -9,7 +9,7 @@ defmodule BijakhqWeb.Api.UserController do
 
   # the following plugs are defined in the controllers/authorize.ex file
   # plug :user_check when action in [:index, :show]
-  plug :role_check, [roles: ["user", "admin"]] when action in [:index, :delete]
+  plug :role_check, [roles: ["admin"]] when action in [:index, :delete]
   plug :id_check when action in [:update, :delete]
 
   def index(conn, _) do
