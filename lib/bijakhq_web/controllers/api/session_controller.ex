@@ -12,8 +12,12 @@ defmodule BijakhqWeb.Api.SessionController do
   def create(conn, %{"session" => params}) do
     case Login.verify(params, Accounts) do
       {:ok, user} ->
-        token = Phauxth.Token.sign(conn, %{"id" => user.id, "role" => user.role})
-        render(conn, "info.json", %{info: token})
+        token = Phauxth.Token.sign(conn, user.id)
+
+        userData = Bijakhq.Accounts.get(user.id)
+        role = userData.role
+
+        render(conn, "info.json", %{info: token, role: role})
       {:error, _message} ->
         error(conn, :unauthorized, 401)
     end
