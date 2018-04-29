@@ -4,7 +4,7 @@ defmodule Bijakhq.Repo.Migrations.UpdateUserAddRole do
   def change do
 
     alter table("users") do
-      add :roles, :string, default: "user"
+      add :role, :string, default: "user"
     end
 
   end

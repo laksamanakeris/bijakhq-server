@@ -28,7 +28,7 @@ defmodule Bijakhq.Accounts.User do
 
   def create_changeset(%User{} = user, attrs) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:email, :password, :username, :role])
     |> validate_required([:email, :password])
     |> unique_email
     |> validate_password(:password)
