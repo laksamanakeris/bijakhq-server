@@ -8,7 +8,8 @@ defmodule BijakhqWeb.Api.UserController do
   action_fallback BijakhqWeb.Api.FallbackController
 
   # the following plugs are defined in the controllers/authorize.ex file
-  plug :user_check when action in [:index, :show]
+  # plug :user_check when action in [:index, :show]
+  plug :role_check, [roles: ["user", "admin"]] when action in [:index, :delete]
   plug :id_check when action in [:update, :delete]
 
   def index(conn, _) do
