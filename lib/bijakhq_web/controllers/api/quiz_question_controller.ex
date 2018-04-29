@@ -1,10 +1,10 @@
-defmodule BijakhqWeb.QuizQuestionController do
+defmodule BijakhqWeb.Api.QuizQuestionController do
   use BijakhqWeb, :controller
 
   alias Bijakhq.Quizzes
   alias Bijakhq.Quizzes.QuizQuestion
 
-  action_fallback BijakhqWeb.FallbackController
+  action_fallback BijakhqWeb.Api.FallbackController
 
   def index(conn, _params) do
     quiz_questions = Quizzes.list_quiz_questions()
@@ -15,7 +15,7 @@ defmodule BijakhqWeb.QuizQuestionController do
     with {:ok, %QuizQuestion{} = quiz_question} <- Quizzes.create_quiz_question(quiz_question_params) do
       conn
       |> put_status(:created)
-      |> put_resp_header("location", quiz_question_path(conn, :show, quiz_question))
+      |> put_resp_header("location", api_quiz_question_path(conn, :show, quiz_question))
       |> render("show.json", quiz_question: quiz_question)
     end
   end

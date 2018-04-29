@@ -1,7 +1,7 @@
-defmodule BijakhqWeb.SessionController do
+defmodule BijakhqWeb.Api.SessionController do
   use BijakhqWeb, :controller
 
-  import BijakhqWeb.Authorize
+  import BijakhqWeb.Api.Authorize
   alias Bijakhq.Accounts
   alias Phauxth.Confirm.Login
 
@@ -12,7 +12,7 @@ defmodule BijakhqWeb.SessionController do
   def create(conn, %{"session" => params}) do
     case Login.verify(params, Accounts) do
       {:ok, user} ->
-        token = Phauxth.Token.sign(conn, user.id)
+        token = Phauxth.Token.sign(conn, %{"id" => user.id, "role" => user.role})
         render(conn, "info.json", %{info: token})
       {:error, _message} ->
         error(conn, :unauthorized, 401)

@@ -1,6 +1,6 @@
-defmodule BijakhqWeb.QuizQuestionView do
+defmodule BijakhqWeb.Api.QuizQuestionView do
   use BijakhqWeb, :view
-  alias BijakhqWeb.QuizQuestionView
+  alias BijakhqWeb.Api.QuizQuestionView
 
   def render("index.json", %{quiz_questions: quiz_questions}) do
     %{data: render_many(quiz_questions, QuizQuestionView, "quiz_question.json")}

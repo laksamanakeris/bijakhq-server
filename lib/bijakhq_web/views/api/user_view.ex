@@ -1,6 +1,6 @@
-defmodule BijakhqWeb.UserView do
+defmodule BijakhqWeb.Api.UserView do
   use BijakhqWeb, :view
-  alias BijakhqWeb.UserView
+  alias BijakhqWeb.Api.UserView
 
   def render("index.json", %{users: users}) do
     %{data: render_many(users, UserView, "user.json")}

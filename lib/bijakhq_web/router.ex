@@ -14,7 +14,7 @@ defmodule BijakhqWeb.Router do
     plug Phauxth.Authenticate, method: :token
   end
 
-  scope "/api", BijakhqWeb do
+  scope host: "api.", alias: BijakhqWeb.Api, as: :api do
     pipe_through :api
 
     post "/sessions", SessionController, :create

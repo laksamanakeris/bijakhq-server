@@ -1,4 +1,4 @@
-defmodule BijakhqWeb.ConfirmView do
+defmodule BijakhqWeb.Api.ConfirmView do
   use BijakhqWeb, :view
 
   def render("info.json", %{info: message}) do

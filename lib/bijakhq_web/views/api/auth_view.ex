@@ -1,4 +1,4 @@
-defmodule BijakhqWeb.AuthView do
+defmodule BijakhqWeb.Api.AuthView do
   use BijakhqWeb, :view
 
   def render("401.json", _assigns) do

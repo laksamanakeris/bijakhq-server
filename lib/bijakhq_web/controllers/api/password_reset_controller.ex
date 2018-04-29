@@ -1,4 +1,4 @@
-defmodule BijakhqWeb.PasswordResetController do
+defmodule BijakhqWeb.Api.PasswordResetController do
   use BijakhqWeb, :controller
   alias Bijakhq.Accounts
 
@@ -8,7 +8,7 @@ defmodule BijakhqWeb.PasswordResetController do
     message = "Check your inbox for instructions on how to reset your password"
     conn
     |> put_status(:created)
-    |> render(BijakhqWeb.PasswordResetView, "info.json", %{info: message})
+    |> render(BijakhqWeb.Api.PasswordResetView, "info.json", %{info: message})
   end
 
   def update(conn, %{"password_reset" => params}) do
@@ -18,7 +18,7 @@ defmodule BijakhqWeb.PasswordResetController do
 
       {:error, message} ->
         put_status(conn, :unprocessable_entity)
-        |> render(BijakhqWeb.PasswordResetView, "error.json", error: message)
+        |> render(BijakhqWeb.Api.PasswordResetView, "error.json", error: message)
     end
   end
 
@@ -26,13 +26,13 @@ defmodule BijakhqWeb.PasswordResetController do
     Accounts.Message.reset_success(user.email)
     message = "Your password has been reset"
 
-    render(conn, BijakhqWeb.PasswordResetView, "info.json", %{info: message})
+    render(conn, BijakhqWeb.Api.PasswordResetView, "info.json", %{info: message})
   end
 
   defp update_password({:error, %Ecto.Changeset{} = changeset}, conn, _params) do
     message = with p <- changeset.errors[:password], do: elem(p, 0)
 
     put_status(conn, :unprocessable_entity)
-    |> render(BijakhqWeb.PasswordResetView, "error.json", error: message || "Invalid input")
+    |> render(BijakhqWeb.Api.PasswordResetView, "error.json", error: message || "Invalid input")
   end
 end
