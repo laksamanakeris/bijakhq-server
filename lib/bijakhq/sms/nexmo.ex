@@ -1,4 +1,4 @@
-defmodule Bijakhq.SMS.Nexmo do
+defmodule Bijakhq.Sms.Nexmo do
 
   @nexmo_url "https://api.nexmo.com/verify"
   @api_key "380f9c4d"
