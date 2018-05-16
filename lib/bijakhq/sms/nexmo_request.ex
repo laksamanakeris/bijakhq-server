@@ -1,7 +1,7 @@
 defmodule Bijakhq.Sms.NexmoRequest do
   use Ecto.Schema
   import Ecto.Changeset
-
+  alias Bijakhq.Sms.NexmoRequest
 
   schema "nexmo_request" do
     field :completed_at, :date
@@ -14,7 +14,7 @@ defmodule Bijakhq.Sms.NexmoRequest do
   end
 
   @doc false
-  def changeset(nexmo_request, attrs) do
+  def changeset(%NexmoRequest{} = nexmo_request, attrs) do
     nexmo_request
     |> cast(attrs, [:phone, :verification_id, :is_completed, :verified_at, :completed_at])
     |> validate_required([:phone, :verification_id, :is_completed, :verified_at, :completed_at])
