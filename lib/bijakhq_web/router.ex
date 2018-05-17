@@ -31,9 +31,9 @@ defmodule BijakhqWeb.Router do
     put "/password_resets/update", PasswordResetController, :update
 
     # Phone verification
-    post "/verification", VerificationController, :verify
-    post "/verification/:request_id", VerificationController, :verify_request
-    post "/verification/:request_id/cancel", VerificationController, :cancel_request
+    post "/verification", VerificationController, :authenticate
+    post "/verification/:request_id", VerificationController, :verify
+    post "/verification/:request_id/cancel", VerificationController, :cancel
 
     resources "/categories", QuizCategoryController, except: [:new, :edit]
     resources "/questions", QuizQuestionController, except: [:new, :edit]
