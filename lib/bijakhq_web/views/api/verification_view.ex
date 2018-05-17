@@ -5,7 +5,7 @@ defmodule BijakhqWeb.Api.VerificationView do
     %{errors: %{details: message}}
   end
 
-  def render("verification.json", %{data: %{phone: phone, request_id: request_id}}) do
+  def render("authentication.json", %{data: %{phone: phone, request_id: request_id}}) do
     %{phone: phone, request_id: request_id}
   end
 

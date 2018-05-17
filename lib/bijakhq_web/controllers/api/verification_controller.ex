@@ -9,42 +9,47 @@ defmodule BijakhqWeb.Api.VerificationController do
 
   action_fallback Bijakhq.Api.FallbackController
 
-  def verify(conn, %{"phone" => phone} = params) do
+  def authenticate(conn, %{"phone" => phone} = params) do
     IO.inspect params
     IO.puts "Phone number #{phone}"
 
     response = Verification.authenticate(phone)
-    IO.inspect response
 
-    process_verify(conn, phone, response);
+    case response do
+      {:ok, data} -> process_auth(conn, phone, data);
+      {:error, data} -> process_auth_error(conn, data)
+    end
   end
 
-  def process_verify(conn, phone, {:ok, %{"status" => "0", "request_id" => request_id}}) do
-    render(conn, "verification.json", %{data: %{phone: phone, request_id: request_id}} )
+  defp process_auth(conn, phone, %{"request_id" => request_id, "status" => "0" } ) do
+    render(conn, "authentication.json", %{data: %{phone: phone, request_id: request_id} } )
   end
 
-  def process_verify(conn, _, {:ok, %{"status" => _, "error_text" => error_text}}) do
-    render(conn, "error.json", error: error_text)
+  defp process_auth_error(conn, %{"error" => error}) do
+    render(conn, "error.json", error: error)
   end
 
-  def process_verify(conn, _, {:error, _}) do
+  defp process_auth_error(conn, _) do
     render(conn, "error.json", error: "Error sending out SMS")
   end
 
-  def verify_request(conn, %{"request_id" => request_id, "code" => code} = params) do
+  def verify(conn, %{"request_id" => request_id, "code" => code} = params) do
     IO.inspect request_id
     IO.inspect params
 
-    response = Nexmo.verify(request_id, code)
+    response = Verification.verify(request_id, code)
 
     IO.inspect response
 
     render(conn, "verify_result.json", %{data: %{request_id: request_id}} )
   end
 
-  def cancel_request(conn, %{"request_id" => request_id} = params) do
+  def cancel(conn, %{"request_id" => request_id} = params) do
     IO.inspect params
     IO.inspect request_id
+
+    response = Verification.cancel(request_id)
+
     render(conn, "verify_result.json", %{data: %{request_id: request_id}} )
   end
 end
