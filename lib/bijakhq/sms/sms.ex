@@ -51,7 +51,7 @@ defmodule Bijakhq.Sms do
   """
   def create_nexmo_request(attrs \\ %{}) do
     %NexmoRequest{}
-    |> NexmoRequest.changeset(attrs)
+    |> NexmoRequest.create_changeset(attrs)
     |> Repo.insert()
   end
 
@@ -100,5 +100,9 @@ defmodule Bijakhq.Sms do
   """
   def change_nexmo_request(%NexmoRequest{} = nexmo_request) do
     NexmoRequest.changeset(nexmo_request, %{})
+  end
+
+  def get_nexmo_request_by!(attrs) do
+    Repo.get_by(NexmoRequest, attrs)
   end
 end
