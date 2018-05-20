@@ -5,6 +5,7 @@ defmodule Bijakhq.Sms.Nexmo do
   @api_secret "9ac0a59b360a3649"
   @brand "Bijak Trivia"
   @headers [{"content-type", "application/json; charset=utf-8"}]
+  @pin_expiry 60
 
   def authenticate(phone_number) do
     request = "/json"
@@ -14,6 +15,7 @@ defmodule Bijakhq.Sms.Nexmo do
       "api_key": @api_key,
       "api_secret": @api_secret,
       "brand": @brand,
+      "pin_expiry": @pin_expiry,
       "number": phone_number
     })
 
