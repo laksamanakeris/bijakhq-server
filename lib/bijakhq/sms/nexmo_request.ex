@@ -17,7 +17,7 @@ defmodule Bijakhq.Sms.NexmoRequest do
   def changeset(%NexmoRequest{} = nexmo_request, attrs) do
     nexmo_request
     |> cast(attrs, [:phone, :request_id, :is_completed, :verified_at, :completed_at])
-    |> validate_required([:phone, :request_id, :is_completed, :verified_at, :completed_at])
+    |> validate_required([:phone, :request_id])
   end
 
   def create_changeset(%NexmoRequest{} = nexmo_request, attrs) do
