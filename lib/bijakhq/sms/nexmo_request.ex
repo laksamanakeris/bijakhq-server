@@ -4,11 +4,11 @@ defmodule Bijakhq.Sms.NexmoRequest do
   alias Bijakhq.Sms.NexmoRequest
 
   schema "nexmo_request" do
-    field :completed_at, :date
+    field :completed_at, :utc_datetime
     field :is_completed, :boolean, default: false
     field :phone, :string
     field :request_id, :string
-    field :verified_at, :date
+    field :verified_at, :utc_datetime
 
     timestamps()
   end
