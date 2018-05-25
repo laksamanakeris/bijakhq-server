@@ -16,6 +16,19 @@ defmodule Bijakhq.Accounts.User do
 
     field :role, :string, default: "user"
 
+    field :country, :string, default: "MY"
+    field :language, :string, default: "en"
+
+    field :games_played, :integer, default: 0
+    field :has_phone, :boolean, default: false
+    field :high_score, :integer, default: 0
+    field :lives, :integer, default: 0
+    field :referral_url, :string
+    field :referred, :boolean, default: false
+    field :referring_user_id, :integer
+    field :win_count, :integer, default: 0
+    field :verification_id, :string
+
     timestamps()
   end
 
