@@ -69,12 +69,12 @@ defmodule BijakhqWeb.Api.VerificationController do
               nil ->
                 render(conn, "verified_new_user.json", %{data: nil} )
               _ ->
-                render(conn, "verified_user.json", %{data: nil} )
+                logged_in_user(conn, user, nexmo_request)
             end
             render(conn, "authentication.json", %{data: %{phone: phone, request_id: request_id} } )
         end
       {:ok, %{"error_text" => error_text, "status" => status}} ->
-        IO.inspect params
+        IO.inspect status
         render(conn, "error.json", error: error_text)
       {:error, error} ->
         IO.inspect error
@@ -82,13 +82,18 @@ defmodule BijakhqWeb.Api.VerificationController do
     end
   end
 
-
+  def logged_in_user( conn, user, nexmo_request) do
+    Sms.update_nexmo_request(nexmo_request, %{is_completed: true, completed_at: DateTime.utc_now})
+    token = Phauxth.Token.sign(conn, user.id)
+    # render(conn, "verified_user.json", %{info: token, user: user})
+    render(conn, BijakhqWeb.Api.VerificationView, "verified_user.json", %{info: token, user: user})
+  end
 
   def cancel(conn, %{"request_id" => request_id} = params) do
     IO.inspect params
     IO.inspect request_id
 
-    response = Verification.cancel(request_id)
+    Nexmo.cancel_next_request(request_id)
 
     render(conn, "verify_result.json", %{data: %{request_id: request_id}} )
   end

@@ -4,6 +4,8 @@ defmodule BijakhqWeb.Api.UserController do
   import BijakhqWeb.Api.Authorize
   alias Phauxth.Log
   alias Bijakhq.Accounts
+  alias Bijakhq.Sms
+  alias Bijakhq.Sms.NexmoRequest
 
   action_fallback BijakhqWeb.Api.FallbackController
 
@@ -29,6 +31,30 @@ defmodule BijakhqWeb.Api.UserController do
       |> put_status(:created)
       |> put_resp_header("location", api_user_path(conn, :show, user))
       |> render("show.json", user: user)
+    end
+  end
+
+  #  Custom registration using verified Nexmo request_id
+  #   {
+  #     "country": "MY",
+  #     "language": "en",
+  #     "referringUsername": "laksamanakeris",
+  #     "username": "nifazu",
+  #     "verificationId": "b693b2d7-0721-4186-be6a-dfe09cff0677"
+  # }
+  def create_user(conn, %{"country" => country,"language" => language, "username" => username, "request_id" => request_id} = user_params) do
+    IO.inspect user_params
+    nexmo_request = Sms.get_verified_request_id(request_id)
+    IO.inspect nexmo_request
+    case nexmo_request do
+      nil ->
+        error(conn, :unauthorized, 401)
+      _ ->
+        params = %{phone: nexmo_request.phone, language: language, country: country, verification_id: request_id, username: username}
+        with {:ok, user} <- Accounts.create_new_user(params) do
+          IO.inspect user
+          BijakhqWeb.Api.VerificationController.logged_in_user(conn, user, nexmo_request)
+        end
     end
   end
 

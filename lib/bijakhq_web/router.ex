@@ -25,6 +25,7 @@ defmodule BijakhqWeb.Router do
     end
 
     post "/sessions", SessionController, :create
+    post "/users", UserController, :create_user
     resources "/users", UserController, except: [:new, :edit]
     get "/confirm", ConfirmController, :index
     post "/password_resets", PasswordResetController, :create
