@@ -48,6 +48,24 @@ defmodule Bijakhq.Accounts.User do
     |> put_pass_hash
   end
 
+  def create_user_changeset(%User{} = user, attrs) do
+    user
+    |> cast(attrs, [:phone, :language, :country, :verification_id, :username])
+    |> validate_required([:phone, :language, :country, :verification_id, :username])
+    |> unique_username
+    |> unique_phone
+  end
+
+  defp unique_username(changeset) do
+    validate_length(changeset, :username, min: 3)
+    |> unique_constraint(:username)
+  end
+
+  defp unique_phone(changeset) do
+    validate_length(changeset, :phone, min: 3)
+    |> unique_constraint(:phone)
+  end
+
   defp unique_email(changeset) do
     validate_format(changeset, :email, ~r/@/)
     |> validate_length(:email, max: 254)

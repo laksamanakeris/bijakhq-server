@@ -31,6 +31,12 @@ defmodule Bijakhq.Accounts do
     |> Repo.insert()
   end
 
+  def create_new_user(attrs) do
+    %User{}
+    |> User.create_user_changeset(attrs)
+    |> Repo.insert()
+  end
+
   def confirm_user(%User{} = user) do
     change(user, %{confirmed_at: DateTime.utc_now()}) |> Repo.update()
   end

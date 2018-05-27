@@ -13,6 +13,17 @@ defmodule BijakhqWeb.Api.VerificationView do
     %{request_id: request_id}
   end
 
+  def render("verified_user.json", %{info: token, user: user}) do
+    %{auth:
+      %{
+        access_token: token,
+        user_id: user.id,
+        username: user.username,
+        profile_picture: user.profile_picture
+      }
+    }
+  end
+
   # Verification process complete
   def render("verified_user.json", %{data: auth}) do
     %{auth: "user exist"}
