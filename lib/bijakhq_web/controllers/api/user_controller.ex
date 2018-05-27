@@ -74,4 +74,11 @@ defmodule BijakhqWeb.Api.UserController do
 
     send_resp(conn, :no_content, "")
   end
+
+  def show_me(%Plug.Conn{assigns: %{current_user: user}} = conn, _) do
+    # user = id == to_string(user.id) and user || Accounts.get(id)
+    # profile = Accounts.get(user.id);
+    # render(conn, "show_me.json", %{user: user, profile: profile})
+    render(conn, "show_me.json", %{user: user})
+  end
 end
