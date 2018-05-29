@@ -20,7 +20,7 @@ defmodule Bijakhq.Mixfile do
   def application do
     [
       mod: {Bijakhq.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :httpoison, :timex]
     ]
   end
 
@@ -40,7 +40,12 @@ defmodule Bijakhq.Mixfile do
       {:phoenix_html, "~> 2.10"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
+      {:phauxth, "~> 1.2"},
+      {:bcrypt_elixir, "~> 1.0"},
+      {:bamboo, "~> 0.8"},
       {:cowboy, "~> 1.0"},
+      {:httpoison, "~> 1.1.1"},
+      {:timex, "~> 3.1"},
       {:libcluster, "~> 2.1", only: :prod}
     ]
   end
