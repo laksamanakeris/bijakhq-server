@@ -17,4 +17,13 @@ defmodule BijakhqWeb.Api.UserView do
       profile_picture: user.profile_picture
     }
   end
+
+  def render("show_me.json", %{user: user}) do
+    %{
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      profile_picture: user.profile_picture
+    }
+  end
 end

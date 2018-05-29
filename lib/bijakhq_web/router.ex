@@ -25,6 +25,8 @@ defmodule BijakhqWeb.Router do
     end
 
     post "/sessions", SessionController, :create
+    post "/users", UserController, :create_user
+    get "/users/me", UserController, :show_me
     resources "/users", UserController, except: [:new, :edit]
     get "/confirm", ConfirmController, :index
     post "/password_resets", PasswordResetController, :create
@@ -37,6 +39,8 @@ defmodule BijakhqWeb.Router do
 
     resources "/categories", QuizCategoryController, except: [:new, :edit]
     resources "/questions", QuizQuestionController, except: [:new, :edit]
+
+    get "/", SettingController, :landing
   end
 
   scope "/", BijakhqWeb do

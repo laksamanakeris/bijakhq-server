@@ -4,6 +4,8 @@ defmodule BijakhqWeb.Api.UserController do
   import BijakhqWeb.Api.Authorize
   alias Phauxth.Log
   alias Bijakhq.Accounts
+  alias Bijakhq.Sms
+  alias Bijakhq.Sms.NexmoRequest
 
   action_fallback BijakhqWeb.Api.FallbackController
 
@@ -32,6 +34,30 @@ defmodule BijakhqWeb.Api.UserController do
     end
   end
 
+  #  Custom registration using verified Nexmo request_id
+  #   {
+  #     "country": "MY",
+  #     "language": "en",
+  #     "referringUsername": "laksamanakeris",
+  #     "username": "nifazu",
+  #     "verificationId": "b693b2d7-0721-4186-be6a-dfe09cff0677"
+  # }
+  def create_user(conn, %{"country" => country,"language" => language, "username" => username, "request_id" => request_id} = user_params) do
+    IO.inspect user_params
+    nexmo_request = Sms.get_verified_request_id(request_id)
+    IO.inspect nexmo_request
+    case nexmo_request do
+      nil ->
+        error(conn, :unauthorized, 401)
+      _ ->
+        params = %{phone: nexmo_request.phone, language: language, country: country, verification_id: request_id, username: username}
+        with {:ok, user} <- Accounts.create_new_user(params) do
+          IO.inspect user
+          BijakhqWeb.Api.VerificationController.logged_in_user(conn, user, nexmo_request)
+        end
+    end
+  end
+
   def show(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"id" => id}) do
     user = (id == to_string(user.id) and user) || Accounts.get(id)
     render(conn, "show.json", user: user)
@@ -47,5 +73,12 @@ defmodule BijakhqWeb.Api.UserController do
     {:ok, _user} = Accounts.delete_user(user)
 
     send_resp(conn, :no_content, "")
+  end
+
+  def show_me(%Plug.Conn{assigns: %{current_user: user}} = conn, _) do
+    # user = id == to_string(user.id) and user || Accounts.get(id)
+    # profile = Accounts.get(user.id);
+    # render(conn, "show_me.json", %{user: user, profile: profile})
+    render(conn, "show_me.json", %{user: user})
   end
 end
