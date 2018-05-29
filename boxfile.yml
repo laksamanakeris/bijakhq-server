@@ -38,15 +38,7 @@ deploy.config:
 data.db:
   image: nanobox/postgresql:9.5
 
-
-data.storage:             #| Storage Component
-  image: nanobox/unfs:0.9 #|  
-
-
 web.main:
   start: node-start mix phx.server
-  writable_dirs:
-    - _build/prod/lib/
-  network_dirs:           #| Network Dirs Config
-    data.storage:         #| Storage Component Designation
-      - shared/uploads    #| Network Directory  
+  writable_dirs:          # Timex and TZData need to write into its priv/ folder
+    - priv
