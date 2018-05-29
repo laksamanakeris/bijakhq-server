@@ -16,6 +16,19 @@ defmodule Bijakhq.Accounts.User do
 
     field :role, :string, default: "user"
 
+    field :country, :string, default: "MY"
+    field :language, :string, default: "en"
+
+    field :games_played, :integer, default: 0
+    field :has_phone, :boolean, default: false
+    field :high_score, :integer, default: 0
+    field :lives, :integer, default: 0
+    field :referral_url, :string
+    field :referred, :boolean, default: false
+    field :referring_user_id, :integer
+    field :win_count, :integer, default: 0
+    field :verification_id, :string
+
     timestamps()
   end
 
@@ -33,6 +46,24 @@ defmodule Bijakhq.Accounts.User do
     |> unique_email
     |> validate_password(:password)
     |> put_pass_hash
+  end
+
+  def create_user_changeset(%User{} = user, attrs) do
+    user
+    |> cast(attrs, [:phone, :language, :country, :verification_id, :username])
+    |> validate_required([:phone, :language, :country, :verification_id, :username])
+    |> unique_username
+    |> unique_phone
+  end
+
+  defp unique_username(changeset) do
+    validate_length(changeset, :username, min: 3)
+    |> unique_constraint(:username)
+  end
+
+  defp unique_phone(changeset) do
+    validate_length(changeset, :phone, min: 3)
+    |> unique_constraint(:phone)
   end
 
   defp unique_email(changeset) do

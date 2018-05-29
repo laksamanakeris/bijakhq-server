@@ -3,7 +3,8 @@ defmodule Bijakhq.Sms do
   The Sms context.
   """
 
-  import Ecto.Query, warn: false
+  import Ecto
+  import Ecto.{Query, Changeset}, warn: false
   alias Bijakhq.Repo
 
   alias Bijakhq.Sms.NexmoRequest
@@ -104,5 +105,19 @@ defmodule Bijakhq.Sms do
 
   def get_nexmo_request_by!(attrs) do
     Repo.get_by(NexmoRequest, attrs)
+  end
+
+  def get_verified_request_id(request_id) do
+    target_records =
+      from(r in NexmoRequest, where: r.request_id == ^request_id and not is_nil(r.verified_at))
+      |> Repo.one()
+  end
+
+  def verify_request(%NexmoRequest{} = nexmo_request) do
+    change(nexmo_request, %{verified_at: DateTime.utc_now}) |> Repo.update
+  end
+
+  def complete_request(%NexmoRequest{} = nexmo_request) do
+    change(nexmo_request, %{verified_at: DateTime.utc_now}) |> Repo.update
   end
 end
