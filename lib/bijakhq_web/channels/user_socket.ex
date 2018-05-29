@@ -1,37 +1,33 @@
 defmodule BijakhqWeb.UserSocket do
   use Phoenix.Socket
 
+  alias Bijakhq.Accounts
+
+  @max_age 365 * 24 * 60 * 60
+
   ## Channels
-  # channel "room:*", BijakhqWeb.RoomChannel
+  channel "game_session:*", BijakhqWeb.GameSessionChannel
 
   ## Transports
-  transport :websocket, Phoenix.Transports.WebSocket
-  # transport :longpoll, Phoenix.Transports.LongPoll
+  transport :websocket, Phoenix.Transports.WebSocket, check_origin: false
 
-  # Socket params are passed from the client and can
-  # be used to verify and authenticate a user. After
-  # verification, you can put default assigns into
-  # the socket that will be set for all channels, ie
-  #
-  #     {:ok, assign(socket, :user_id, verified_user_id)}
-  #
-  # To deny connection, return `:error`.
-  #
-  # See `Phoenix.Token` documentation for examples in
-  # performing token verification on connect.
-  def connect(_params, socket) do
-    {:ok, socket}
+  def connect(%{"token" => token}, socket) do
+    IO.puts "=============================================================================================================="
+    IO.puts "Connection attempt  > #{token}"
+    IO.puts "=============================================================================================================="
+    case Phauxth.Token.verify(socket, token, @max_age) do
+      {:ok, user_id} ->
+        user = Accounts.get(user_id)
+        socket = assign(socket, :user, user)
+        IO.puts "=============================================================================================================="
+        IO.puts "User connected: ID  > #{user.id}"
+        IO.puts "=============================================================================================================="
+        {:ok, socket}
+      {:error, something} ->
+        IO.inspect something
+        :error
+    end
   end
 
-  # Socket id's are topics that allow you to identify all sockets for a given user:
-  #
-  #     def id(socket), do: "user_socket:#{socket.assigns.user_id}"
-  #
-  # Would allow you to broadcast a "disconnect" event and terminate
-  # all active sockets and channels for a given user:
-  #
-  #     BijakhqWeb.Endpoint.broadcast("user_socket:#{user.id}", "disconnect", %{})
-  #
-  # Returning `nil` makes this socket anonymous.
   def id(_socket), do: nil
 end
