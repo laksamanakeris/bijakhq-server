@@ -5,6 +5,11 @@ defmodule Bijakhq.Repo.Migrations.CreateQuizSessionQuestion do
     create table(:quiz_session_question) do
       add :sequence, :integer
       add :is_completed, :boolean, default: false, null: false
+
+      add :sequence_answer_a, :integer
+      add :sequence_answer_b, :integer
+      add :sequence_answer_c, :integer
+
       add :total_answered_a, :integer
       add :total_answered_b, :integer
       add :total_answered_c, :integer

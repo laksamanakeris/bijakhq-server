@@ -8,6 +8,11 @@ defmodule Bijakhq.Quizzes.SessionQuestion do
   schema "quiz_session_question" do
     field :is_completed, :boolean, default: false
     field :sequence, :integer
+
+    field :sequence_answer_a, :integer
+    field :sequence_answer_b, :integer
+    field :sequence_answer_c, :integer
+
     field :total_answered_a, :integer
     field :total_answered_b, :integer
     field :total_answered_c, :integer
@@ -22,7 +27,7 @@ defmodule Bijakhq.Quizzes.SessionQuestion do
   @doc false
   def changeset(session_question, attrs) do
     session_question
-    |> cast(attrs, [:sequence, :is_completed, :total_answered_a, :total_answered_b, :total_answered_c, :total_correct])
+    |> cast(attrs, [:sequence, :is_completed, :total_answered_a, :sequence_answer_a, :sequence_answer_b, :sequence_answer_c, :total_answered_b, :total_answered_c, :total_correct])
     |> validate_required([:sequence, :is_completed, :total_answered_a, :total_answered_b, :total_answered_c, :total_correct])
   end
 end
