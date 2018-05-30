@@ -197,4 +197,100 @@ defmodule Bijakhq.Quizzes do
   def change_quiz_question(%QuizQuestion{} = quiz_question) do
     QuizQuestion.changeset(quiz_question, %{})
   end
+
+  alias Bijakhq.Quizzes.QuizSession
+
+  @doc """
+  Returns the list of quiz_sessions.
+
+  ## Examples
+
+      iex> list_quiz_sessions()
+      [%QuizSession{}, ...]
+
+  """
+  def list_quiz_sessions do
+    Repo.all(QuizSession)
+  end
+
+  @doc """
+  Gets a single quiz_session.
+
+  Raises `Ecto.NoResultsError` if the Quiz session does not exist.
+
+  ## Examples
+
+      iex> get_quiz_session!(123)
+      %QuizSession{}
+
+      iex> get_quiz_session!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_quiz_session!(id), do: Repo.get!(QuizSession, id)
+
+  @doc """
+  Creates a quiz_session.
+
+  ## Examples
+
+      iex> create_quiz_session(%{field: value})
+      {:ok, %QuizSession{}}
+
+      iex> create_quiz_session(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_quiz_session(attrs \\ %{}) do
+    %QuizSession{}
+    |> QuizSession.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a quiz_session.
+
+  ## Examples
+
+      iex> update_quiz_session(quiz_session, %{field: new_value})
+      {:ok, %QuizSession{}}
+
+      iex> update_quiz_session(quiz_session, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_quiz_session(%QuizSession{} = quiz_session, attrs) do
+    quiz_session
+    |> QuizSession.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a QuizSession.
+
+  ## Examples
+
+      iex> delete_quiz_session(quiz_session)
+      {:ok, %QuizSession{}}
+
+      iex> delete_quiz_session(quiz_session)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_quiz_session(%QuizSession{} = quiz_session) do
+    Repo.delete(quiz_session)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking quiz_session changes.
+
+  ## Examples
+
+      iex> change_quiz_session(quiz_session)
+      %Ecto.Changeset{source: %QuizSession{}}
+
+  """
+  def change_quiz_session(%QuizSession{} = quiz_session) do
+    QuizSession.changeset(quiz_session, %{})
+  end
 end
