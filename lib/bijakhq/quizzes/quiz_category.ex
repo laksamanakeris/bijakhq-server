@@ -19,6 +19,6 @@ defmodule Bijakhq.Quizzes.QuizCategory do
   def changeset(quiz_category, attrs) do
     quiz_category
     |> cast(attrs, [:title, :description])
-    |> validate_required([:title, :description])
+    |> validate_required([:title])
   end
 end
