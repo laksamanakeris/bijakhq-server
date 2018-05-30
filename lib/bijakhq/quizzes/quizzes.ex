@@ -293,4 +293,100 @@ defmodule Bijakhq.Quizzes do
   def change_quiz_session(%QuizSession{} = quiz_session) do
     QuizSession.changeset(quiz_session, %{})
   end
+
+  alias Bijakhq.Quizzes.SessionQuestion
+
+  @doc """
+  Returns the list of quiz_session_question.
+
+  ## Examples
+
+      iex> list_quiz_session_question()
+      [%SessionQuestion{}, ...]
+
+  """
+  def list_quiz_session_question do
+    Repo.all(SessionQuestion)
+  end
+
+  @doc """
+  Gets a single session_question.
+
+  Raises `Ecto.NoResultsError` if the Session question does not exist.
+
+  ## Examples
+
+      iex> get_session_question!(123)
+      %SessionQuestion{}
+
+      iex> get_session_question!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_session_question!(id), do: Repo.get!(SessionQuestion, id)
+
+  @doc """
+  Creates a session_question.
+
+  ## Examples
+
+      iex> create_session_question(%{field: value})
+      {:ok, %SessionQuestion{}}
+
+      iex> create_session_question(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_session_question(attrs \\ %{}) do
+    %SessionQuestion{}
+    |> SessionQuestion.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a session_question.
+
+  ## Examples
+
+      iex> update_session_question(session_question, %{field: new_value})
+      {:ok, %SessionQuestion{}}
+
+      iex> update_session_question(session_question, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_session_question(%SessionQuestion{} = session_question, attrs) do
+    session_question
+    |> SessionQuestion.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a SessionQuestion.
+
+  ## Examples
+
+      iex> delete_session_question(session_question)
+      {:ok, %SessionQuestion{}}
+
+      iex> delete_session_question(session_question)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_session_question(%SessionQuestion{} = session_question) do
+    Repo.delete(session_question)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking session_question changes.
+
+  ## Examples
+
+      iex> change_session_question(session_question)
+      %Ecto.Changeset{source: %SessionQuestion{}}
+
+  """
+  def change_session_question(%SessionQuestion{} = session_question) do
+    SessionQuestion.changeset(session_question, %{})
+  end
 end
