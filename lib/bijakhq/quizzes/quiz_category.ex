@@ -20,5 +20,11 @@ defmodule Bijakhq.Quizzes.QuizCategory do
     quiz_category
     |> cast(attrs, [:title, :description])
     |> validate_required([:title])
+    |> unique_title
+  end
+
+  defp unique_title(changeset) do
+    validate_length(changeset, :title, min: 3)
+    |> unique_constraint(:title)
   end
 end
