@@ -2,6 +2,8 @@ defmodule BijakhqWeb.GameSessionChannel do
   use BijakhqWeb, :channel
 
   alias BijakhqWeb.Presence
+  alias Bijakhq.Quizzes
+  alias Bijakhq.Quizzes.{QuizQuestion}
 
   def join("game_session:lobby", payload, socket) do
     if authorized?(payload) do
@@ -34,7 +36,11 @@ defmodule BijakhqWeb.GameSessionChannel do
   end
 
   def handle_in("question:show", payload, socket) do
-    broadcast socket, "question:show", payload
+    %{"question_id" => question_id} = payload
+
+    quiz_question = Quizzes.get_quiz_question!(question_id)
+    response = Phoenix.View.render_one(quiz_question, BijakhqWeb.Api.QuizQuestionView, "show.json")
+    broadcast socket, "question:show", response
     {:noreply, socket}
   end
 
@@ -43,20 +49,57 @@ defmodule BijakhqWeb.GameSessionChannel do
     {:noreply, socket}
   end
 
-  def handle_in("result:show", payload, socket) do
-    broadcast socket, "result:show", payload
+  def handle_in("question:result:show", payload, socket) do
+    broadcast socket, "question:result:show", payload
     {:noreply, socket}
   end
 
-  def handle_in("result:end", payload, socket) do
-    broadcast socket, "result:end", payload
+  def handle_in("question:result:end", payload, socket) do
+    broadcast socket, "question:result:end", payload
     {:noreply, socket}
   end
 
+  def handle_in("game:result:show", payload, socket) do
+    broadcast socket, "game:result:show", payload
+    {:noreply, socket}
+  end
+
+  def handle_in("game:result:end", payload, socket) do
+    broadcast socket, "game:result:end", payload
+    {:noreply, socket}
+  end
+
+  # GAME SESSION
   def handle_in("game:end", payload, socket) do
     broadcast socket, "game:end", payload
     {:noreply, socket}
   end
+
+  # Users
+
+  def handle_in("user:answer", payload, socket) do
+    {:reply, {:ok, payload}, socket}
+  end
+
+  def handle_in("user:chat", payload, socket) do
+    user = socket.assigns.user
+    user = Phoenix.View.render_one(user, BijakhqWeb.Api.UserView, "user.json")
+    response = Map.put(payload, :user, user)
+    broadcast socket, "user:chat", response
+    {:reply, {:ok, payload}, socket}
+  end
+
+  def handle_in("new_time", msg, socket) do
+    push socket, "new_time", msg
+    {:noreply, socket}
+  end
+
+  def handle_in("start_timer", _, socket) do
+    BijakhqWeb.Endpoint.broadcast("timer:start", "start_timer", %{})
+    {:noreply, socket}
+  end
+
+  # From user
 
 
 
