@@ -11,7 +11,7 @@ defmodule BijakhqWeb.Api.QuizSessionController do
     render(conn, "index.json", quiz_sessions: quiz_sessions)
   end
 
-  def create(conn, %{"quiz_session" => quiz_session_params}) do
+  def create(conn, quiz_session_params) do
     with {:ok, %QuizSession{} = quiz_session} <- Quizzes.create_quiz_session(quiz_session_params) do
       conn
       |> put_status(:created)

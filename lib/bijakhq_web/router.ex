@@ -39,8 +39,8 @@ defmodule BijakhqWeb.Router do
 
     resources "/categories", QuizCategoryController, except: [:new, :edit]
     resources "/questions", QuizQuestionController, except: [:new, :edit]
-    resources "/sessions", QuizSessionController, except: [:new, :edit]
-    resources "/session_question", SessionQuestionController, except: [:new, :edit]
+    resources "/games", QuizSessionController, except: [:new, :edit]
+    resources "/games_question", SessionQuestionController, except: [:new, :edit]
 
     get "/", SettingController, :landing
   end

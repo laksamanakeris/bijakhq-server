@@ -25,6 +25,6 @@ defmodule Bijakhq.Quizzes.QuizSession do
   def changeset(quiz_session, attrs) do
     quiz_session
     |> cast(attrs, [:name, :description, :prize, :prize_description, :total_questions, :time, :is_active, :is_completed, :completed_at])
-    |> validate_required([:name, :description, :prize, :prize_description, :total_questions, :time, :is_active, :is_completed, :completed_at])
+    |> validate_required([:name, :prize, :total_questions, :time])
   end
 end
