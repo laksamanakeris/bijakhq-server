@@ -198,6 +198,16 @@ defmodule Bijakhq.Quizzes do
     QuizQuestion.changeset(quiz_question, %{})
   end
 
+  def get_random_question do
+
+    query = from j in QuizQuestion,
+            where: j.selected == false,
+            order_by: [desc: j.question, asc: fragment("RANDOM()")],
+            limit: 1
+
+    Repo.one(query)
+  end
+
   alias Bijakhq.Quizzes.QuizSession
 
   @doc """
@@ -339,7 +349,7 @@ defmodule Bijakhq.Quizzes do
   """
   def create_session_question(attrs \\ %{}) do
     %SessionQuestion{}
-    |> SessionQuestion.changeset(attrs)
+    |> SessionQuestion.changeset_create(attrs)
     |> Repo.insert()
   end
 
