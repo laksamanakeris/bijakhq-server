@@ -30,4 +30,10 @@ defmodule Bijakhq.Quizzes.SessionQuestion do
     |> cast(attrs, [:sequence, :is_completed, :total_answered_a, :sequence_answer_a, :sequence_answer_b, :sequence_answer_c, :total_answered_b, :total_answered_c, :total_correct])
     |> validate_required([:sequence, :is_completed, :total_answered_a, :total_answered_b, :total_answered_c, :total_correct])
   end
+
+  def changeset_create(session_question, attrs) do
+    session_question
+    |> cast(attrs, [:session_id, :question_id])
+    |> validate_required([:session_id, :question_id])
+  end
 end
