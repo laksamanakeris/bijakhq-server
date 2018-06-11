@@ -11,7 +11,7 @@ defmodule Bijakhq.Quizzes.QuizSession do
     field :is_active, :boolean, default: false
     field :is_completed, :boolean, default: false
     field :name, :string
-    field :prize, :string
+    field :prize, :integer
     field :prize_description, :string
     field :time, :utc_datetime
     field :total_questions, :integer
