@@ -6,6 +6,7 @@ defmodule BijakhqWeb.GameSessionChannel do
   alias Bijakhq.Quizzes.{QuizQuestion}
 
   alias Bijakhq.Game.Server
+  alias Bijakhq.Game.Chat
 
   def join("game_session:lobby", payload, socket) do
     if authorized?(payload) do
@@ -36,7 +37,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     %{"game_id" => game_id} = payload
 
     res = Server.game_start game_id
-    with response = Server.view do
+    with response = Server.get_game_state do
       IO.inspect response
       broadcast socket, "game:start", payload
       {:noreply, socket}
@@ -46,7 +47,7 @@ defmodule BijakhqWeb.GameSessionChannel do
   def handle_in("question:show", payload, socket) do
     %{"question_id" => question_id} = payload
 
-    with game = Server.view do
+    with game = Server.get_game_state do
       IO.inspect game
       questions = game.questions
       question = Enum.at( questions , question_id)
@@ -69,7 +70,7 @@ defmodule BijakhqWeb.GameSessionChannel do
   def handle_in("question:result:show", payload, socket) do
     %{"question_id" => question_id} = payload
 
-    with game = Server.view do
+    with game = Server.get_game_state do
       # IO.inspect game
       questions = game.questions
       question = Enum.at( questions , question_id)
@@ -122,7 +123,7 @@ defmodule BijakhqWeb.GameSessionChannel do
   def handle_in("user:answer", payload, socket) do
     %{"game_id" => game_id, "question_id" => question_id, "answer_id" => answer_id} = payload
 
-    with game = Server.view do
+    with game = Server.get_game_state do
       # IO.inspect game
       questions = game.questions
       question = Enum.at( questions , question_id)
@@ -142,8 +143,9 @@ defmodule BijakhqWeb.GameSessionChannel do
   def handle_in("user:chat", payload, socket) do
     user = socket.assigns.user
     user = Phoenix.View.render_one(user, BijakhqWeb.Api.UserView, "user.json")
-    response = Map.put(payload, :user, user)
-    broadcast socket, "user:chat", response
+    message = Map.put(payload, :user, user)
+    # broadcast socket, "user:chat", response
+    Chat.add_message(message)
     {:reply, {:ok, payload}, socket}
   end
 
