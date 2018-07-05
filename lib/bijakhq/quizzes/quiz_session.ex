@@ -2,7 +2,8 @@ defmodule Bijakhq.Quizzes.QuizSession do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Bijakhq.Quizzes.SessionQuestion
+  alias Bijakhq.Quizzes.QuizQuestion
+
 
 
   schema "quiz_sessions" do
@@ -16,7 +17,8 @@ defmodule Bijakhq.Quizzes.QuizSession do
     field :time, :utc_datetime
     field :total_questions, :integer
 
-    has_many :questions, SessionQuestion, foreign_key: :session_id
+    # has_many :questions, SessionQuestion, foreign_key: :session_id
+    many_to_many :questions, QuizQuestion, join_through: "quiz_session_question"
 
     timestamps()
   end
