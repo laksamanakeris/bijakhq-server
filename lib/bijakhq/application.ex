@@ -16,6 +16,7 @@ defmodule Bijakhq.Application do
       # worker(Bijakhq.Worker, [arg1, arg2, arg3]),
       supervisor(BijakhqWeb.Presence, []),
       supervisor(Bijakhq.Game.Server, []),
+      supervisor(Bijakhq.Game.Chat, []),
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
