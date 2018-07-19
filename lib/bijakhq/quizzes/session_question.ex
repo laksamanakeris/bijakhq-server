@@ -9,14 +9,10 @@ defmodule Bijakhq.Quizzes.SessionQuestion do
     field :is_completed, :boolean, default: false
     field :sequence, :integer
 
-    field :sequence_answer_a, :integer
-    field :sequence_answer_b, :integer
-    field :sequence_answer_c, :integer
-
-    field :total_answered_a, :integer
-    field :total_answered_b, :integer
-    field :total_answered_c, :integer
     field :total_correct, :integer
+
+    field :answers_sequence, :map, default: %{}
+    field :answers_totals, :map, default: %{}
 
     belongs_to :session, QuizSession, foreign_key: :session_id
     belongs_to :question, QuizQuestion, foreign_key: :question_id
@@ -27,8 +23,8 @@ defmodule Bijakhq.Quizzes.SessionQuestion do
   @doc false
   def changeset(session_question, attrs) do
     session_question
-    |> cast(attrs, [:sequence, :is_completed, :total_answered_a, :sequence_answer_a, :sequence_answer_b, :sequence_answer_c, :total_answered_b, :total_answered_c, :total_correct])
-    |> validate_required([:sequence, :is_completed, :total_answered_a, :total_answered_b, :total_answered_c, :total_correct])
+    |> cast(attrs, [:sequence, :is_completed, :total_correct, :answers_sequence, :answers_totals])
+    |> validate_required([:sequence, :is_completed, :total_correct])
   end
 
   def changeset_create(session_question, attrs) do
