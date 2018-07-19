@@ -32,4 +32,9 @@ defmodule BijakhqWeb.Api.QuizSessionView do
       prize_text: game_details.prize_text
     }
   end
+
+
+  def render("session_question.json", %{session_question: session_question}) do
+    %{data: render_many(session_question, BijakhqWeb.Api.SessionQuestionView, "question.json")}
+  end
 end

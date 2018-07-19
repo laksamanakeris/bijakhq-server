@@ -14,9 +14,16 @@ defmodule BijakhqWeb.Api.SessionQuestionView do
     %{id: session_question.id,
       sequence: session_question.sequence,
       is_completed: session_question.is_completed,
-      total_answered_a: session_question.total_answered_a,
-      total_answered_b: session_question.total_answered_b,
-      total_answered_c: session_question.total_answered_c,
       total_correct: session_question.total_correct}
+  end
+
+  def render("question.json", %{session_question: session_question}) do
+    %{
+      id: session_question.id,
+      sequence: session_question.sequence,
+      is_completed: session_question.is_completed,
+      total_correct: session_question.total_correct,
+      question: render_one(session_question.question, BijakhqWeb.Api.QuizQuestionView, "quiz_question.json")
+    }
   end
 end
