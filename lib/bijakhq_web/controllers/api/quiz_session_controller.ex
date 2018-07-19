@@ -39,4 +39,10 @@ defmodule BijakhqWeb.Api.QuizSessionController do
       send_resp(conn, :no_content, "")
     end
   end
+
+  def list_questions(conn, %{"game_id" => id}) do
+    session_question = Quizzes.get_questions_by_game_id(id)
+    IO.inspect session_question
+    render(conn, "session_question.json", session_question: session_question)
+  end
 end
