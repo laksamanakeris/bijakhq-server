@@ -4,7 +4,7 @@ defmodule BijakhqWeb.Api.SessionQuestionController do
   alias Bijakhq.Quizzes
   alias Bijakhq.Quizzes.SessionQuestion
 
-  action_fallback BijakhqWeb.FallbackController
+  action_fallback BijakhqWeb.Api.FallbackController
 
   def index(conn, _params) do
     quiz_session_question = Quizzes.list_quiz_session_question()
