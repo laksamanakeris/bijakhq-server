@@ -6,6 +6,7 @@ defmodule Bijakhq.Game.Chat do
   alias Bijakhq.Quizzes
 
   @name :game_chat
+  @interval_time 1_000 * 1
 
   # This is chat state
   @chat_state %{
@@ -37,19 +38,19 @@ defmodule Bijakhq.Game.Chat do
     Logger.warn "Game chat initialized"
     chat_state = initial_data
     IO.inspect chat_state
-    timer_start()
+    # timer_start()
     {:ok, chat_state}
   end
 
   def handle_call({:get_messages}, _from, chat_state) do
-    IO.inspect chat_state
+    # IO.inspect chat_state
     %{ timer_ref: _timer_ref, messages: messages} = chat_state
     {:reply, messages, chat_state}
   end
 
   def handle_call({:add_message, message}, _from, chat_state) do
-    IO.inspect message
-    IO.inspect chat_state
+    # IO.inspect message
+    # IO.inspect chat_state
     %{ timer_ref: _timer_ref, messages: messages} = chat_state
     messages = messages ++ [message]
     new_state = Map.put(chat_state, :messages, messages)
@@ -61,7 +62,7 @@ defmodule Bijakhq.Game.Chat do
 
   def handle_cast(:timer_start, chat_state) do
     Logger.warn "Timer Start"
-    timer_ref = schedule_timer 1_000 * 10
+    timer_ref = schedule_timer @interval_time
     new_state = Map.put(chat_state, :timer_ref, timer_ref)
     {:noreply, new_state}
   end
@@ -80,7 +81,7 @@ defmodule Bijakhq.Game.Chat do
     %{ timer_ref: _timer_ref, messages: messages} = chat_state
     broadcast(%{messages: messages})
 
-    timer_ref = schedule_timer 1_000 * 10
+    timer_ref = schedule_timer @interval_time
     new_state = %{ timer_ref: timer_ref, messages: [] }
     {:noreply, new_state}
   end
@@ -89,8 +90,8 @@ defmodule Bijakhq.Game.Chat do
   defp cancel_timer(nil), do: :ok
   defp cancel_timer(ref), do: Process.cancel_timer(ref)
   defp broadcast(messages) do
-    Logger.warn "broadcast"
-    IO.inspect messages
+    # Logger.warn "broadcast"
+    # IO.inspect messages
     BijakhqWeb.Endpoint.broadcast("game_session:lobby", "user:chat", messages)
   end
 
