@@ -22,6 +22,19 @@ defmodule BijakhqWeb.Router do
 
     scope "/admin" do
       resources "/users", UserController, except: [:new, :edit]
+
+      resources "/categories", QuizCategoryController, except: [:new, :edit]
+      resources "/questions", QuizQuestionController, except: [:new, :edit]
+
+
+      get "/games/:game_id/questions", QuizSessionController, :list_questions
+      get "/games/:game_id/questions/:question_id", QuizSessionController, :show_question
+      put "/games/:game_id/questions/:question_id", QuizSessionController, :update_question
+      resources "/games", QuizSessionController, except: [:new, :edit]
+
+      resources "/games_question", SessionQuestionController, except: [:new, :edit]
+
+
     end
 
     post "/sessions", SessionController, :create
@@ -39,13 +52,6 @@ defmodule BijakhqWeb.Router do
 
     resources "/categories", QuizCategoryController, except: [:new, :edit]
     resources "/questions", QuizQuestionController, except: [:new, :edit]
-
-    get "/games/:game_id/questions", QuizSessionController, :list_questions
-    get "/games/:game_id/questions/:question_id", QuizSessionController, :show_question
-    put "/games/:game_id/questions/:question_id", QuizSessionController, :update_question
-    resources "/games", QuizSessionController, except: [:new, :edit]
-
-    resources "/games_question", SessionQuestionController, except: [:new, :edit]
 
     get "/", SettingController, :landing
   end
