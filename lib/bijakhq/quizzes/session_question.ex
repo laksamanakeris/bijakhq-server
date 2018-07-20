@@ -24,12 +24,12 @@ defmodule Bijakhq.Quizzes.SessionQuestion do
   def changeset(session_question, attrs) do
     session_question
     |> cast(attrs, [:sequence, :is_completed, :total_correct, :answers_sequence, :answers_totals])
-    |> validate_required([:sequence, :is_completed, :total_correct])
+    |> validate_required([:sequence])
   end
 
   def changeset_create(session_question, attrs) do
     session_question
     |> cast(attrs, [:session_id, :question_id])
-    |> validate_required([:session_id, :question_id])
+    |> validate_required([:session_id, :question_id, :sequence])
   end
 end

@@ -41,6 +41,8 @@ defmodule BijakhqWeb.Router do
     resources "/questions", QuizQuestionController, except: [:new, :edit]
 
     get "/games/:game_id/questions", QuizSessionController, :list_questions
+    get "/games/:game_id/questions/:question_id", QuizSessionController, :show_question
+    put "/games/:game_id/questions/:question_id", QuizSessionController, :update_question
     resources "/games", QuizSessionController, except: [:new, :edit]
 
     resources "/games_question", SessionQuestionController, except: [:new, :edit]
