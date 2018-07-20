@@ -4,9 +4,9 @@ defmodule BijakhqWeb.Api.SessionQuestionControllerTest do
   alias Bijakhq.Quizzes
   alias Bijakhq.Quizzes.SessionQuestion
 
-  @create_attrs %{is_completed: true, sequence: 42, total_answered_a: 42, total_answered_b: 42, total_answered_c: 42, total_correct: 42}
-  @update_attrs %{is_completed: false, sequence: 43, total_answered_a: 43, total_answered_b: 43, total_answered_c: 43, total_correct: 43}
-  @invalid_attrs %{is_completed: nil, sequence: nil, total_answered_a: nil, total_answered_b: nil, total_answered_c: nil, total_correct: nil}
+  @create_attrs %{is_completed: true, sequence: 42, total_correct: 42}
+  @update_attrs %{is_completed: false, sequence: 43, total_correct: 43}
+  @invalid_attrs %{is_completed: nil, sequence: nil, total_correct: nil}
 
   def fixture(:session_question) do
     {:ok, session_question} = Quizzes.create_session_question(@create_attrs)
@@ -34,9 +34,6 @@ defmodule BijakhqWeb.Api.SessionQuestionControllerTest do
         "id" => id,
         "is_completed" => true,
         "sequence" => 42,
-        "total_answered_a" => 42,
-        "total_answered_b" => 42,
-        "total_answered_c" => 42,
         "total_correct" => 42}
     end
 
@@ -58,9 +55,6 @@ defmodule BijakhqWeb.Api.SessionQuestionControllerTest do
         "id" => id,
         "is_completed" => false,
         "sequence" => 43,
-        "total_answered_a" => 43,
-        "total_answered_b" => 43,
-        "total_answered_c" => 43,
         "total_correct" => 43}
     end
 
