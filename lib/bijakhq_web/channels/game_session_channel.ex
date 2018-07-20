@@ -36,6 +36,9 @@ defmodule BijakhqWeb.GameSessionChannel do
   def handle_in("game:start", payload, socket) do
     %{"game_id" => game_id} = payload
 
+    # start chat timer
+    Chat.timer_start()
+
     res = Server.game_start game_id
     with response = Server.get_game_state do
       IO.inspect response
@@ -114,6 +117,10 @@ defmodule BijakhqWeb.GameSessionChannel do
 
   # GAME SESSION
   def handle_in("game:end", payload, socket) do
+
+    # stop chat timer
+    Chat.timer_end()
+
     broadcast socket, "game:end", payload
     {:noreply, socket}
   end
