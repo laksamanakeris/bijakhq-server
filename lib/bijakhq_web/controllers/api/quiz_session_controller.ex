@@ -3,6 +3,7 @@ defmodule BijakhqWeb.Api.QuizSessionController do
 
   alias Bijakhq.Quizzes
   alias Bijakhq.Quizzes.QuizSession
+  alias Bijakhq.Quizzes.SessionQuestion
 
   action_fallback BijakhqWeb.Api.FallbackController
 
@@ -11,7 +12,7 @@ defmodule BijakhqWeb.Api.QuizSessionController do
     render(conn, "index.json", quiz_sessions: quiz_sessions)
   end
 
-  def create(conn, quiz_session_params) do
+  def create(conn, %{"game" => quiz_session_params}) do
     with {:ok, %QuizSession{} = quiz_session} <- Quizzes.create_quiz_session(quiz_session_params) do
       conn
       |> put_status(:created)
@@ -25,7 +26,7 @@ defmodule BijakhqWeb.Api.QuizSessionController do
     render(conn, "show.json", quiz_session: quiz_session)
   end
 
-  def update(conn, %{"id" => id, "quiz_session" => quiz_session_params}) do
+  def update(conn, %{"id" => id, "game" => quiz_session_params}) do
     quiz_session = Quizzes.get_quiz_session!(id)
 
     with {:ok, %QuizSession{} = quiz_session} <- Quizzes.update_quiz_session(quiz_session, quiz_session_params) do
@@ -44,5 +45,20 @@ defmodule BijakhqWeb.Api.QuizSessionController do
     session_question = Quizzes.get_questions_by_game_id(id)
     IO.inspect session_question
     render(conn, "session_question.json", session_question: session_question)
+  end
+
+  def show_question(conn, %{"game_id" => game_id, "question_id" => question_id}) do
+    attrs = %{session_id: game_id, question_id: question_id}
+    quiz_session = Quizzes.get_game_question_by!(attrs)
+    IO.inspect quiz_session
+    render(conn, "session_question_show.json", session_question: quiz_session)
+  end
+
+  def update_question(conn, %{"game_id" => game_id, "question_id" => question_id, "question" => data}) do
+    attrs = %{session_id: game_id, question_id: question_id}
+    session_question = Quizzes.get_game_question_by!(attrs)
+    with {:ok, %SessionQuestion{} = session_question} <- Quizzes.update_session_question(session_question, data) do
+      render(conn, "session_question_show.json", session_question: session_question)
+    end
   end
 end

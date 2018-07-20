@@ -401,6 +401,14 @@ defmodule Bijakhq.Quizzes do
     SessionQuestion.changeset(session_question, %{})
   end
 
+  def get_game_question_by!(attrs) do
+    Repo.get_by(SessionQuestion, attrs) |> Repo.preload([:session, question: :category])
+  end
+
+  def get_game_question_basic_by!(attrs) do
+    Repo.get_by(SessionQuestion, attrs)
+  end
+
   def get_questions_by_game_id(game_id) do
     query =
         from q in SessionQuestion,
