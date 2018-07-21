@@ -10,6 +10,8 @@ defmodule Bijakhq.Quizzes.QuizQuestion do
     field :optionB, :string
     field :optionC, :string
     field :question, :string
+
+    field :selected, :boolean, default: false
     # field :category_id, :id
 
     belongs_to :category, QuizCategory, foreign_key: :category_id
@@ -20,7 +22,7 @@ defmodule Bijakhq.Quizzes.QuizQuestion do
   @doc false
   def changeset(quiz_question, attrs) do
     quiz_question
-    |> cast(attrs, [:category_id, :question, :answer, :optionB, :optionC])
+    |> cast(attrs, [:category_id, :question, :answer, :optionB, :optionC, :selected])
     |> validate_required([:question, :answer, :optionB, :optionC])
   end
 end
