@@ -1,11 +1,14 @@
 defmodule BijakhqWeb.Api.QuizSessionController do
   use BijakhqWeb, :controller
 
+  import BijakhqWeb.Api.Authorize
   alias Bijakhq.Quizzes
   alias Bijakhq.Quizzes.QuizSession
   alias Bijakhq.Quizzes.SessionQuestion
 
   action_fallback BijakhqWeb.Api.FallbackController
+
+  plug :role_check, [roles: ["admin"]] when action in [:index, :create, :show, :update, :delete, :list_questions, :show_question, :update_question]
 
   def index(conn, _params) do
     quiz_sessions = Quizzes.list_quiz_sessions()
