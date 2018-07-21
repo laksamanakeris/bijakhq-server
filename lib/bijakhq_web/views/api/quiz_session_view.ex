@@ -35,10 +35,10 @@ defmodule BijakhqWeb.Api.QuizSessionView do
 
 
   def render("session_question.json", %{session_question: session_question}) do
-    %{data: render_many(session_question, BijakhqWeb.Api.SessionQuestionView, "question.json")}
+    %{data: render_many(session_question, BijakhqWeb.Api.GameQuestionView, "question.json")}
   end
 
   def render("session_question_show.json", %{session_question: session_question}) do
-    %{data: render_one(session_question, BijakhqWeb.Api.SessionQuestionView, "question_preload.json")}
+    %{data: render_one(session_question, BijakhqWeb.Api.GameQuestionView, "question_preload.json")}
   end
 end

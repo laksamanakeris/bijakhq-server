@@ -32,7 +32,7 @@ defmodule BijakhqWeb.Router do
       put "/games/:game_id/questions/:question_id", QuizSessionController, :update_question
       resources "/games", QuizSessionController, except: [:new, :edit]
 
-      resources "/games_question", SessionQuestionController, except: [:new, :edit]
+      resources "/games_question", GameQuestionController, except: [:new, :edit]
 
 
     end

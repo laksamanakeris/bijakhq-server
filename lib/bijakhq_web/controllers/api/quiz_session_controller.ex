@@ -4,7 +4,7 @@ defmodule BijakhqWeb.Api.QuizSessionController do
   import BijakhqWeb.Api.Authorize
   alias Bijakhq.Quizzes
   alias Bijakhq.Quizzes.QuizSession
-  alias Bijakhq.Quizzes.SessionQuestion
+  alias Bijakhq.Quizzes.QuizGameQuestion
 
   action_fallback BijakhqWeb.Api.FallbackController
 
@@ -60,7 +60,7 @@ defmodule BijakhqWeb.Api.QuizSessionController do
   def update_question(conn, %{"game_id" => game_id, "question_id" => question_id, "question" => data}) do
     attrs = %{session_id: game_id, question_id: question_id}
     session_question = Quizzes.get_game_question_by!(attrs)
-    with {:ok, %SessionQuestion{} = session_question} <- Quizzes.update_session_question(session_question, data) do
+    with {:ok, %QuizGameQuestion{} = session_question} <- Quizzes.update_session_question(session_question, data) do
       render(conn, "session_question_show.json", session_question: session_question)
     end
   end

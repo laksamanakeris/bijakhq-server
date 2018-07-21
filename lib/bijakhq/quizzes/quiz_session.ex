@@ -17,7 +17,7 @@ defmodule Bijakhq.Quizzes.QuizSession do
     field :time, :utc_datetime
     field :total_questions, :integer
 
-    # has_many :questions, SessionQuestion, foreign_key: :session_id
+    # has_many :questions, QuizGameQuestion, foreign_key: :session_id
     many_to_many :questions, QuizQuestion, join_through: "quiz_session_question"
 
     timestamps()
