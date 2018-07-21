@@ -308,15 +308,15 @@ defmodule Bijakhq.Quizzes do
   alias Bijakhq.Quizzes.QuizGameQuestion
 
   @doc """
-  Returns the list of quiz_session_question.
+  Returns the list of quiz_game_question.
 
   ## Examples
 
-      iex> list_quiz_session_question()
+      iex> list_quiz_game_question()
       [%QuizGameQuestion{}, ...]
 
   """
-  def list_quiz_session_question do
+  def list_quiz_game_question do
     Repo.all(QuizGameQuestion)
   end
 
@@ -327,28 +327,28 @@ defmodule Bijakhq.Quizzes do
 
   ## Examples
 
-      iex> get_session_question!(123)
+      iex> get_game_question!(123)
       %QuizGameQuestion{}
 
-      iex> get_session_question!(456)
+      iex> get_game_question!(456)
       ** (Ecto.NoResultsError)
 
   """
-  def get_session_question!(id), do: Repo.get!(QuizGameQuestion, id)
+  def get_game_question!(id), do: Repo.get!(QuizGameQuestion, id)
 
   @doc """
   Creates a game_question.
 
   ## Examples
 
-      iex> create_session_question(%{field: value})
+      iex> create_game_question(%{field: value})
       {:ok, %QuizGameQuestion{}}
 
-      iex> create_session_question(%{field: bad_value})
+      iex> create_game_question(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_session_question(attrs \\ %{}) do
+  def create_game_question(attrs \\ %{}) do
     %QuizGameQuestion{}
     |> QuizGameQuestion.changeset_create(attrs)
     |> Repo.insert()
@@ -359,14 +359,14 @@ defmodule Bijakhq.Quizzes do
 
   ## Examples
 
-      iex> update_session_question(game_question, %{field: new_value})
+      iex> update_game_question(game_question, %{field: new_value})
       {:ok, %QuizGameQuestion{}}
 
-      iex> update_session_question(game_question, %{field: bad_value})
+      iex> update_game_question(game_question, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_session_question(%QuizGameQuestion{} = game_question, attrs) do
+  def update_game_question(%QuizGameQuestion{} = game_question, attrs) do
     game_question
     |> QuizGameQuestion.changeset(attrs)
     |> Repo.update()
@@ -377,14 +377,14 @@ defmodule Bijakhq.Quizzes do
 
   ## Examples
 
-      iex> delete_session_question(game_question)
+      iex> delete_game_question(game_question)
       {:ok, %QuizGameQuestion{}}
 
-      iex> delete_session_question(game_question)
+      iex> delete_game_question(game_question)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_session_question(%QuizGameQuestion{} = game_question) do
+  def delete_game_question(%QuizGameQuestion{} = game_question) do
     Repo.delete(game_question)
   end
 
@@ -393,11 +393,11 @@ defmodule Bijakhq.Quizzes do
 
   ## Examples
 
-      iex> change_session_question(game_question)
+      iex> change_game_question(game_question)
       %Ecto.Changeset{source: %QuizGameQuestion{}}
 
   """
-  def change_session_question(%QuizGameQuestion{} = game_question) do
+  def change_game_question(%QuizGameQuestion{} = game_question) do
     QuizGameQuestion.changeset(game_question, %{})
   end
 
