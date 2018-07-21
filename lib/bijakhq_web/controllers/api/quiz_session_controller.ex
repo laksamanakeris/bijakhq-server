@@ -60,7 +60,7 @@ defmodule BijakhqWeb.Api.QuizSessionController do
   def update_question(conn, %{"game_id" => game_id, "question_id" => question_id, "question" => data}) do
     attrs = %{session_id: game_id, question_id: question_id}
     game_question = Quizzes.get_game_question_by!(attrs)
-    with {:ok, %QuizGameQuestion{} = game_question} <- Quizzes.update_session_question(game_question, data) do
+    with {:ok, %QuizGameQuestion{} = game_question} <- Quizzes.update_game_question(game_question, data) do
       render(conn, "session_question_show.json", game_question: game_question)
     end
   end
