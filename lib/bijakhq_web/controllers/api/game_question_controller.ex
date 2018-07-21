@@ -1,4 +1,4 @@
-defmodule BijakhqWeb.Api.QuizGameQuestionController do
+defmodule BijakhqWeb.Api.GameQuestionController do
   use BijakhqWeb, :controller
 
   alias Bijakhq.Quizzes
@@ -15,7 +15,7 @@ defmodule BijakhqWeb.Api.QuizGameQuestionController do
     with {:ok, %QuizGameQuestion{} = game_question} <- Quizzes.create_game_question(session_question_params) do
       conn
       |> put_status(:created)
-      |> put_resp_header("location", api_quiz_game_question_path(conn, :show, game_question))
+      |> put_resp_header("location", api_game_question_path(conn, :show, game_question))
       |> render("show.json", game_question: game_question)
     end
   end
