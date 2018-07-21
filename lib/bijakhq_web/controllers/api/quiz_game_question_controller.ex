@@ -1,8 +1,8 @@
-defmodule BijakhqWeb.Api.SessionQuestionController do
+defmodule BijakhqWeb.Api.QuizGameQuestionController do
   use BijakhqWeb, :controller
 
   alias Bijakhq.Quizzes
-  alias Bijakhq.Quizzes.SessionQuestion
+  alias Bijakhq.Quizzes.QuizGameQuestion
 
   action_fallback BijakhqWeb.Api.FallbackController
 
@@ -12,7 +12,7 @@ defmodule BijakhqWeb.Api.SessionQuestionController do
   end
 
   def create(conn, %{"session_question" => session_question_params}) do
-    with {:ok, %SessionQuestion{} = session_question} <- Quizzes.create_session_question(session_question_params) do
+    with {:ok, %QuizGameQuestion{} = session_question} <- Quizzes.create_session_question(session_question_params) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", api_session_question_path(conn, :show, session_question))
@@ -28,14 +28,14 @@ defmodule BijakhqWeb.Api.SessionQuestionController do
   def update(conn, %{"id" => id, "session_question" => session_question_params}) do
     session_question = Quizzes.get_session_question!(id)
 
-    with {:ok, %SessionQuestion{} = session_question} <- Quizzes.update_session_question(session_question, session_question_params) do
+    with {:ok, %QuizGameQuestion{} = session_question} <- Quizzes.update_session_question(session_question, session_question_params) do
       render(conn, "show.json", session_question: session_question)
     end
   end
 
   def delete(conn, %{"id" => id}) do
     session_question = Quizzes.get_session_question!(id)
-    with {:ok, %SessionQuestion{}} <- Quizzes.delete_session_question(session_question) do
+    with {:ok, %QuizGameQuestion{}} <- Quizzes.delete_session_question(session_question) do
       send_resp(conn, :no_content, "")
     end
   end

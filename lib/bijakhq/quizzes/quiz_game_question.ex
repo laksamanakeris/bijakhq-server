@@ -1,4 +1,4 @@
-defmodule Bijakhq.Quizzes.SessionQuestion do
+defmodule Bijakhq.Quizzes.QuizGameQuestion do
   use Ecto.Schema
   import Ecto.Changeset
   alias Bijakhq.Quizzes.QuizSession

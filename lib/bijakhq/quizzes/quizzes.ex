@@ -305,7 +305,7 @@ defmodule Bijakhq.Quizzes do
     QuizSession.changeset(quiz_session, %{})
   end
 
-  alias Bijakhq.Quizzes.SessionQuestion
+  alias Bijakhq.Quizzes.QuizGameQuestion
 
   @doc """
   Returns the list of quiz_session_question.
@@ -313,11 +313,11 @@ defmodule Bijakhq.Quizzes do
   ## Examples
 
       iex> list_quiz_session_question()
-      [%SessionQuestion{}, ...]
+      [%QuizGameQuestion{}, ...]
 
   """
   def list_quiz_session_question do
-    Repo.all(SessionQuestion)
+    Repo.all(QuizGameQuestion)
   end
 
   @doc """
@@ -328,13 +328,13 @@ defmodule Bijakhq.Quizzes do
   ## Examples
 
       iex> get_session_question!(123)
-      %SessionQuestion{}
+      %QuizGameQuestion{}
 
       iex> get_session_question!(456)
       ** (Ecto.NoResultsError)
 
   """
-  def get_session_question!(id), do: Repo.get!(SessionQuestion, id)
+  def get_session_question!(id), do: Repo.get!(QuizGameQuestion, id)
 
   @doc """
   Creates a session_question.
@@ -342,15 +342,15 @@ defmodule Bijakhq.Quizzes do
   ## Examples
 
       iex> create_session_question(%{field: value})
-      {:ok, %SessionQuestion{}}
+      {:ok, %QuizGameQuestion{}}
 
       iex> create_session_question(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
   def create_session_question(attrs \\ %{}) do
-    %SessionQuestion{}
-    |> SessionQuestion.changeset_create(attrs)
+    %QuizGameQuestion{}
+    |> QuizGameQuestion.changeset_create(attrs)
     |> Repo.insert()
   end
 
@@ -360,31 +360,31 @@ defmodule Bijakhq.Quizzes do
   ## Examples
 
       iex> update_session_question(session_question, %{field: new_value})
-      {:ok, %SessionQuestion{}}
+      {:ok, %QuizGameQuestion{}}
 
       iex> update_session_question(session_question, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_session_question(%SessionQuestion{} = session_question, attrs) do
+  def update_session_question(%QuizGameQuestion{} = session_question, attrs) do
     session_question
-    |> SessionQuestion.changeset(attrs)
+    |> QuizGameQuestion.changeset(attrs)
     |> Repo.update()
   end
 
   @doc """
-  Deletes a SessionQuestion.
+  Deletes a QuizGameQuestion.
 
   ## Examples
 
       iex> delete_session_question(session_question)
-      {:ok, %SessionQuestion{}}
+      {:ok, %QuizGameQuestion{}}
 
       iex> delete_session_question(session_question)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_session_question(%SessionQuestion{} = session_question) do
+  def delete_session_question(%QuizGameQuestion{} = session_question) do
     Repo.delete(session_question)
   end
 
@@ -394,24 +394,24 @@ defmodule Bijakhq.Quizzes do
   ## Examples
 
       iex> change_session_question(session_question)
-      %Ecto.Changeset{source: %SessionQuestion{}}
+      %Ecto.Changeset{source: %QuizGameQuestion{}}
 
   """
-  def change_session_question(%SessionQuestion{} = session_question) do
-    SessionQuestion.changeset(session_question, %{})
+  def change_session_question(%QuizGameQuestion{} = session_question) do
+    QuizGameQuestion.changeset(session_question, %{})
   end
 
   def get_game_question_by!(attrs) do
-    Repo.get_by(SessionQuestion, attrs) |> Repo.preload([:session, question: :category])
+    Repo.get_by(QuizGameQuestion, attrs) |> Repo.preload([:session, question: :category])
   end
 
   def get_game_question_basic_by!(attrs) do
-    Repo.get_by(SessionQuestion, attrs)
+    Repo.get_by(QuizGameQuestion, attrs)
   end
 
   def get_questions_by_game_id(game_id) do
     query =
-        from q in SessionQuestion,
+        from q in QuizGameQuestion,
         where: q.session_id == ^game_id,
         preload: [:question]
 

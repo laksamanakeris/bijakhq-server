@@ -1,13 +1,13 @@
-defmodule BijakhqWeb.Api.SessionQuestionView do
+defmodule BijakhqWeb.Api.QuizGameQuestionView do
   use BijakhqWeb, :view
-  alias BijakhqWeb.Api.SessionQuestionView
+  alias BijakhqWeb.Api.GameQuestionView
 
   def render("index.json", %{quiz_session_question: quiz_session_question}) do
-    %{data: render_many(quiz_session_question, SessionQuestionView, "session_question.json")}
+    %{data: render_many(quiz_session_question, GameQuestionView, "session_question.json")}
   end
 
   def render("show.json", %{session_question: session_question}) do
-    %{data: render_one(session_question, SessionQuestionView, "session_question.json")}
+    %{data: render_one(session_question, GameQuestionView, "session_question.json")}
   end
 
   def render("session_question.json", %{session_question: session_question}) do
