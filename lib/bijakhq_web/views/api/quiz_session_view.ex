@@ -34,11 +34,11 @@ defmodule BijakhqWeb.Api.QuizSessionView do
   end
 
 
-  def render("session_question.json", %{session_question: session_question}) do
-    %{data: render_many(session_question, BijakhqWeb.Api.QuizGameQuestionView, "question.json")}
+  def render("game_question.json", %{game_question: game_question}) do
+    %{data: render_many(game_question, BijakhqWeb.Api.QuizGameQuestionView, "question.json")}
   end
 
-  def render("session_question_show.json", %{session_question: session_question}) do
-    %{data: render_one(session_question, BijakhqWeb.Api.QuizGameQuestionView, "question_preload.json")}
+  def render("session_question_show.json", %{game_question: game_question}) do
+    %{data: render_one(game_question, BijakhqWeb.Api.QuizGameQuestionView, "question_preload.json")}
   end
 end

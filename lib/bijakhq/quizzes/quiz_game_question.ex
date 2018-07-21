@@ -21,14 +21,14 @@ defmodule Bijakhq.Quizzes.QuizGameQuestion do
   end
 
   @doc false
-  def changeset(session_question, attrs) do
-    session_question
+  def changeset(game_question, attrs) do
+    game_question
     |> cast(attrs, [:sequence, :is_completed, :total_correct, :answers_sequence, :answers_totals])
     |> validate_required([:sequence])
   end
 
-  def changeset_create(session_question, attrs) do
-    session_question
+  def changeset_create(game_question, attrs) do
+    game_question
     |> cast(attrs, [:session_id, :question_id])
     |> validate_required([:session_id, :question_id, :sequence])
   end
