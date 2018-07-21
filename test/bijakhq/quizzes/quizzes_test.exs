@@ -130,4 +130,150 @@ defmodule Bijakhq.QuizzesTest do
       assert %Ecto.Changeset{} = Quizzes.change_quiz_question(quiz_question)
     end
   end
+
+  describe "quiz_sessions" do
+    alias Bijakhq.Quizzes.QuizSession
+
+    @valid_attrs %{completed_at: "2010-04-17 14:00:00.000000Z", description: "some description", is_active: true, is_completed: true, name: "some name", prize: "some prize", prize_description: "some prize_description", time: "2010-04-17 14:00:00.000000Z", total_questions: 42}
+    @update_attrs %{completed_at: "2011-05-18 15:01:01.000000Z", description: "some updated description", is_active: false, is_completed: false, name: "some updated name", prize: "some updated prize", prize_description: "some updated prize_description", time: "2011-05-18 15:01:01.000000Z", total_questions: 43}
+    @invalid_attrs %{completed_at: nil, description: nil, is_active: nil, is_completed: nil, name: nil, prize: nil, prize_description: nil, time: nil, total_questions: nil}
+
+    def quiz_session_fixture(attrs \\ %{}) do
+      {:ok, quiz_session} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Quizzes.create_quiz_session()
+
+      quiz_session
+    end
+
+    test "list_quiz_sessions/0 returns all quiz_sessions" do
+      quiz_session = quiz_session_fixture()
+      assert Quizzes.list_quiz_sessions() == [quiz_session]
+    end
+
+    test "get_quiz_session!/1 returns the quiz_session with given id" do
+      quiz_session = quiz_session_fixture()
+      assert Quizzes.get_quiz_session!(quiz_session.id) == quiz_session
+    end
+
+    test "create_quiz_session/1 with valid data creates a quiz_session" do
+      assert {:ok, %QuizSession{} = quiz_session} = Quizzes.create_quiz_session(@valid_attrs)
+      assert quiz_session.completed_at == DateTime.from_naive!(~N[2010-04-17 14:00:00.000000Z], "Etc/UTC")
+      assert quiz_session.description == "some description"
+      assert quiz_session.is_active == true
+      assert quiz_session.is_completed == true
+      assert quiz_session.name == "some name"
+      assert quiz_session.prize == "some prize"
+      assert quiz_session.prize_description == "some prize_description"
+      assert quiz_session.time == DateTime.from_naive!(~N[2010-04-17 14:00:00.000000Z], "Etc/UTC")
+      assert quiz_session.total_questions == 42
+    end
+
+    test "create_quiz_session/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Quizzes.create_quiz_session(@invalid_attrs)
+    end
+
+    test "update_quiz_session/2 with valid data updates the quiz_session" do
+      quiz_session = quiz_session_fixture()
+      assert {:ok, quiz_session} = Quizzes.update_quiz_session(quiz_session, @update_attrs)
+      assert %QuizSession{} = quiz_session
+      assert quiz_session.completed_at == DateTime.from_naive!(~N[2011-05-18 15:01:01.000000Z], "Etc/UTC")
+      assert quiz_session.description == "some updated description"
+      assert quiz_session.is_active == false
+      assert quiz_session.is_completed == false
+      assert quiz_session.name == "some updated name"
+      assert quiz_session.prize == "some updated prize"
+      assert quiz_session.prize_description == "some updated prize_description"
+      assert quiz_session.time == DateTime.from_naive!(~N[2011-05-18 15:01:01.000000Z], "Etc/UTC")
+      assert quiz_session.total_questions == 43
+    end
+
+    test "update_quiz_session/2 with invalid data returns error changeset" do
+      quiz_session = quiz_session_fixture()
+      assert {:error, %Ecto.Changeset{}} = Quizzes.update_quiz_session(quiz_session, @invalid_attrs)
+      assert quiz_session == Quizzes.get_quiz_session!(quiz_session.id)
+    end
+
+    test "delete_quiz_session/1 deletes the quiz_session" do
+      quiz_session = quiz_session_fixture()
+      assert {:ok, %QuizSession{}} = Quizzes.delete_quiz_session(quiz_session)
+      assert_raise Ecto.NoResultsError, fn -> Quizzes.get_quiz_session!(quiz_session.id) end
+    end
+
+    test "change_quiz_session/1 returns a quiz_session changeset" do
+      quiz_session = quiz_session_fixture()
+      assert %Ecto.Changeset{} = Quizzes.change_quiz_session(quiz_session)
+    end
+  end
+
+  describe "quiz_session_question" do
+    alias Bijakhq.Quizzes.SessionQuestion
+
+    @valid_attrs %{is_completed: true, sequence: 42, total_answered_a: 42, total_answered_b: 42, total_answered_c: 42, total_correct: 42}
+    @update_attrs %{is_completed: false, sequence: 43, total_answered_a: 43, total_answered_b: 43, total_answered_c: 43, total_correct: 43}
+    @invalid_attrs %{is_completed: nil, sequence: nil, total_answered_a: nil, total_answered_b: nil, total_answered_c: nil, total_correct: nil}
+
+    def session_question_fixture(attrs \\ %{}) do
+      {:ok, session_question} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Quizzes.create_session_question()
+
+      session_question
+    end
+
+    test "list_quiz_session_question/0 returns all quiz_session_question" do
+      session_question = session_question_fixture()
+      assert Quizzes.list_quiz_session_question() == [session_question]
+    end
+
+    test "get_session_question!/1 returns the session_question with given id" do
+      session_question = session_question_fixture()
+      assert Quizzes.get_session_question!(session_question.id) == session_question
+    end
+
+    test "create_session_question/1 with valid data creates a session_question" do
+      assert {:ok, %SessionQuestion{} = session_question} = Quizzes.create_session_question(@valid_attrs)
+      assert session_question.is_completed == true
+      assert session_question.sequence == 42
+      assert session_question.total_answered_a == 42
+      assert session_question.total_answered_b == 42
+      assert session_question.total_answered_c == 42
+      assert session_question.total_correct == 42
+    end
+
+    test "create_session_question/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Quizzes.create_session_question(@invalid_attrs)
+    end
+
+    test "update_session_question/2 with valid data updates the session_question" do
+      session_question = session_question_fixture()
+      assert {:ok, session_question} = Quizzes.update_session_question(session_question, @update_attrs)
+      assert %SessionQuestion{} = session_question
+      assert session_question.is_completed == false
+      assert session_question.sequence == 43
+      assert session_question.total_answered_a == 43
+      assert session_question.total_answered_b == 43
+      assert session_question.total_answered_c == 43
+      assert session_question.total_correct == 43
+    end
+
+    test "update_session_question/2 with invalid data returns error changeset" do
+      session_question = session_question_fixture()
+      assert {:error, %Ecto.Changeset{}} = Quizzes.update_session_question(session_question, @invalid_attrs)
+      assert session_question == Quizzes.get_session_question!(session_question.id)
+    end
+
+    test "delete_session_question/1 deletes the session_question" do
+      session_question = session_question_fixture()
+      assert {:ok, %SessionQuestion{}} = Quizzes.delete_session_question(session_question)
+      assert_raise Ecto.NoResultsError, fn -> Quizzes.get_session_question!(session_question.id) end
+    end
+
+    test "change_session_question/1 returns a session_question changeset" do
+      session_question = session_question_fixture()
+      assert %Ecto.Changeset{} = Quizzes.change_session_question(session_question)
+    end
+  end
 end

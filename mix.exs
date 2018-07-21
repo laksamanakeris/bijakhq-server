@@ -20,7 +20,7 @@ defmodule Bijakhq.Mixfile do
   def application do
     [
       mod: {Bijakhq.Application, []},
-      extra_applications: [:logger, :runtime_tools, :httpoison, :timex]
+      extra_applications: [:logger, :runtime_tools, :httpoison, :timex, :faker]
     ]
   end
 
@@ -46,6 +46,7 @@ defmodule Bijakhq.Mixfile do
       {:cowboy, "~> 1.0"},
       {:httpoison, "~> 1.1.1"},
       {:timex, "~> 3.1"},
+      {:faker, "~> 0.10"},
       {:libcluster, "~> 2.1", only: :prod}
     ]
   end

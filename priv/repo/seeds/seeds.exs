@@ -6,8 +6,8 @@
 #
 
 users = [
-  %{email: "jane.doe@example.com", password: "password", username: "janedoe"},
-  %{email: "john.smith@example.org", password: "password", username: "johnsmith"}
+  %{email: "kerismelayu@gmail.com", password: "Bijak@2018", username: "administrator", role: "admin"},
+  %{email: "hatta.zainal@gmail.com", password: "Bijak@2018", username: "moderator", role: "admin"}
 ]
 
 for user <- users do
