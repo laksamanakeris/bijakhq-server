@@ -321,7 +321,7 @@ defmodule Bijakhq.Quizzes do
   end
 
   @doc """
-  Gets a single session_question.
+  Gets a single game_question.
 
   Raises `Ecto.NoResultsError` if the Session question does not exist.
 
@@ -337,7 +337,7 @@ defmodule Bijakhq.Quizzes do
   def get_session_question!(id), do: Repo.get!(QuizGameQuestion, id)
 
   @doc """
-  Creates a session_question.
+  Creates a game_question.
 
   ## Examples
 
@@ -355,19 +355,19 @@ defmodule Bijakhq.Quizzes do
   end
 
   @doc """
-  Updates a session_question.
+  Updates a game_question.
 
   ## Examples
 
-      iex> update_session_question(session_question, %{field: new_value})
+      iex> update_session_question(game_question, %{field: new_value})
       {:ok, %QuizGameQuestion{}}
 
-      iex> update_session_question(session_question, %{field: bad_value})
+      iex> update_session_question(game_question, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_session_question(%QuizGameQuestion{} = session_question, attrs) do
-    session_question
+  def update_session_question(%QuizGameQuestion{} = game_question, attrs) do
+    game_question
     |> QuizGameQuestion.changeset(attrs)
     |> Repo.update()
   end
@@ -377,28 +377,28 @@ defmodule Bijakhq.Quizzes do
 
   ## Examples
 
-      iex> delete_session_question(session_question)
+      iex> delete_session_question(game_question)
       {:ok, %QuizGameQuestion{}}
 
-      iex> delete_session_question(session_question)
+      iex> delete_session_question(game_question)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_session_question(%QuizGameQuestion{} = session_question) do
-    Repo.delete(session_question)
+  def delete_session_question(%QuizGameQuestion{} = game_question) do
+    Repo.delete(game_question)
   end
 
   @doc """
-  Returns an `%Ecto.Changeset{}` for tracking session_question changes.
+  Returns an `%Ecto.Changeset{}` for tracking game_question changes.
 
   ## Examples
 
-      iex> change_session_question(session_question)
+      iex> change_session_question(game_question)
       %Ecto.Changeset{source: %QuizGameQuestion{}}
 
   """
-  def change_session_question(%QuizGameQuestion{} = session_question) do
-    QuizGameQuestion.changeset(session_question, %{})
+  def change_session_question(%QuizGameQuestion{} = game_question) do
+    QuizGameQuestion.changeset(game_question, %{})
   end
 
   def get_game_question_by!(attrs) do
