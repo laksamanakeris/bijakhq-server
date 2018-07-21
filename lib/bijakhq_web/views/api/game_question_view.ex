@@ -1,16 +1,17 @@
-defmodule BijakhqWeb.Api.QuizGameQuestionView do
+defmodule BijakhqWeb.Api.GameQuestionView do
   use BijakhqWeb, :view
-  alias BijakhqWeb.Api.QuizGameQuestionView
+  alias BijakhqWeb.Api.GameQuestionView
 
   def render("index.json", %{quiz_game_question: quiz_game_question}) do
-    %{data: render_many(quiz_game_question, QuizGameQuestionView, "game_question.json")}
+    %{data: render_many(quiz_game_question, GameQuestionView, "game_question.json")}
   end
 
   def render("show.json", %{game_question: game_question}) do
-    %{data: render_one(game_question, QuizGameQuestionView, "game_question.json")}
+    %{data: render_one(game_question, GameQuestionView, "game_question.json")}
   end
 
   def render("game_question.json", %{game_question: game_question}) do
+
     %{id: game_question.id,
       sequence: game_question.sequence,
       is_completed: game_question.is_completed,
