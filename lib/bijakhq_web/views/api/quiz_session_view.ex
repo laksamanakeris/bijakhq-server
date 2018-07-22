@@ -11,12 +11,16 @@ defmodule BijakhqWeb.Api.QuizSessionView do
   end
 
   def render("quiz_session.json", %{quiz_session: quiz_session}) do
+
+    questions_count = Enum.count(quiz_session.game_questions)
+    IO.inspect questions_count
+
     %{id: quiz_session.id,
       name: quiz_session.name,
       description: quiz_session.description,
       prize: quiz_session.prize,
       prize_description: quiz_session.prize_description,
-      total_questions: quiz_session.total_questions,
+      total_questions: questions_count,
       time: quiz_session.time,
       is_active: quiz_session.is_active,
       is_completed: quiz_session.is_completed,

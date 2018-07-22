@@ -3,6 +3,7 @@ defmodule Bijakhq.Quizzes.QuizSession do
   import Ecto.Changeset
 
   alias Bijakhq.Quizzes.QuizQuestion
+  alias Bijakhq.Quizzes.QuizGameQuestion
 
 
 
@@ -17,7 +18,7 @@ defmodule Bijakhq.Quizzes.QuizSession do
     field :time, :utc_datetime
     field :total_questions, :integer
 
-    # has_many :questions, QuizGameQuestion, foreign_key: :session_id
+    has_many :game_questions, QuizGameQuestion, foreign_key: :session_id
     many_to_many :questions, QuizQuestion, join_through: "quiz_session_question"
 
     timestamps()
@@ -27,6 +28,6 @@ defmodule Bijakhq.Quizzes.QuizSession do
   def changeset(quiz_session, attrs) do
     quiz_session
     |> cast(attrs, [:name, :description, :prize, :prize_description, :total_questions, :time, :is_active, :is_completed, :completed_at])
-    |> validate_required([:name, :prize, :total_questions, :time])
+    |> validate_required([:name, :prize, :time])
   end
 end
