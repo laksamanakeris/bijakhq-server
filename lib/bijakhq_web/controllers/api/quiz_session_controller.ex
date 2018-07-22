@@ -44,24 +44,4 @@ defmodule BijakhqWeb.Api.QuizSessionController do
     end
   end
 
-  def list_questions(conn, %{"game_id" => id}) do
-    game_question = Quizzes.get_questions_by_game_id(id)
-    IO.inspect game_question
-    render(conn, "game_question.json", game_question: game_question)
-  end
-
-  def show_question(conn, %{"game_id" => game_id, "question_id" => question_id}) do
-    attrs = %{session_id: game_id, question_id: question_id}
-    quiz_session = Quizzes.get_game_question_by!(attrs)
-    IO.inspect quiz_session
-    render(conn, "session_question_show.json", game_question: quiz_session)
-  end
-
-  def update_question(conn, %{"game_id" => game_id, "question_id" => question_id, "question" => data}) do
-    attrs = %{session_id: game_id, question_id: question_id}
-    game_question = Quizzes.get_game_question_by!(attrs)
-    with {:ok, %QuizGameQuestion{} = game_question} <- Quizzes.update_game_question(game_question, data) do
-      render(conn, "session_question_show.json", game_question: game_question)
-    end
-  end
 end
