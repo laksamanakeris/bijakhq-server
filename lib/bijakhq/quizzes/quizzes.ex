@@ -413,7 +413,7 @@ defmodule Bijakhq.Quizzes do
     query =
         from q in QuizGameQuestion,
         where: q.session_id == ^game_id,
-        preload: [:question]
+        preload: [:session, question: :category]
 
     Repo.all(query)
   end
