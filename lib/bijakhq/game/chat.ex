@@ -76,7 +76,7 @@ defmodule Bijakhq.Game.Chat do
   end
 
   def handle_info(:update, chat_state) do
-    Logger.warn "update"
+    # Logger.warn "update"
 
     %{ timer_ref: _timer_ref, messages: messages} = chat_state
     broadcast(%{messages: messages})

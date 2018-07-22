@@ -68,8 +68,8 @@ defmodule Bijakhq.Game.Server do
   end
 
   def handle_call(:game_state, _from, game_state) do
-    IO.inspect _from
-    IO.inspect game_state
+    # IO.inspect _from
+    # IO.inspect game_state
     {:reply, game_state, game_state}
   end
 
