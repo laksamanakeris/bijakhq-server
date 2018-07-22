@@ -23,7 +23,15 @@ defmodule BijakhqWeb.Api.GameQuestionController do
   end
 
   def create(conn, %{"question" => session_question_params}, game) do
+
+    %{"question_id" => question_id } = session_question_params
+    question = Quizzes.get_quiz_question!(question_id);
+    question_randomized = Quizzes.randomize_answer(question);
+
+    session_question_params = Map.put(session_question_params, "answers_sequence", question_randomized)
     session_question_params = Map.put(session_question_params, "session_id", game.id)
+
+
     with {:ok, %QuizGameQuestion{} = game_question} <- Quizzes.create_game_question(session_question_params) do
 
       attrs = %{session_id: game.id, question_id: game_question.question_id}
@@ -57,7 +65,7 @@ defmodule BijakhqWeb.Api.GameQuestionController do
     # randomize answers
     question = Quizzes.get_quiz_question!(game_question.question_id);
     question_randomized = Quizzes.randomize_answer(question);
-    IO.inspect question_randomized
+
     with {:ok, %QuizGameQuestion{} = game_question} <- Quizzes.update_game_question(game_question, %{answers_sequence: question_randomized, sequence: game_question.sequence}) do
       attrs = %{session_id: game.id, question_id: game_question.question_id}
       game_question = Quizzes.get_game_question_by!(attrs)
