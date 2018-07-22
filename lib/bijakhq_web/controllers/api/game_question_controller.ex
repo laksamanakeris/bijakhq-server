@@ -25,10 +25,14 @@ defmodule BijakhqWeb.Api.GameQuestionController do
   def create(conn, %{"question" => session_question_params}, game) do
     session_question_params = Map.put(session_question_params, "session_id", game.id)
     with {:ok, %QuizGameQuestion{} = game_question} <- Quizzes.create_game_question(session_question_params) do
+
+      attrs = %{session_id: game.id, question_id: game_question.question_id}
+      game_question = Quizzes.get_game_question_by!(attrs)
+
       conn
       |> put_status(:created)
       |> put_resp_header("location", api_quiz_session_game_question_path(conn, :show, game.id, game_question))
-      |> render("show.json", game_question: game_question)
+      |> render("show_preload.json", game_question: game_question)
     end
   end
 
