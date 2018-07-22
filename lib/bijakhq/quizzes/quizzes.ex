@@ -221,7 +221,7 @@ defmodule Bijakhq.Quizzes do
 
   """
   def list_quiz_sessions do
-    Repo.all(QuizSession)
+    Repo.all(QuizSession) |> Repo.preload([:questions])
   end
 
   @doc """
@@ -419,6 +419,16 @@ defmodule Bijakhq.Quizzes do
     Repo.all(query)
   end
 
+  def get_game_questions_with_empty_answers_sequence do
+    query =
+        from q in QuizGameQuestion,
+        where: q.answers_sequence == ^%{},
+        preload: [:session, question: :category],
+        order_by: [asc: q.sequence]
+
+    Repo.all(query)
+  end
+
   def game_details_by_game_id(game_id) do
     game_details = Quizzes.get_quiz_session!(game_id);
     game_questions = Quizzes.get_questions_by_game_id(game_id)
@@ -457,14 +467,23 @@ defmodule Bijakhq.Quizzes do
   end
 
   def get_questions_for_game(game_id) do
-    game_questions = Quizzes.get_questions_by_game_id(game_id)
-                    |> Quizzes.process_questions
+    Quizzes.get_questions_by_game_id(game_id)
   end
 
   def process_questions(questions_list) do
-    new_list = Enum.map(questions_list, fn(x) ->
+    Enum.map(questions_list, fn(x) ->
         quest = Quizzes.randomize_answer(x.question)
         Map.put(x, :soalan, quest)
-        end)
+    end)
+  end
+
+  # Update game_question if "answers_sequence" is empty
+  def update_game_questions_random_answers do
+    questions = Quizzes.get_game_questions_with_empty_answers_sequence
+    Enum.map(questions, fn(quest) ->
+        # IO.inspect quest.question
+        question_randomized = Quizzes.randomize_answer(quest.question);
+        Quizzes.update_game_question(quest, %{answers_sequence: question_randomized, sequence: quest.sequence})
+    end)
   end
 end
