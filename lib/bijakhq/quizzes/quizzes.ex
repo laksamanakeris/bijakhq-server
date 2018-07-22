@@ -36,7 +36,7 @@ defmodule Bijakhq.Quizzes do
       ** (Ecto.NoResultsError)
 
   """
-  def get_quiz_category!(id), do: Repo.get!(QuizCategory, id)
+  def get_quiz_category!(id), do: Repo.get(QuizCategory, id)
 
   @doc """
   Creates a quiz_category.
@@ -132,7 +132,7 @@ defmodule Bijakhq.Quizzes do
       ** (Ecto.NoResultsError)
 
   """
-  def get_quiz_question!(id), do: Repo.get!(QuizQuestion, id)
+  def get_quiz_question!(id), do: Repo.get(QuizQuestion, id)
 
   @doc """
   Creates a quiz_question.
@@ -238,7 +238,7 @@ defmodule Bijakhq.Quizzes do
       ** (Ecto.NoResultsError)
 
   """
-  def get_quiz_session!(id), do: Repo.get!(QuizSession, id)
+  def get_quiz_session!(id), do: Repo.get(QuizSession, id)
 
   @doc """
   Creates a quiz_session.
@@ -334,7 +334,7 @@ defmodule Bijakhq.Quizzes do
       ** (Ecto.NoResultsError)
 
   """
-  def get_game_question!(id), do: Repo.get!(QuizGameQuestion, id)
+  def get_game_question!(id), do: Repo.get(QuizGameQuestion, id)
 
   @doc """
   Creates a game_question.
