@@ -79,10 +79,11 @@ defmodule BijakhqWeb.GameSessionChannel do
       questions = game.questions
       question = Enum.at( questions , question_id)
       question = Map.put(question, :question_id, question_id)
-      IO.inspect question.soalan
+      # IO.inspect question.soalan
 
-      soalan = question.soalan
-      answers = question.soalan.answers
+      soalan = Bijakhq.MapHelpers.atomize_keys(question.answers_sequence)
+      IO.inspect soalan
+      answers = soalan.answers
 
       [answer1, answer2, answer3] = answers
       answer1 = Map.put(answer1, :total_answered, Enum.random(1..200) )
