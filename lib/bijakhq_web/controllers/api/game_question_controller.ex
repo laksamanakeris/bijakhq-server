@@ -51,6 +51,24 @@ defmodule BijakhqWeb.Api.GameQuestionController do
     end
   end
 
+  def randomize_answers(conn, %{"id" => id}, game) do
+    attrs = %{session_id: game.id, question_id: id}
+    game_question = Quizzes.get_game_question_by!(attrs)
+    # randomize answers
+    question = Quizzes.get_quiz_question!(game_question.question_id);
+    question_randomized = Quizzes.randomize_answer(question);
+    IO.inspect question_randomized
+    with {:ok, %QuizGameQuestion{} = game_question} <- Quizzes.update_game_question(game_question, %{answers_sequence: question_randomized, sequence: game_question.sequence}) do
+      attrs = %{session_id: game.id, question_id: game_question.question_id}
+      game_question = Quizzes.get_game_question_by!(attrs)
+
+      conn
+      |> put_status(:created)
+      |> put_resp_header("location", api_quiz_session_game_question_path(conn, :show, game.id, game_question))
+      |> render("show_preload.json", game_question: game_question)
+    end
+  end
+
   def delete(conn, %{"id" => id}) do
     game_question = Quizzes.get_game_question!(id)
     with {:ok, %QuizGameQuestion{}} <- Quizzes.delete_game_question(game_question) do
