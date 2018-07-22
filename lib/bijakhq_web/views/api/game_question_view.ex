@@ -6,8 +6,16 @@ defmodule BijakhqWeb.Api.GameQuestionView do
     %{data: render_many(quiz_game_question, GameQuestionView, "game_question.json")}
   end
 
+  def render("index_preload.json", %{quiz_game_question: quiz_game_question}) do
+    %{data: render_many(quiz_game_question, GameQuestionView, "question_preload.json")}
+  end
+
   def render("show.json", %{game_question: game_question}) do
     %{data: render_one(game_question, GameQuestionView, "game_question.json")}
+  end
+
+  def render("show_preload.json", %{game_question: game_question}) do
+    %{data: render_one(game_question, GameQuestionView, "question_preload.json")}
   end
 
   def render("game_question.json", %{game_question: game_question}) do
@@ -38,6 +46,7 @@ defmodule BijakhqWeb.Api.GameQuestionView do
       total_correct: game_question.total_correct,
       answers_sequence: game_question.answers_sequence,
       answers_totals: game_question.answers_totals,
+      question_id: game_question.question_id,
       question: render_one(game_question.question, BijakhqWeb.Api.QuizQuestionView, "quiz_question.json"),
       session: render_one(game_question.session, BijakhqWeb.Api.QuizSessionView, "quiz_session.json")
     }
