@@ -29,7 +29,8 @@ defmodule Bijakhq.Quizzes.QuizGameQuestion do
 
   def changeset_create(game_question, attrs) do
     game_question
-    |> cast(attrs, [:session_id, :question_id])
+    |> cast(attrs, [:session_id, :question_id, :sequence])
     |> validate_required([:session_id, :question_id, :sequence])
+    |> unique_constraint(:game_id_question_id, name: :game_question_unique)
   end
 end
