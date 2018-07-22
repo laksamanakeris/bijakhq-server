@@ -11,7 +11,7 @@ defmodule BijakhqWeb.Api.QuizQuestionController do
     render(conn, "index.json", quiz_questions: quiz_questions)
   end
 
-  def create(conn, %{"quiz_question" => quiz_question_params}) do
+  def create(conn, %{"question" => quiz_question_params}) do
     with {:ok, %QuizQuestion{} = quiz_question} <- Quizzes.create_quiz_question(quiz_question_params) do
       conn
       |> put_status(:created)
@@ -25,7 +25,7 @@ defmodule BijakhqWeb.Api.QuizQuestionController do
     render(conn, "show.json", quiz_question: quiz_question)
   end
 
-  def update(conn, %{"id" => id, "quiz_question" => quiz_question_params}) do
+  def update(conn, %{"id" => id, "question" => quiz_question_params}) do
     quiz_question = Quizzes.get_quiz_question!(id)
 
     with {:ok, %QuizQuestion{} = quiz_question} <- Quizzes.update_quiz_question(quiz_question, quiz_question_params) do
