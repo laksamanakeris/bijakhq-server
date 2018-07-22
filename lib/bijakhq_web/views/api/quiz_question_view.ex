@@ -20,16 +20,29 @@ defmodule BijakhqWeb.Api.QuizQuestionView do
   end
 
   def render("soalan.json", %{quiz_question: quiz_question}) do
+
+    # convert map keys from strings to atoms in Elixir
+    answers_sequence = QuizQuestionView.map_keys_to_atoms(quiz_question.answers_sequence)
+
     %{
       game_question_id: quiz_question.id,
-      question: quiz_question.soalan.question,
-      answers: render_many(quiz_question.soalan.answers, BijakhqWeb.Api.QuizQuestionView , "jawapan.json"),
+      question: answers_sequence.question,
+      answers: render_many(answers_sequence.answers, BijakhqWeb.Api.QuizQuestionView , "jawapan.json"),
       question_id: quiz_question.question_id,
       game_id: quiz_question.session_id
     }
   end
 
+  # Utils
+  # convert map keys from strings to atoms in Elixir
+  def map_keys_to_atoms(map) do
+    for {key, val} <- map, into: %{}, do: {String.to_atom(key), val}
+  end
+
   def render("jawapan.json", %{quiz_question: jawapan}) do
+
+    jawapan = QuizQuestionView.map_keys_to_atoms(jawapan)
+
     %{
       id: jawapan.id,
       text: jawapan.text
@@ -38,16 +51,22 @@ defmodule BijakhqWeb.Api.QuizQuestionView do
 
 
   def render("soalan_jawapan.json", %{quiz_question: quiz_question}) do
+
+    answers_sequence = QuizQuestionView.map_keys_to_atoms(quiz_question.answers_sequence)
+
     %{
       game_question_id: quiz_question.id,
-      question: quiz_question.soalan.question,
-      answers: render_many(quiz_question.soalan.answers, BijakhqWeb.Api.QuizQuestionView , "jawapan_full.json"),
+      question: answers_sequence.question,
+      answers: render_many(answers_sequence.answers, BijakhqWeb.Api.QuizQuestionView , "jawapan_full.json"),
       question_id: quiz_question.question_id,
       game_id: quiz_question.session_id
     }
   end
 
   def render("jawapan_full.json", %{quiz_question: jawapan}) do
+
+    jawapan = QuizQuestionView.map_keys_to_atoms(jawapan)
+
     %{
       id: jawapan.id,
       text: jawapan.text,
