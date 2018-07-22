@@ -46,7 +46,7 @@ defmodule BijakhqWeb.Router do
     post "/verification/:request_id", VerificationController, :verify
     post "/verification/:request_id/cancel", VerificationController, :cancel
 
-    resources "/categories", QuizCategoryController, except: [:new, :edit]
+    get "/categories", QuizCategoryController, :index
     resources "/questions", QuizQuestionController, except: [:new, :edit]
 
     get "/", SettingController, :landing
