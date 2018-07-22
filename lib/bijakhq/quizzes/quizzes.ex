@@ -402,7 +402,7 @@ defmodule Bijakhq.Quizzes do
   end
 
   def get_game_question_by!(attrs) do
-    Repo.get_by(QuizGameQuestion, attrs) |> Repo.preload([:session, question: :category])
+    QuizGameQuestion |> order_by(asc: :sequence) |> Repo.get_by(QuizGameQuestion, attrs) |> Repo.preload([:session, question: :category])
   end
 
   def get_game_question_basic_by!(attrs) do
@@ -413,7 +413,8 @@ defmodule Bijakhq.Quizzes do
     query =
         from q in QuizGameQuestion,
         where: q.session_id == ^game_id,
-        preload: [:session, question: :category]
+        preload: [:session, question: :category],
+        order_by: [asc: q.sequence]
 
     Repo.all(query)
   end
