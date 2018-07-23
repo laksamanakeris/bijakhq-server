@@ -419,6 +419,15 @@ defmodule Bijakhq.Quizzes do
     Repo.all(query)
   end
 
+  def get_questions_by_game_id_basic(game_id) do
+    query =
+        from q in QuizGameQuestion,
+        where: q.session_id == ^game_id,
+        order_by: [asc: q.sequence]
+
+    Repo.all(query)
+  end
+
   def get_game_questions_with_empty_answers_sequence do
     query =
         from q in QuizGameQuestion,
@@ -481,9 +490,32 @@ defmodule Bijakhq.Quizzes do
   def update_game_questions_random_answers do
     questions = Quizzes.get_game_questions_with_empty_answers_sequence
     Enum.map(questions, fn(quest) ->
-        # IO.inspect quest.question
-        question_randomized = Quizzes.randomize_answer(quest.question);
-        Quizzes.update_game_question(quest, %{answers_sequence: question_randomized, sequence: quest.sequence})
+        IO.inspect quest
+        # question_randomized = Quizzes.randomize_answer(quest.question);
+        # Quizzes.update_game_question(quest, %{answers_sequence: question_randomized, sequence: quest.sequence})
     end)
+  end
+
+  def get_initial_game_state(game_id) do
+    game_details = Quizzes.get_quiz_session!(game_id)
+    # game_details = Bijakhq.MapHelpers.atomize_keys(game_details.game_questions)
+
+    game_questions = Enum.map(game_details.game_questions, fn(quest) ->
+      atomized = Bijakhq.MapHelpers.atomize_keys(quest.answers_sequence)
+      quest = Map.put(quest, :answers_sequence, atomized)
+      # IO.inspect quest
+    end)
+
+    # IO.puts "===================================================================================================================================================================================="
+
+    game_state = %{
+      session_id: game_details.id,
+      total_questions: Enum.count(game_questions),
+      current_question: 0,
+      questions: game_questions,
+      prize: game_details.prize,
+      prize_text: "RM #{game_details.prize}",
+      current_viewing: 0
+    }
   end
 end

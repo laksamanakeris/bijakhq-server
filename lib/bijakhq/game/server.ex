@@ -21,19 +21,8 @@ defmodule Bijakhq.Game.Server do
 
   def game_start(game_id) do
 
-    game_details = Quizzes.get_quiz_session!(game_id)
-    game_questions = Quizzes.get_questions_for_game(game_id)
-
-    game_state = %{
-      session_id: game_details.id,
-      total_questions: game_details.total_questions,
-      current_question: 0,
-      questions: game_questions,
-      prize: game_details.prize,
-      prize_text: "RM #{game_details.prize}",
-      current_viewing: 0
-    }
-
+    # Game state format - @initial_state
+    game_state = Quizzes.get_initial_game_state(game_id)
     GenServer.cast(@name, game_state)
   end
 
