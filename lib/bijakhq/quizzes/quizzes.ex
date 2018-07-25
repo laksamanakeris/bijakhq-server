@@ -518,4 +518,38 @@ defmodule Bijakhq.Quizzes do
       current_viewing: 0
     }
   end
+
+
+  # get upcoming game
+  def get_upcoming_game do
+
+    now = Timex.now
+    query =
+        from q in QuizSession,
+        where: q.is_completed == false and q.is_active != true and q.time > ^now,
+        preload: [:game_questions],
+        order_by: [asc: q.time]
+
+    Repo.all(query)
+  end
+
+  def get_current_game do
+    query =
+        from q in QuizSession,
+        where: q.is_active == true,
+        preload: [:game_questions],
+        order_by: [asc: q.time]
+
+    Repo.one(query)
+  end
+
+  def get_game_now_status do
+    current = Quizzes.get_current_game
+    upcoming = Quizzes.get_upcoming_game
+
+    %{
+      current: current,
+      upcoming: upcoming
+    }
+  end
 end

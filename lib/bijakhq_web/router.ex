@@ -50,6 +50,8 @@ defmodule BijakhqWeb.Router do
     get "/categories", QuizCategoryController, :index
     resources "/questions", QuizQuestionController, except: [:new, :edit]
 
+    get "/games/now", QuizSessionController, :now
+
     get "/", SettingController, :landing
   end
 
