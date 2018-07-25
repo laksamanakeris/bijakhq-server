@@ -44,4 +44,9 @@ defmodule BijakhqWeb.Api.QuizSessionController do
     end
   end
 
+  def now(conn,_params) do
+    game = Quizzes.get_game_now_status()
+    render(conn, "now.json", game: game)
+  end
+
 end
