@@ -86,8 +86,12 @@ defmodule BijakhqWeb.Api.UserController do
   def upload_image_profile(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"profile_picture" => params} = user_params) do
     # IO.inspect params
 
+    # uploaded = ImageFile.store(params)
+    # IO.inspect uploaded
+
     with {:ok, user} <- Accounts.upload_image(user, user_params) do
       render(conn, "show_me.json", user: user)
     end
+    # render(conn, "show_me.json", user: user)
   end
 end

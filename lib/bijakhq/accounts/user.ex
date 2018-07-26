@@ -9,6 +9,7 @@ defmodule Bijakhq.Accounts.User do
     field :username, :string
     field :phone, :string
     field :profile_picture, Bijakhq.ImageFile.Type
+    # field :profile_picture, :string
     field :filename, :string, virtual: true
 
     field :password, :string, virtual: true
@@ -60,6 +61,8 @@ defmodule Bijakhq.Accounts.User do
 
   @doc false
   def upload_changeset(%User{} = user, attrs) do
+
+    attrs = add_timestamp(attrs)
     user
     |> cast(attrs, [:profile_picture])
     |> cast_attachments(attrs, [:profile_picture])
@@ -80,6 +83,28 @@ defmodule Bijakhq.Accounts.User do
     validate_format(changeset, :email, ~r/@/)
     |> validate_length(:email, max: 254)
     |> unique_constraint(:email)
+  end
+
+  defp add_timestamp(%{"profile_picture" => %Plug.Upload{filename: name} = image} = attrs) do
+    image = %Plug.Upload{image | filename: prepend_timestamp(name)}
+    %{attrs | "profile_picture" => image}
+  end
+
+  defp add_timestamp(params), do: params
+
+  defp prepend_timestamp(name) do
+    "#{:os.system_time()}" <> name
+  end
+
+  defp put_random_filename(%{"profile_picture" => %Plug.Upload{filename: name} = image} = params) do
+    image = %Plug.Upload{image | filename: random_filename(name)}
+    %{params | "profile_picture" => image}
+  end
+
+  defp put_random_filename(params), do: params
+
+  defp random_filename(name) do
+    (:crypto.strong_rand_bytes(20) |> Base.url_encode64 |> binary_part(0, 20)) <> name
   end
 
   # In the function below, strong_password? just checks that the password
