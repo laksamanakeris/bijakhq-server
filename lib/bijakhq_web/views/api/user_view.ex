@@ -21,9 +21,18 @@ defmodule BijakhqWeb.Api.UserView do
   def render("show_me.json", %{user: user}) do
     %{
       id: user.id,
-      email: user.email,
+      # email: user.email,
       username: user.username,
-      profile_picture: user.profile_picture
+      profile_picture: UserView.check_profile_picture(user.profile_picture)
     }
   end
+
+  def check_profile_picture(nil) do
+    "https://storage.googleapis.com/bijakhq_avatars/uploads/user/avatars/avatar_circle_blue_512dp.png"
+  end
+
+  def check_profile_picture(file) do
+    "https://storage.googleapis.com/bijakhq_avatars/uploads/user/avatars/#{file.file_name}"
+  end
+
 end

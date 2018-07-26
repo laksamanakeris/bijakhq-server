@@ -55,6 +55,12 @@ defmodule Bijakhq.Accounts do
     |> Repo.update()
   end
 
+  def upload_image(%User{} = user, attrs) do
+    user
+    |> User.upload_changeset(attrs)
+    |> Repo.update()
+  end
+
   def update_password(%User{} = user, attrs) do
     user
     |> User.create_changeset(attrs)

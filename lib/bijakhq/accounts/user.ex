@@ -2,12 +2,14 @@ defmodule Bijakhq.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
   alias Bijakhq.Accounts.User
+  use Arc.Ecto.Schema
 
   schema "users" do
     field :email, :string
     field :username, :string
     field :phone, :string
-    field :profile_picture, :string
+    field :profile_picture, Bijakhq.ImageFile.Type
+    field :filename, :string, virtual: true
 
     field :password, :string, virtual: true
     field :password_hash, :string
@@ -54,6 +56,14 @@ defmodule Bijakhq.Accounts.User do
     |> validate_required([:phone, :language, :country, :verification_id, :username])
     |> unique_username
     |> unique_phone
+  end
+
+  @doc false
+  def upload_changeset(%User{} = user, attrs) do
+    user
+    |> cast(attrs, [:profile_picture])
+    |> cast_attachments(attrs, [:profile_picture])
+    |> validate_required([:profile_picture])
   end
 
   defp unique_username(changeset) do
