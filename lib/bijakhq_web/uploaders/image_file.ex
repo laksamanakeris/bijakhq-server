@@ -47,10 +47,14 @@ defmodule Bijakhq.ImageFile do
   #   end
   # end
 
-  def filename(version, {file, scope}) do
-    file_name = Path.basename(file.file_name, Path.extname(file.file_name))
-    "#{file_name}_#{version}_#{:os.system_time}"
-  end
+  # def filename(version, {file, scope}) do
+  #   file_name = Path.basename(file.file_name, Path.extname(file.file_name))
+  #   "#{file_name}_#{version}_#{:os.system_time}"
+  # end
+
+  # def filename(version, _) do
+  #   version
+  # end
 
   # Override the storage directory:
   def storage_dir(version, {file, scope}) do
