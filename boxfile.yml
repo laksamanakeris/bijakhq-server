@@ -4,6 +4,9 @@ run.config:
   engine.config:
     runtime: elixir-1.6
     erlang_runtime: erlang-20
+  
+  extra_packages:
+    - ImageMagick
 
   # we need nodejs in development
   # ensure inotify exists for hot-code reloading
