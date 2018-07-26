@@ -20,7 +20,7 @@ defmodule Bijakhq.ImageFile do
   end
 
   # # # Define a thumbnail transformation:
-  def transform(:thumb, _) do
+  def transform(:original, _) do
     {:convert, "-strip -thumbnail 400x400^ -gravity center -extent 400x400 -format png", :png}
   end
 
