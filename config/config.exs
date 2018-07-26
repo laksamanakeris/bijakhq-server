@@ -34,7 +34,7 @@ config :logger, :console,
 # Storage
 config :arc,
   storage: Arc.Storage.GCS,
-  bucket: "bijakhq"
+  bucket: "bijakhq_avatars"
 
 config :goth,
   json: "keys/bijakhq-dev-6a9c509c6c90.json" |> Path.expand |> File.read!

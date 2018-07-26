@@ -6,6 +6,7 @@ defmodule BijakhqWeb.Api.UserController do
   alias Bijakhq.Accounts
   alias Bijakhq.Sms
   alias Bijakhq.Sms.NexmoRequest
+  alias Bijakhq.ImageFile
 
   action_fallback BijakhqWeb.Api.FallbackController
 
@@ -80,5 +81,13 @@ defmodule BijakhqWeb.Api.UserController do
     # profile = Accounts.get(user.id);
     # render(conn, "show_me.json", %{user: user, profile: profile})
     render(conn, "show_me.json", %{user: user})
+  end
+
+  def upload_image_profile(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"profile_picture" => params} = user_params) do
+    # IO.inspect params
+
+    with {:ok, user} <- Accounts.upload_image(user, user_params) do
+      render(conn, "show_me.json", user: user)
+    end
   end
 end

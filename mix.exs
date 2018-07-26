@@ -47,6 +47,8 @@ defmodule Bijakhq.Mixfile do
       {:httpoison, "~> 1.1.1", override: true},
       {:timex, "~> 3.1"},
       {:faker, "~> 0.10"},
+      {:arc, "~> 0.10.0"},
+      {:arc_ecto, "~> 0.10.0"},
       {:arc_gcs, "~> 0.0.8"},
       {:libcluster, "~> 2.1", only: :prod}
     ]

@@ -36,6 +36,7 @@ defmodule BijakhqWeb.Router do
 
     post "/sessions", SessionController, :create
     post "/users", UserController, :create_user
+    post "/users/me/upload", UserController, :upload_image_profile
     get "/users/me", UserController, :show_me
     resources "/users", UserController, except: [:new, :edit]
     get "/confirm", ConfirmController, :index
