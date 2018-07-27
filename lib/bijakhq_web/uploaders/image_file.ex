@@ -13,7 +13,7 @@ defmodule Bijakhq.ImageFile do
 
   # # # Define a thumbnail transformation:
   def transform(:original, _) do
-    {:convert, "-strip -thumbnail 400x400^ -gravity center -extent 400x400 -format png", :png}
+    {:convert, "-strip -thumbnail 400x400^ -gravity center -extent 400x400"}
   end
 
   # Override the storage directory:
