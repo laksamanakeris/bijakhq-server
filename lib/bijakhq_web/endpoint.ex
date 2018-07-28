@@ -38,6 +38,7 @@ defmodule BijakhqWeb.Endpoint do
     key: "_bijakhq_key",
     signing_salt: "oUxG7SNc"
 
+  plug CORSPlug, origin: "*"
   plug BijakhqWeb.Router
 
   @doc """

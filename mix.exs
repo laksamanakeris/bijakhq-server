@@ -50,6 +50,7 @@ defmodule Bijakhq.Mixfile do
       {:arc, "~> 0.10.0"},
       {:arc_ecto, "~> 0.10.0"},
       {:arc_gcs, "~> 0.0.8"},
+      {:cors_plug, "~> 1.5"},
       {:libcluster, "~> 2.1", only: :prod}
     ]
   end
