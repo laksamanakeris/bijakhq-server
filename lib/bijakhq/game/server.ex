@@ -23,6 +23,8 @@ defmodule Bijakhq.Game.Server do
 
     # Game state format - @initial_state
     game_state = Quizzes.get_initial_game_state(game_id)
+    # activate game
+    Quizzes.activate_game_session(game_id)
     GenServer.cast(@name, game_state)
   end
 
