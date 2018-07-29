@@ -543,6 +543,21 @@ defmodule Bijakhq.Quizzes do
     Repo.one(query)
   end
 
+  def activate_game_session(game_id) do
+    from(p in QuizSession, where: p.is_active == true)
+    |> Repo.update_all(set: [is_active: false])
+
+    quiz_session = Quizzes.get_quiz_session!(game_id)
+    case quiz_session do
+      nil -> nil
+      quiz_session ->
+        with {:ok, %QuizSession{} = quiz_session} <- Quizzes.update_quiz_session(quiz_session, %{is_active: true}) do
+          quiz_session
+        end
+    end
+
+  end
+
   def get_game_now_status do
     current = Quizzes.get_current_game
     upcoming = Quizzes.get_upcoming_game
