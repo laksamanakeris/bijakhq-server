@@ -24,6 +24,7 @@ defmodule BijakhqWeb.Api.QuizSessionView do
       time: quiz_session.time,
       is_active: quiz_session.is_active,
       is_completed: quiz_session.is_completed,
+      stream_url: quiz_session.stream_url,
       completed_at: quiz_session.completed_at}
   end
 
@@ -35,6 +36,7 @@ defmodule BijakhqWeb.Api.QuizSessionView do
       prize: quiz_session.prize,
       prize_description: quiz_session.prize_description,
       time: quiz_session.time,
+      stream_url: quiz_session.stream_url
     }
   end
 
