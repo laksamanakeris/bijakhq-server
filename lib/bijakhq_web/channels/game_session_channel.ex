@@ -79,10 +79,13 @@ defmodule BijakhqWeb.GameSessionChannel do
       questions = game.questions
       question = Enum.at( questions , question_id)
       question = Map.put(question, :question_id, question_id)
-      # IO.inspect question.soalan
 
-      soalan = Bijakhq.MapHelpers.atomize_keys(question.answers_sequence)
-      IO.inspect soalan
+      IO.inspect question
+      IO.puts "========================================================================"
+
+      # soalan = Bijakhq.MapHelpers.atomize_keys(question.answers_sequence)
+      soalan = question.answers_sequence
+      # IO.inspect soalan
       answers = soalan.answers
 
       [answer1, answer2, answer3] = answers
@@ -92,7 +95,8 @@ defmodule BijakhqWeb.GameSessionChannel do
 
       answers = [answer1, answer2, answer3]
       soalan = Map.put(soalan, :answers, answers)
-      question = Map.put(question, :soalan, soalan)
+      # update the sequence again
+      question = Map.put(question, :answers_sequence, soalan)
 
       IO.inspect question
 
