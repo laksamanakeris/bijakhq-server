@@ -28,6 +28,19 @@ defmodule BijakhqWeb.Api.QuizSessionView do
       completed_at: quiz_session.completed_at}
   end
 
+  def render("game_start_details.json", %{quiz_session: quiz_session}) do
+
+    %{
+      session_id: quiz_session.session_id,
+      total_questions: quiz_session.total_questions,
+      current_question: quiz_session.current_question,
+      questions: render_many(quiz_session.questions, BijakhqWeb.Api.GameQuestionView, "game_start_question.json"),
+      prize: quiz_session.prize,
+      prize_text: quiz_session.prize_text,
+      current_viewing: quiz_session.current_viewing
+    }
+  end
+
   def render("game_details.json", %{quiz_session: quiz_session}) do
     %{
       game_id: quiz_session.id,

@@ -8,6 +8,7 @@ defmodule Bijakhq.Quizzes do
 
   alias Bijakhq.Quizzes
   alias Bijakhq.Quizzes.QuizCategory
+  alias Bijakhq.Quizzes.QuizGameQuestion
 
   @doc """
   Returns the list of quiz_categories.
@@ -238,7 +239,11 @@ defmodule Bijakhq.Quizzes do
       ** (Ecto.NoResultsError)
 
   """
-  def get_quiz_session!(id), do: Repo.get(QuizSession, id) |> Repo.preload([:game_questions])
+  def get_quiz_session!(id) do
+    Repo.get(QuizSession, id)
+    |> Repo.preload([game_questions: (from q in QuizGameQuestion, order_by: [asc: q.sequence] )])
+
+  end
 
   @doc """
   Creates a quiz_session.
@@ -305,7 +310,6 @@ defmodule Bijakhq.Quizzes do
     QuizSession.changeset(quiz_session, %{})
   end
 
-  alias Bijakhq.Quizzes.QuizGameQuestion
 
   @doc """
   Returns the list of quiz_game_question.
