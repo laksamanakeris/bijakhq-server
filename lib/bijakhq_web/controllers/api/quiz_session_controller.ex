@@ -17,6 +17,7 @@ defmodule BijakhqWeb.Api.QuizSessionController do
 
   def create(conn, %{"game" => quiz_session_params}) do
     with {:ok, %QuizSession{} = quiz_session} <- Quizzes.create_quiz_session(quiz_session_params) do
+      quiz_session = Quizzes.get_quiz_session!(quiz_session.id)
       conn
       |> put_status(:created)
       |> put_resp_header("location", api_quiz_session_path(conn, :show, quiz_session))
