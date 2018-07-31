@@ -13,8 +13,7 @@ defmodule Bijakhq.Game.Server do
     current_question: 0,
     questions: [],
     prize: 0,
-    prize_text: "RM 0",
-    current_viewing: 0
+    prize_text: "RM 0"
   }
   # Client
   def start_link, do: GenServer.start_link(__MODULE__, @initial_state, name: @name)

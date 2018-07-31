@@ -1,6 +1,8 @@
 defmodule BijakhqWeb.GameSessionChannel do
   use BijakhqWeb, :channel
 
+  require Logger
+
   alias BijakhqWeb.Presence
   alias Bijakhq.Quizzes
   alias Bijakhq.Quizzes.{QuizQuestion}
@@ -186,9 +188,10 @@ defmodule BijakhqWeb.GameSessionChannel do
 
   def handle_info(:after_join, socket) do
     push socket, "presence_state", Presence.list(socket)
+    Chat.viewer_add()
 
     user = socket.assigns.user
-    IO.inspect socket
+    # IO.inspect socket
 
     {:ok, _} = Presence.track(socket, "user:#{user.id}", %{
       online_at: :os.system_time(:milli_seconds),
@@ -197,6 +200,15 @@ defmodule BijakhqWeb.GameSessionChannel do
     })
 
     {:noreply, socket}
+  end
+
+  def terminate(_reason, socket) do
+    Logger.warn "Player::leave"
+    # IO.inspect user_id
+    # IO.inspect room_id
+    IO.puts "========================"
+    Chat.viewer_remove()
+    {:ok, socket}
   end
 
 end
