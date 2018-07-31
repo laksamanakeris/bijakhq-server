@@ -126,6 +126,7 @@ defmodule BijakhqWeb.GameSessionChannel do
   # GAME SESSION
   def handle_in("game:end", payload, socket) do
 
+    Server.game_end()
     # stop chat timer
     Chat.timer_end()
 

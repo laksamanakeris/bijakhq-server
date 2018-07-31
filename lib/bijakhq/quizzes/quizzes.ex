@@ -562,6 +562,11 @@ defmodule Bijakhq.Quizzes do
 
   end
 
+  def stop_game_session do
+    from(p in QuizSession, where: p.is_active == true)
+    |> Repo.update_all(set: [is_active: false])
+  end
+
   def get_game_now_status do
     current = Quizzes.get_current_game
     upcoming = Quizzes.get_upcoming_game
