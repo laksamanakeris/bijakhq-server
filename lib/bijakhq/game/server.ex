@@ -40,6 +40,7 @@ defmodule Bijakhq.Game.Server do
   end
 
   def game_end() do
+    Quizzes.stop_game_session()
   end
 
   def get_game_state do
