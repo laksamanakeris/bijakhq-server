@@ -98,8 +98,9 @@ defmodule Bijakhq.Game.Chat do
     Logger.warn "Timer Stop"
     %{ timer_ref: timer_ref, messages: _messages, current_viewing: _current_viewing} = chat_state
     cancel_timer(timer_ref)
-    new_state = Map.put(chat_state, :timer_ref, nil)
-    {:noreply, new_state}
+    # new_state = Map.put(chat_state, :timer_ref, nil)
+    # Reset timer
+    {:noreply, @chat_state}
   end
 
 
