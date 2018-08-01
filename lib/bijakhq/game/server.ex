@@ -89,4 +89,16 @@ defmodule Bijakhq.Game.Server do
     {:reply, new_game_state, new_game_state}
   end
 
+  def handle_call({:set_current_question, question_number}, _from, game_state) do
+    # new_quest_now = case quest_now do
+    #   nil ->
+    #     quest_now = quest_now ++ [user]
+    #   users ->
+    #     Map.put(quest_now, :quest_now, Enum.uniq([user | users]))
+    # end
+    game_state = Map.put(game_state, :game_started, true)
+    game_state = Map.put(game_state, :current_question, question_number)
+    {:reply, game_state, game_state}
+  end
+
 end
