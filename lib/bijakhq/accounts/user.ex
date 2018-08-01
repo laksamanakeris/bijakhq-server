@@ -33,6 +33,9 @@ defmodule Bijakhq.Accounts.User do
     field :win_count, :integer, default: 0
     field :verification_id, :string
 
+    field :rank_weekly, :integer
+    field :rank_alltime, :integer
+
     timestamps()
 
     has_many :scores, QuizScore, foreign_key: :user_id
