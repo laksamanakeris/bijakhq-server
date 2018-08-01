@@ -9,6 +9,8 @@ defmodule Bijakhq.Quizzes do
   alias Bijakhq.Quizzes
   alias Bijakhq.Quizzes.QuizCategory
   alias Bijakhq.Quizzes.QuizGameQuestion
+  alias Bijakhq.Quizzes.QuizScore
+  alias Bijakhq.Accounts.User
 
   @doc """
   Returns the list of quiz_categories.
@@ -569,4 +571,63 @@ defmodule Bijakhq.Quizzes do
       upcoming: upcoming
     }
   end
+
+
+
+
+
+
+
+  def list_quiz_scores do
+    Repo.all(QuizScore)
+  end
+
+  def get_quiz_score!(id), do: Repo.get(QuizScore, id)
+
+  def create_quiz_score(attrs \\ %{}) do
+    %QuizScore{}
+    |> QuizScore.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def update_quiz_score(%QuizScore{} = quiz_score, attrs) do
+    quiz_score
+    |> QuizScore.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def delete_quiz_score(%QuizScore{} = quiz_score) do
+    Repo.delete(quiz_score)
+  end
+
+  def change_quiz_score(%QuizScore{} = quiz_score) do
+    QuizScore.changeset(quiz_score, %{})
+  end
+
+  def list_quiz_scores_weekly do
+    query = from r in QuizScore,
+        join: d in User,
+        where: r.user_id == d.id
+
+    query = from [r, d] in query,
+        join: game in QuizSession,
+        where: r.game_id == game.id
+
+    query = from [res, dri, rac] in query,
+        # where: rac.round <= 3,
+        select: %{
+          user: dri,
+          amounts: sum(res.amount)
+          },
+        group_by: dri.id,
+        order_by: [desc: sum(res.amount)]
+
+    Repo.all query
+  end
+
+  def list_quiz_scores_all_time do
+    Repo.all(QuizScore)
+  end
+
+
 end
