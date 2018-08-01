@@ -1,6 +1,7 @@
 defmodule BijakhqWeb.Api.QuizSessionView do
   use BijakhqWeb, :view
   alias BijakhqWeb.Api.QuizSessionView
+  alias Bijakhq.Game.Server
 
   def render("index.json", %{quiz_sessions: quiz_sessions}) do
     %{data: render_many(quiz_sessions, QuizSessionView, "quiz_session.json")}
@@ -52,6 +53,19 @@ defmodule BijakhqWeb.Api.QuizSessionView do
     }
   end
 
+  def render("game_current.json", %{quiz_session: quiz_session}) do
+    %{
+      game_id: quiz_session.id,
+      name: quiz_session.name,
+      description: quiz_session.description,
+      prize: quiz_session.prize,
+      prize_description: quiz_session.prize_description,
+      time: quiz_session.time,
+      stream_url: quiz_session.stream_url,
+      game_started: quiz_session.game_started
+    }
+  end
+
 
   def render("game_question.json", %{game_question: game_question}) do
     %{data: render_many(game_question, BijakhqWeb.Api.GameQuestionView, "question.json")}
@@ -63,9 +77,24 @@ defmodule BijakhqWeb.Api.QuizSessionView do
 
   def render("now.json", %{game: game}) do
     %{ current: current, upcoming: upcoming} = game
+
+    # if current != nil do
+    #   game_state = Server.get_game_state;
+    #   %{game_started: game_started} = game_state
+    #   current = Map.put(current, :game_started, game_started)
+    # end
+
+    current =
+      case current do
+          nil   -> current
+          _ ->
+            game_state = Server.get_game_state;
+            %{game_started: game_started} = game_state
+            Map.put(current, :game_started, game_started)
+      end
     %{
       data: %{
-          current: render_one(current, QuizSessionView, "game_details.json"),
+          current: render_one(current, QuizSessionView, "game_current.json"),
           upcoming: render_many(upcoming, QuizSessionView, "game_details.json")
       }
     }
