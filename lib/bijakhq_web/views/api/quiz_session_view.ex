@@ -2,6 +2,7 @@ defmodule BijakhqWeb.Api.QuizSessionView do
   use BijakhqWeb, :view
   alias BijakhqWeb.Api.QuizSessionView
   alias Bijakhq.Game.Server
+  alias BijakhqWeb.Api.UserView
 
   def render("index.json", %{quiz_sessions: quiz_sessions}) do
     %{data: render_many(quiz_sessions, QuizSessionView, "quiz_session.json")}
@@ -99,4 +100,19 @@ defmodule BijakhqWeb.Api.QuizSessionView do
       }
     }
   end
+
+  #  leaderboard
+  def render("leaderboard.json", %{scores: scores}) do
+    %{data: render_many(scores, QuizSessionView, "score.json")}
+  end
+
+  def render("score.json", %{quiz_session: quiz_session}) do
+    %{
+      amounts: quiz_session.amounts,
+      username: quiz_session.user.username,
+      user_id: quiz_session.user.id,
+      profile_picture: UserView.check_profile_picture(quiz_session.user.profile_picture)
+    }
+  end
+
 end
