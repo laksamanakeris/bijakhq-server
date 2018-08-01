@@ -36,8 +36,7 @@ defmodule BijakhqWeb.Api.QuizSessionView do
       current_question: quiz_session.current_question,
       questions: render_many(quiz_session.questions, BijakhqWeb.Api.GameQuestionView, "game_start_question.json"),
       prize: quiz_session.prize,
-      prize_text: quiz_session.prize_text,
-      current_viewing: quiz_session.current_viewing
+      prize_text: quiz_session.prize_text
     }
   end
 
