@@ -6,7 +6,8 @@ defmodule Bijakhq.Game.Players do
   @name :game_players
   @players_state %{
     quest_now: [],
-    quest_next: []
+    quest_next: [],
+    results: []
   }
 
   def start_link() do
@@ -37,6 +38,14 @@ defmodule Bijakhq.Game.Players do
     GenServer.call(@name, :users_ready_next_question)
   end
 
+  def set_game_result(users) do
+    GenServer.call(@name, {:set_game_result, users})
+  end
+
+  def get_game_result() do
+    GenServer.call(@name, :get_game_result)
+  end
+
   # GenServer implementation
 
   def init(args) do
@@ -48,7 +57,8 @@ defmodule Bijakhq.Game.Players do
 
   def handle_call({:user_joined, user}, _from, players_state) do
 
-    %{ quest_now: quest_now, quest_next: _quest_next } = players_state
+    # %{ quest_now: quest_now, quest_next: _quest_next } = players_state
+    quest_now = Map.get(players_state, :quest_now)
 
     # new_quest_now = case quest_now do
     #   nil ->
@@ -63,9 +73,12 @@ defmodule Bijakhq.Game.Players do
     {:reply, new_state, new_state}
   end
 
+
+
+
   def handle_call(:users_ready_next_question, _from, players_state) do
-    %{ quest_now: _, quest_next: quest_next } = players_state
-    new_state = %{ quest_now: quest_next, quest_next: [] }
+    %{ quest_now: _, quest_next: quest_next, results: _ } = players_state
+    new_state = %{ quest_now: quest_next, quest_next: [], results: [] }
     {:reply, new_state, new_state}
   end
 
@@ -112,4 +125,23 @@ defmodule Bijakhq.Game.Players do
     # end)
     {:reply, player, players_state}
   end
+
+
+  # Games
+  def handle_call({:set_game_result, users}, _from, players_state) do
+    IO.puts "set_game_result"
+
+    Logger.warn "set_game_result"
+    new_state = Map.put(players_state, :results, users)
+    {:reply, new_state, new_state}
+  end
+
+  def handle_call(:get_game_result, _from, players_state) do
+    IO.puts "get_game_result"
+
+    Logger.warn "get_game_result"
+    results = Map.get(players_state, :results)
+    {:reply, results, players_state}
+  end
+
 end

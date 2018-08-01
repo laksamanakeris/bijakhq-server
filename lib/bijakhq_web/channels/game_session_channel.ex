@@ -132,8 +132,23 @@ defmodule BijakhqWeb.GameSessionChannel do
     {:noreply, socket}
   end
 
+  def handle_in("game:result:process", _payload, socket) do
+    # broadcast socket, "game:result:show", payload
+    with game_result = Server.game_process_result() do
+      # IO.inspect game
+      response = Phoenix.View.render_one(game_result.results, BijakhqWeb.Api.UserView, "game_result_index.json")
+      IO.inspect response
+      {:reply, {:ok, response}, socket}
+    end
+    # {:noreply, socket}
+  end
+
   def handle_in("game:result:show", payload, socket) do
-    broadcast socket, "game:result:show", payload
+
+    winners = Players.get_game_result()
+    IO.inspect winners
+    response = Phoenix.View.render_many(winners, BijakhqWeb.Api.UserView, "game_result_index.json")
+    broadcast socket, "game:result:show", winners
     {:noreply, socket}
   end
 
@@ -220,9 +235,9 @@ defmodule BijakhqWeb.GameSessionChannel do
   def add_user_to_game_player_list(user) do
     game_state = Server.get_game_state
     game_started = Map.get(game_state, :game_started)
-    case game_started do
-      false ->
-        Players.user_joined(user)
+
+    if game_started == false do
+      Players.user_joined(user)
     end
   end
 
@@ -250,7 +265,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     with game = Server.get_game_state do
       # IO.inspect game
       questions = game.questions
-      question = Enum.at( questions , question_id)
+      question = Enum.at(questions,question_id)
       question.answers_sequence
     end
   end
