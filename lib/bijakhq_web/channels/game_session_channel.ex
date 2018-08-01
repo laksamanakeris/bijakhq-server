@@ -222,7 +222,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     with Players.user_find(user) do
       increment_question_answer(question_id, answer_id)
       question = get_question_by_id(question_id)
-      selected_answer = Enum.find(question, fn u -> u.id == answer_id end)
+      selected_answer = Enum.find(question.answer, fn u -> u.id == answer_id end)
       if selected_answer.answer == true do
         Players.user_go_to_next_question(user)
       end
