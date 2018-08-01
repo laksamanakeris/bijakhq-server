@@ -29,6 +29,10 @@ defmodule Bijakhq.Game.Players do
     GenServer.call(@name, {:user_find, user_id})
   end
 
+  def user_go_to_next_question(user) do
+    GenServer.call(@name, {:user_go_to_next_question, user})
+  end
+
   # GenServer implementation
 
   def init(args) do
@@ -52,6 +56,23 @@ defmodule Bijakhq.Game.Players do
     quest_now = Enum.uniq(quest_now)
 
     new_state = Map.put(players_state, :quest_now, quest_now)
+    {:reply, new_state, new_state}
+  end
+
+  def handle_call({:user_go_to_next_question, user}, _from, players_state) do
+
+    %{ quest_now: _quest_now, quest_next: quest_next } = players_state
+
+    # new_quest_now = case quest_now do
+    #   nil ->
+    #     quest_now = quest_now ++ [user]
+    #   users ->
+    #     Map.put(quest_now, :quest_now, Enum.uniq([user | users]))
+    # end
+    quest_next = quest_next ++ [user]
+    quest_next = Enum.uniq(quest_next)
+
+    new_state = Map.put(players_state, :quest_next, quest_next)
     {:reply, new_state, new_state}
   end
 
