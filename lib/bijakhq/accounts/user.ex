@@ -2,6 +2,7 @@ defmodule Bijakhq.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
   alias Bijakhq.Accounts.User
+  alias Bijakhq.Quizzes.QuizScore
   use Arc.Ecto.Schema
 
   schema "users" do
@@ -33,6 +34,8 @@ defmodule Bijakhq.Accounts.User do
     field :verification_id, :string
 
     timestamps()
+
+    has_many :scores, QuizScore, foreign_key: :user_id
   end
 
   def changeset(%User{} = user, attrs) do
