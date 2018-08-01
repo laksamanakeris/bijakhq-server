@@ -42,8 +42,8 @@ defmodule Bijakhq.Game.Server do
     GenServer.cast(@name, game_state)
   end
 
-  def question_show(question_number) do
-
+  def set_current_question(question_number) do
+    GenServer.call(@name, {:set_current_question, question_number})
   end
 
   def question_result(question_number) do

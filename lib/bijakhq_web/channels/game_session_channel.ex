@@ -56,6 +56,8 @@ defmodule BijakhqWeb.GameSessionChannel do
     %{"question_id" => question_id} = payload
 
     with game = Server.get_game_state do
+
+      Server.set_current_question(question_id)
       # IO.inspect game
       questions = game.questions
       question = Enum.at( questions , question_id)
