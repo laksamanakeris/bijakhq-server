@@ -58,6 +58,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     with game = Server.get_game_state do
 
       Server.set_current_question(question_id)
+      Players.users_ready_next_question()
       # IO.inspect game
       questions = game.questions
       question = Enum.at( questions , question_id)
