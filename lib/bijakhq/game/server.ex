@@ -8,9 +8,10 @@ defmodule Bijakhq.Game.Server do
   @name :game_server
 
   @initial_state %{
+    game_started: false,
     session_id: nil,
     total_questions: 0,
-    current_question: 0,
+    current_question: nil,
     questions: [],
     prize: 0,
     prize_text: "RM 0"
@@ -21,7 +22,21 @@ defmodule Bijakhq.Game.Server do
   def game_start(game_id) do
 
     # Game state format - @initial_state
-    game_state = Quizzes.get_initial_game_state(game_id)
+    game_data = Quizzes.get_initial_game_state(game_id)
+    IO.inspect game_data
+
+    %{ game_details: game_details, game_questions: game_questions } = game_data
+
+    game_state = %{
+      game_started: false,
+      session_id: game_details.id,
+      total_questions: Enum.count(game_questions),
+      current_question: nil,
+      questions: game_questions,
+      prize: game_details.prize,
+      prize_text: "RM #{game_details.prize}"
+    }
+
     # activate game
     Quizzes.activate_game_session(game_id)
     GenServer.cast(@name, game_state)
@@ -46,6 +61,10 @@ defmodule Bijakhq.Game.Server do
     GenServer.call(@name, :game_state)
   end
 
+  def update_game_state(new_game_state) do
+    GenServer.call(@name, {:update_game_state, new_game_state})
+  end
+
   # Server
   def init(game_state) do
     Logger.warn "Game server initialized"
@@ -62,6 +81,12 @@ defmodule Bijakhq.Game.Server do
     # IO.inspect _from
     # IO.inspect game_state
     {:reply, game_state, game_state}
+  end
+
+  def handle_call({:update_game_state, new_game_state}, _from, game_state) do
+    # IO.inspect _from
+    # IO.inspect game_state
+    {:reply, new_game_state, new_game_state}
   end
 
 end
