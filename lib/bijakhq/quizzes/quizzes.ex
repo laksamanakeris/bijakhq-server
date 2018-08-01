@@ -505,21 +505,14 @@ defmodule Bijakhq.Quizzes do
     # game_details = Bijakhq.MapHelpers.atomize_keys(game_details.game_questions)
 
     game_questions = Enum.map(game_details.game_questions, fn(quest) ->
-      atomized = Bijakhq.MapHelpers.atomize_keys(quest.answers_sequence)
-      quest = Map.put(quest, :answers_sequence, atomized)
-      # IO.inspect quest
-    end)
+        atomized = Bijakhq.MapHelpers.atomize_keys(quest.answers_sequence)
+        quest = Map.put(quest, :answers_sequence, atomized)
+        # IO.inspect quest
+      end)
 
-    # IO.puts "===================================================================================================================================================================================="
-
-    game_state = %{
-      session_id: game_details.id,
-      total_questions: Enum.count(game_questions),
-      current_question: 0,
-      questions: game_questions,
-      prize: game_details.prize,
-      prize_text: "RM #{game_details.prize}",
-      current_viewing: 0
+    %{
+      game_details: game_details,
+      game_questions: game_questions
     }
   end
 
