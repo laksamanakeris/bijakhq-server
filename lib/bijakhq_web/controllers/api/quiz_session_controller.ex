@@ -50,4 +50,14 @@ defmodule BijakhqWeb.Api.QuizSessionController do
     render(conn, "now.json", game: game)
   end
 
+  def leaderboard_weekly(conn,_params) do
+    game = Quizzes.list_quiz_scores_weekly()
+    render(conn, "leaderboard.json", scores: game)
+  end
+
+  def leaderboard_alltime(conn,_params) do
+    game = Quizzes.list_quiz_scores_weekly()
+    render(conn, "leaderboard.json", scores: game)
+  end
+
 end
