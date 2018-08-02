@@ -77,8 +77,10 @@ defmodule BijakhqWeb.Api.GameQuestionController do
     end
   end
 
-  def delete(conn, %{"id" => id}) do
-    game_question = Quizzes.get_game_question!(id)
+  def delete(conn, %{"id" => id}, game) do
+    attrs = %{session_id: game.id, question_id: id}
+    game_question = Quizzes.get_game_question_by!(attrs)
+
     with {:ok, %QuizGameQuestion{}} <- Quizzes.delete_game_question(game_question) do
       send_resp(conn, :no_content, "")
     end

@@ -9,6 +9,8 @@ defmodule Bijakhq.Quizzes do
   alias Bijakhq.Quizzes
   alias Bijakhq.Quizzes.QuizCategory
   alias Bijakhq.Quizzes.QuizGameQuestion
+  alias Bijakhq.Quizzes.QuizScore
+  alias Bijakhq.Accounts.User
 
   @doc """
   Returns the list of quiz_categories.
@@ -505,21 +507,14 @@ defmodule Bijakhq.Quizzes do
     # game_details = Bijakhq.MapHelpers.atomize_keys(game_details.game_questions)
 
     game_questions = Enum.map(game_details.game_questions, fn(quest) ->
-      atomized = Bijakhq.MapHelpers.atomize_keys(quest.answers_sequence)
-      quest = Map.put(quest, :answers_sequence, atomized)
-      # IO.inspect quest
-    end)
+        atomized = Bijakhq.MapHelpers.atomize_keys(quest.answers_sequence)
+        quest = Map.put(quest, :answers_sequence, atomized)
+        # IO.inspect quest
+      end)
 
-    # IO.puts "===================================================================================================================================================================================="
-
-    game_state = %{
-      session_id: game_details.id,
-      total_questions: Enum.count(game_questions),
-      current_question: 0,
-      questions: game_questions,
-      prize: game_details.prize,
-      prize_text: "RM #{game_details.prize}",
-      current_viewing: 0
+    %{
+      game_details: game_details,
+      game_questions: game_questions
     }
   end
 
@@ -562,6 +557,11 @@ defmodule Bijakhq.Quizzes do
 
   end
 
+  def stop_game_session do
+    from(p in QuizSession, where: p.is_active == true)
+    |> Repo.update_all(set: [is_active: false])
+  end
+
   def get_game_now_status do
     current = Quizzes.get_current_game
     upcoming = Quizzes.get_upcoming_game
@@ -571,4 +571,63 @@ defmodule Bijakhq.Quizzes do
       upcoming: upcoming
     }
   end
+
+
+
+
+
+
+
+  def list_quiz_scores do
+    Repo.all(QuizScore)
+  end
+
+  def get_quiz_score!(id), do: Repo.get(QuizScore, id)
+
+  def create_quiz_score(attrs \\ %{}) do
+    %QuizScore{}
+    |> QuizScore.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def update_quiz_score(%QuizScore{} = quiz_score, attrs) do
+    quiz_score
+    |> QuizScore.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def delete_quiz_score(%QuizScore{} = quiz_score) do
+    Repo.delete(quiz_score)
+  end
+
+  def change_quiz_score(%QuizScore{} = quiz_score) do
+    QuizScore.changeset(quiz_score, %{})
+  end
+
+  def list_quiz_scores_weekly do
+    query = from r in QuizScore,
+        join: d in User,
+        where: r.user_id == d.id
+
+    query = from [r, d] in query,
+        join: game in QuizSession,
+        where: r.game_id == game.id
+
+    query = from [res, dri, rac] in query,
+        # where: rac.round <= 3,
+        select: %{
+          user: dri,
+          amounts: sum(res.amount)
+          },
+        group_by: dri.id,
+        order_by: [desc: sum(res.amount)]
+
+    Repo.all query
+  end
+
+  def list_quiz_scores_all_time do
+    Repo.all(QuizScore)
+  end
+
+
 end
