@@ -4,6 +4,7 @@ defmodule Bijakhq.Quizzes.QuizSession do
 
   alias Bijakhq.Quizzes.QuizQuestion
   alias Bijakhq.Quizzes.QuizGameQuestion
+  alias Bijakhq.Quizzes.QuizScore
 
 
 
@@ -20,6 +21,7 @@ defmodule Bijakhq.Quizzes.QuizSession do
     field :stream_url, :string
 
     has_many :game_questions, QuizGameQuestion, foreign_key: :session_id
+    has_many :scores, QuizScore, foreign_key: :game_id
     many_to_many :questions, QuizQuestion, join_through: "quiz_session_question"
 
     timestamps()
