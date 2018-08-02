@@ -147,8 +147,8 @@ defmodule BijakhqWeb.GameSessionChannel do
 
     winners = Players.get_game_result()
     IO.inspect winners
-    response = Phoenix.View.render_many(winners, BijakhqWeb.Api.UserView, "game_result_index.json")
-    broadcast socket, "game:result:show", winners
+    response = Phoenix.View.render_one(winners, BijakhqWeb.Api.UserView, "game_result_index.json")
+    broadcast socket, "game:result:show", response
     {:noreply, socket}
   end
 
