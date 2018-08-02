@@ -3,6 +3,9 @@ defmodule Bijakhq.Game.Players do
   use GenServer
   require Logger
 
+  alias Bijakhq.Quizzes
+  alias Bijakhq.Quizzes.QuizScore
+
   @name :game_players
   @players_state %{
     quest_now: [],
@@ -44,6 +47,10 @@ defmodule Bijakhq.Game.Players do
 
   def get_game_result() do
     GenServer.call(@name, :get_game_result)
+  end
+
+  def game_save_scores(game_id) do
+    GenServer.call(@name, {:game_save_scores, game_id})
   end
 
   # GenServer implementation
@@ -129,18 +136,30 @@ defmodule Bijakhq.Game.Players do
 
   # Games
   def handle_call({:set_game_result, users}, _from, players_state) do
-    IO.puts "set_game_result"
-
     Logger.warn "set_game_result"
     new_state = Map.put(players_state, :results, users)
     {:reply, new_state, new_state}
   end
 
   def handle_call(:get_game_result, _from, players_state) do
-    IO.puts "get_game_result"
-
     Logger.warn "get_game_result"
     results = Map.get(players_state, :results)
+    {:reply, results, players_state}
+  end
+
+
+  def handle_call({:game_save_scores, game_id}, _from, players_state) do
+    Logger.warn "game_save_scores"
+    results = Map.get(players_state, :results)
+
+    Enum.map(results, fn(subj) ->
+      score = %{amount: subj.amounts, user_id: subj.id, game_id: game_id, completed_at: DateTime.utc_now}
+      with {:ok, %QuizScore{} = quiz_score} <- Bijakhq.Quizzes.create_quiz_score(score) do
+        IO.inspect quiz_score
+      end
+
+    end)
+
     {:reply, results, players_state}
   end
 
