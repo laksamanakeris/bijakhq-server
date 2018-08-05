@@ -241,8 +241,8 @@ defmodule BijakhqWeb.GameSessionChannel do
   def add_user_to_game_player_list(user) do
     game_state = Server.get_game_state
     game_started = Map.get(game_state, :game_started)
-
-    if game_started == false do
+    Logger.warn "Connected user is #{user.role}"
+    if game_started == false and user.role != "admin" do
       Players.user_joined(user)
     end
   end
