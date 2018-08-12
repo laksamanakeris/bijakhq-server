@@ -44,6 +44,13 @@ defmodule BijakhqWeb.Api.UserView do
     }
   end
 
+  def render("username_available.json", %{response: response}) do
+    %{
+      available: response.available,
+      message: response.message
+    }
+  end
+
   def check_profile_picture(nil) do
     "https://storage.googleapis.com/bijakhq_avatars/uploads/user/avatars/avatar_circle_blue_512dp.png"
   end
