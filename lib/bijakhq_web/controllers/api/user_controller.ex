@@ -12,9 +12,9 @@ defmodule BijakhqWeb.Api.UserController do
 
   # the following plugs are defined in the controllers/authorize.ex file
   # plug :user_check when action in [:index, :show]
-  plug :role_check, [roles: ["admin"]] when action in [:index, :delete]
+  plug :role_check, [roles: ["admin"]] when action in [:index, :update, :delete]
   plug :id_or_role, [roles: ["admin"]] when action in [:show]
-  plug :id_check when action in [:update, :delete]
+  # plug :id_check when action in [:update, :delete]
   plug :user_check when action in [:upload_image_profile, :show_me]
 
   def index(conn, _) do
@@ -60,12 +60,13 @@ defmodule BijakhqWeb.Api.UserController do
     end
   end
 
-  def show(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"id" => id}) do
-    user = (id == to_string(user.id) and user) || Accounts.get(id)
+  def show(conn, %{"id" => id}) do
+    user = Accounts.get(id)
     render(conn, "show.json", user: user)
   end
 
-  def update(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"user" => user_params}) do
+  def update(conn, %{"id" => id, "user" => user_params}) do
+    user = Accounts.get(id)
     with {:ok, user} <- Accounts.update_user(user, user_params) do
       render(conn, "show.json", user: user)
     end
