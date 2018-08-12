@@ -15,7 +15,7 @@ defmodule BijakhqWeb.Api.UserController do
   plug :role_check, [roles: ["admin"]] when action in [:index, :update, :delete]
   plug :id_or_role, [roles: ["admin"]] when action in [:show]
   # plug :id_check when action in [:update, :delete]
-  plug :user_check when action in [:upload_image_profile, :show_me]
+  plug :user_check when action in [:upload_image_profile, :show_me, :update_me]
 
   def index(conn, _) do
     users = Accounts.list_users()
@@ -83,6 +83,12 @@ defmodule BijakhqWeb.Api.UserController do
     # profile = Accounts.get(user.id);
     # render(conn, "show_me.json", %{user: user, profile: profile})
     render(conn, "show_me.json", %{user: user})
+  end
+
+  def update_me(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"username" => username} = user_params) do
+    with {:ok, user} <- Accounts.update_username(user, user_params) do
+      render(conn, "show_me.json", %{user: user})
+    end
   end
 
   def upload_image_profile(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"profile_picture" => _params} = user_params) do

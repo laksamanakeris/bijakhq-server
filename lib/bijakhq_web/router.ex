@@ -39,7 +39,8 @@ defmodule BijakhqWeb.Router do
     post "/users/me/upload", UserController, :upload_image_profile
     post "/users/username/available", UserController, :check_username
     get "/users/me", UserController, :show_me
-    resources "/users", UserController, except: [:new, :edit]
+    put "/users/me", UserController, :update_me
+
     get "/confirm", ConfirmController, :index
     post "/password_resets", PasswordResetController, :create
     put "/password_resets/update", PasswordResetController, :update
