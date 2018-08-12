@@ -75,6 +75,13 @@ defmodule Bijakhq.Accounts.User do
     |> validate_required([:profile_picture])
   end
 
+  def update_username_changeset(%User{} = user, attrs)do
+    user
+    |> cast(attrs, [:username])
+    |> validate_required([:username])
+    |> unique_username
+  end
+
   defp unique_username(changeset) do
     validate_length(changeset, :username, min: 3)
     |> unique_constraint(:username)
