@@ -84,7 +84,7 @@ defmodule BijakhqWeb.Api.UserController do
     render(conn, "show_me.json", %{user: user})
   end
 
-  def upload_image_profile(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"profile_picture" => params} = user_params) do
+  def upload_image_profile(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"profile_picture" => _params} = user_params) do
     IO.puts "===================================================================================="
     IO.inspect user
     IO.inspect user_params
@@ -97,5 +97,18 @@ defmodule BijakhqWeb.Api.UserController do
       render(conn, "show_me.json", user: user)
     end
     # render(conn, "show_me.json", user: user)
+  end
+
+  def check_username(conn, %{"username" => username} = user_params) do
+    case result = Accounts.get_by(user_params) do
+      nil ->
+        # render(conn, "username_unavailable.json", nil)
+        response = %{available: true, message: "Username is available" }
+        render(conn, "username_available.json", %{response: response})
+      _ ->
+        # render(conn, "empty.json", nil)
+        response = %{available: false, message: "Username is not available" }
+        render(conn, "username_available.json", %{response: response})
+    end
   end
 end
