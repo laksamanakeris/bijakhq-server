@@ -614,7 +614,8 @@ defmodule Bijakhq.Quizzes do
         where: r.game_id == game.id
 
     query = from [res, dri, rac] in query,
-        # where: rac.round <= 3,
+        where: res.inserted_at >= ^Timex.beginning_of_week(Timex.now),
+        where: res.inserted_at <= ^Timex.end_of_week(Timex.now),
         select: %{
           user: dri,
           amounts: sum(res.amount)
@@ -626,7 +627,24 @@ defmodule Bijakhq.Quizzes do
   end
 
   def list_quiz_scores_all_time do
-    Repo.all(QuizScore)
+    query = from r in QuizScore,
+        join: d in User,
+        where: r.user_id == d.id
+
+    query = from [r, d] in query,
+        join: game in QuizSession,
+        where: r.game_id == game.id
+
+    query = from [res, dri, rac] in query,
+        # where: rac.round <= 3,
+        select: %{
+          user: dri,
+          amounts: sum(res.amount)
+          },
+        group_by: dri.id,
+        order_by: [desc: sum(res.amount)]
+
+    Repo.all query
   end
 
   def get_user_ranking_alltime(user_id) do

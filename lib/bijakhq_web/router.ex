@@ -32,6 +32,8 @@ defmodule BijakhqWeb.Router do
         get "/questions/:id/randomize_answers", GameQuestionController, :randomize_answers
         resources "/questions", GameQuestionController, except: [:new, :edit]
       end
+      get "/games/leaderboard/weekly", QuizSessionController, :leaderboard_weekly
+      get "/games/leaderboard/all-time", QuizSessionController, :leaderboard_alltime
 
 
     end
