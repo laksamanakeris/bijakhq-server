@@ -629,5 +629,34 @@ defmodule Bijakhq.Quizzes do
     Repo.all(QuizScore)
   end
 
+  def get_user_ranking_alltime(user_id) do
+    query = from r in QuizScore,
+        join: d in User,
+        where: r.user_id == d.id
+
+    query = from [res, dri] in query,
+        # where: dri.id == ^user_id,
+        select: %{
+          username: dri.username,
+          user_id: dri.id,
+          amounts: sum(res.amount),
+          rank: fragment("rank() OVER (ORDER BY sum(q0.amount) DESC)")
+          # rank: fragment("rank() OVER (PARTITION BY user_id ORDER BY username DESC)")
+          },
+        group_by: dri.id,
+        order_by: [desc: sum(res.amount)]
+
+    Repo.all query
+  end
+
+
+  def get_total_amount_by_user_id(user_id) do
+    amount = Repo.one(from p in QuizScore, where: p.user_id == ^user_id, select: sum(p.amount))
+    case amount do
+      nil -> 0
+      _ -> amount
+    end
+  end
+
 
 end

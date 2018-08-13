@@ -30,7 +30,8 @@ defmodule BijakhqWeb.Api.UserView do
       username: user.username,
       profile_picture: UserView.check_profile_picture(user.profile_picture),
       rank_weekly: user.rank_weekly,
-      rank_alltime: user.rank_alltime
+      rank_alltime: user.rank_alltime,
+      balance: user.balance
     }
   end
 

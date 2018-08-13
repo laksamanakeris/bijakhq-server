@@ -7,6 +7,7 @@ defmodule BijakhqWeb.Api.UserController do
   alias Bijakhq.Sms
   alias Bijakhq.Sms.NexmoRequest
   alias Bijakhq.ImageFile
+  alias Bijakhq.Payments
 
   action_fallback BijakhqWeb.Api.FallbackController
 
@@ -82,13 +83,20 @@ defmodule BijakhqWeb.Api.UserController do
     # user = id == to_string(user.id) and user || Accounts.get(id)
     # profile = Accounts.get(user.id);
     # render(conn, "show_me.json", %{user: user, profile: profile})
+    user = add_balance_to_user(user)
     render(conn, "show_me.json", %{user: user})
   end
 
   def update_me(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"username" => username} = user_params) do
     with {:ok, user} <- Accounts.update_username(user, user_params) do
+      user = add_balance_to_user(user)
       render(conn, "show_me.json", %{user: user})
     end
+  end
+
+  def add_balance_to_user(user)do
+    balance = Payments.get_balance_by_user_id(user.id)
+    user |> Map.put(:balance, balance)
   end
 
   def upload_image_profile(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"profile_picture" => _params} = user_params) do
