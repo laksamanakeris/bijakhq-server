@@ -7,6 +7,10 @@ defmodule Bijakhq.Payments do
   alias Bijakhq.Repo
 
   alias Bijakhq.Payments.Payment
+  alias Bijakhq.Accounts.User
+  alias Bijakhq.Quizzes.QuizScore
+  alias Bijakhq.Quizzes
+  alias Bijakhq.Payments
 
   @doc """
   Returns the list of payment_history.
@@ -100,5 +104,20 @@ defmodule Bijakhq.Payments do
   """
   def change_payment(%Payment{} = payment) do
     Payment.changeset(payment, %{})
+  end
+
+  # get amount from score
+  def get_total_payment_to_user_id(user_id) do
+    amount = Repo.one(from p in Payment, where: p.user_id == ^user_id, select: sum(p.amount))
+    case amount do
+      nil -> 0
+      _ -> amount
+    end
+  end
+
+  def get_balance_by_user_id(user_id) do
+    total_amount = Quizzes.get_total_amount_by_user_id(user_id)
+    total_payment = get_total_payment_to_user_id(user_id)
+    total_amount - total_payment
   end
 end
