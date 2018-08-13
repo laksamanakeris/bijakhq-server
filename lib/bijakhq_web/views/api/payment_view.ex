@@ -1,6 +1,6 @@
 defmodule BijakhqWeb.Api.PaymentView do
   use BijakhqWeb, :view
-  alias BijakhqWeb.PaymentView
+  alias BijakhqWeb.Api.PaymentView
 
   def render("index.json", %{payment_history: payment_history}) do
     %{data: render_many(payment_history, PaymentView, "payment.json")}
@@ -16,6 +16,8 @@ defmodule BijakhqWeb.Api.PaymentView do
       user_id: payment.user_id,
       payment_at: payment.payment_at,
       remarks: payment.remarks,
-      updated_by: payment.updated_by}
+      updated_by: payment.updated_by,
+      inserted_at: payment.inserted_at,
+      updated_at: payment.updated_at}
   end
 end

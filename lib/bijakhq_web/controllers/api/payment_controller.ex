@@ -4,7 +4,7 @@ defmodule BijakhqWeb.Api.PaymentController do
   alias Bijakhq.Payments
   alias Bijakhq.Payments.Payment
 
-  action_fallback BijakhqWeb.FallbackController
+  action_fallback BijakhqWeb.Api.FallbackController
 
   def index(conn, _params) do
     payment_history = Payments.list_payment_history()
