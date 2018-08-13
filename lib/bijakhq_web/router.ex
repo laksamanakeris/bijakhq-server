@@ -26,6 +26,8 @@ defmodule BijakhqWeb.Router do
       resources "/categories", QuizCategoryController, except: [:new, :edit]
       resources "/questions", QuizQuestionController, except: [:new, :edit]
 
+      resources "/payments", PaymentController, except: [:new, :edit]
+
       resources "/games", QuizSessionController, except: [:new, :edit] do
         get "/questions/:id/randomize_answers", GameQuestionController, :randomize_answers
         resources "/questions", GameQuestionController, except: [:new, :edit]
