@@ -1,17 +1,22 @@
 defmodule BijakhqWeb.Api.PaymentController do
   use BijakhqWeb, :controller
 
+  import BijakhqWeb.Api.Authorize
   alias Bijakhq.Payments
   alias Bijakhq.Payments.Payment
 
   action_fallback BijakhqWeb.Api.FallbackController
+
+  plug :role_check, [roles: ["admin"]] when action in [:index, :create, :show, :update, :delete]
 
   def index(conn, _params) do
     payment_history = Payments.list_payment_history()
     render(conn, "index.json", payment_history: payment_history)
   end
 
-  def create(conn, %{"payment" => payment_params}) do
+  # def create(conn, %{"payment" => payment_params}) do
+  def create(%Plug.Conn{assigns: %{current_user: admin}} = conn, %{"payment" => payment_params}) do
+    Map.put(payment_params, :update_by, admin.id)
     with {:ok, %Payment{} = payment} <- Payments.create_payment(payment_params) do
       conn
       |> put_status(:created)
@@ -25,9 +30,9 @@ defmodule BijakhqWeb.Api.PaymentController do
     render(conn, "show.json", payment: payment)
   end
 
-  def update(conn, %{"id" => id, "payment" => payment_params}) do
+  def update(%Plug.Conn{assigns: %{current_user: admin}} = conn, %{"id" => id, "payment" => payment_params}) do
     payment = Payments.get_payment!(id)
-
+    Map.put(payment_params, :update_by, admin.id)
     with {:ok, %Payment{} = payment} <- Payments.update_payment(payment, payment_params) do
       render(conn, "show.json", payment: payment)
     end

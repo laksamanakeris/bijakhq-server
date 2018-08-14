@@ -10,8 +10,8 @@ defmodule Bijakhq.Payments.Payment do
     field :payment_at, :utc_datetime
     field :remarks, :string
 
-    belongs_to :player, User, foreign_key: :user_id
-    belongs_to :admin, User, foreign_key: :updated_by
+    belongs_to :user, User, foreign_key: :user_id
+    belongs_to :update_by, User, foreign_key: :updated_by
 
     timestamps()
   end

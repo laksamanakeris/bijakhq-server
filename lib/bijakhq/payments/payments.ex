@@ -22,7 +22,7 @@ defmodule Bijakhq.Payments do
 
   """
   def list_payment_history do
-    Repo.all(Payment)
+    Repo.all(Payment) |> Repo.preload([:user, :update_by])
   end
 
   @doc """
@@ -39,7 +39,9 @@ defmodule Bijakhq.Payments do
       ** (Ecto.NoResultsError)
 
   """
-  def get_payment!(id), do: Repo.get!(Payment, id)
+  def get_payment!(id) do
+    Repo.get(Payment, id) |> Repo.preload([:user, :update_by])
+  end
 
   @doc """
   Creates a payment.
