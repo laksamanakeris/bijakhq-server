@@ -55,7 +55,7 @@ defmodule BijakhqWeb.Api.Authorize do
     else: error(conn, :unauthorized, 403)
   end
 
-  def id_or_role(%Plug.Conn{assigns: %{current_user: nil}} = conn, opts) do
+  def id_or_role(%Plug.Conn{assigns: %{current_user: nil}} = conn, _opts) do
     error(conn, :unauthorized, 403)
   end
   def id_or_role(%Plug.Conn{params: %{"id" => id}, assigns: %{current_user: current_user}} = conn, opts) do
