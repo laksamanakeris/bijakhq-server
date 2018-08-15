@@ -73,7 +73,8 @@ defmodule BijakhqWeb.Api.UserController do
     end
   end
 
-  def delete(%Plug.Conn{assigns: %{current_user: user}} = conn, _) do
+  def show(conn, %{"id" => id}) do
+    user = Accounts.get(id)
     {:ok, _user} = Accounts.delete_user(user)
 
     send_resp(conn, :no_content, "")
