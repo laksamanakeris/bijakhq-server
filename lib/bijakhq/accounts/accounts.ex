@@ -6,6 +6,7 @@ defmodule Bijakhq.Accounts do
   import Ecto.{Query, Changeset}, warn: false
   alias Phauxth.Log
   alias Bijakhq.{Accounts.User, Repo}
+  alias Bijakhq.Accounts.Referral
 
   def list_users do
     Repo.all(User)
@@ -80,5 +81,34 @@ defmodule Bijakhq.Accounts do
 
   def change_user(%User{} = user) do
     User.changeset(user, %{})
+  end
+
+
+
+  def list_referrals do
+    Repo.all(Referral) |> Repo.preload([:user, :referrer])
+  end
+  def get_referral!(id), do: Repo.get!(Referral, id) |> Repo.preload([:user, :referrer])
+
+  def create_referral(attrs \\ %{}) do
+    %Referral{}
+    |> Referral.changeset(attrs)
+    |> Repo.insert()
+    |> Repo.preload([:user, :referrer])
+  end
+
+  def update_referral(%Referral{} = referral, attrs) do
+    referral
+    |> Referral.changeset(attrs)
+    |> Repo.update()
+    |> Repo.preload([:user, :referrer])
+  end
+
+  def delete_referral(%Referral{} = referral) do
+    Repo.delete(referral)
+  end
+
+  def change_referral(%Referral{} = referral) do
+    Referral.changeset(referral, %{})
   end
 end
