@@ -22,6 +22,7 @@ defmodule BijakhqWeb.Router do
 
     scope "/admin" do
       resources "/users", UserController, except: [:new, :edit]
+      resources "/referrals", ReferralController, except: [:new, :edit]
 
       resources "/categories", QuizCategoryController, except: [:new, :edit]
       resources "/questions", QuizQuestionController, except: [:new, :edit]
