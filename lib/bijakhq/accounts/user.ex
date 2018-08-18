@@ -47,6 +47,7 @@ defmodule Bijakhq.Accounts.User do
     |> cast(attrs, [:email, :username, :phone, :profile_picture, :confirmed_at, :role, :country, :language, :games_played, :has_phone, :high_score, :lives, :referral_url, :referred, :referring_user_id, :win_count, :verification_id, :rank_weekly, :rank_alltime])
     |> validate_required([:username])
     |> unique_email
+    |> unique_username
   end
 
   def create_changeset(%User{} = user, attrs) do
@@ -54,6 +55,7 @@ defmodule Bijakhq.Accounts.User do
     |> cast(attrs, [:email, :password, :username, :role])
     |> validate_required([:email, :password])
     |> unique_email
+    |> unique_username
     |> validate_password(:password)
     |> put_pass_hash
   end
@@ -86,6 +88,7 @@ defmodule Bijakhq.Accounts.User do
   defp unique_username(changeset) do
     validate_length(changeset, :username, min: 3)
     |> unique_constraint(:username)
+    |> downcase_username
   end
 
   defp unique_phone(changeset) do
@@ -97,6 +100,10 @@ defmodule Bijakhq.Accounts.User do
     validate_format(changeset, :email, ~r/@/)
     |> validate_length(:email, max: 254)
     |> unique_constraint(:email)
+  end
+
+  defp downcase_username(changeset) do
+    update_change(changeset, :username, &String.downcase/1)
   end
 
   defp add_timestamp(%{"profile_picture" => %Plug.Upload{filename: name} = image} = attrs) do
