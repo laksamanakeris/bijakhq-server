@@ -3,7 +3,7 @@ defmodule BijakhqWeb.Api.UserController do
 
   import BijakhqWeb.Api.Authorize
   alias Phauxth.Log
-  alias Bijakhq.Accounts
+  alias Bijakhq.{Accounts, Repo}
   alias Bijakhq.Sms
   alias Bijakhq.Sms.NexmoRequest
   alias Bijakhq.ImageFile
@@ -84,6 +84,8 @@ defmodule BijakhqWeb.Api.UserController do
     # user = id == to_string(user.id) and user || Accounts.get(id)
     # profile = Accounts.get(user.id);
     # render(conn, "show_me.json", %{user: user, profile: profile})
+    user = user |> Repo.preload(:referrer)
+    IO.inspect user
     user = add_balance_to_user(user)
     render(conn, "show_me.json", %{user: user})
   end

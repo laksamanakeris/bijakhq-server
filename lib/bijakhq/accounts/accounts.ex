@@ -98,7 +98,6 @@ defmodule Bijakhq.Accounts do
     %Referral{}
     |> Referral.changeset(attrs)
     |> Repo.insert()
-    |> Repo.preload([:user, :referrer])
   end
 
   def update_referral(%Referral{} = referral, attrs) do

@@ -29,7 +29,7 @@ defmodule Bijakhq.Accounts.User do
     field :lives, :integer, default: 0
     field :referral_url, :string
     field :referred, :boolean, default: false
-    field :referring_user_id, :integer
+    # field :referring_user_id, :integer
     field :win_count, :integer, default: 0
     field :verification_id, :string
 
@@ -39,12 +39,13 @@ defmodule Bijakhq.Accounts.User do
     timestamps()
 
     has_many :scores, QuizScore, foreign_key: :user_id
+    belongs_to :referrer, User, foreign_key: :referring_user_id
   end
 
   def changeset(%User{} = user, attrs) do
     user
-    |> cast(attrs, [:email])
-    |> validate_required([:email])
+    |> cast(attrs, [:email, :username, :phone, :profile_picture, :confirmed_at, :role, :country, :language, :games_played, :has_phone, :high_score, :lives, :referral_url, :referred, :referring_user_id, :win_count, :verification_id, :rank_weekly, :rank_alltime])
+    |> validate_required([:username])
     |> unique_email
   end
 
