@@ -32,6 +32,7 @@ defmodule BijakhqWeb.Api.UserView do
       rank_weekly: user.rank_weekly,
       rank_alltime: user.rank_alltime,
       balance: user.balance,
+      lives: user.lives,
       referred: user.referred,
       referrer: render_one(user.referrer, UserView, "user.json")
     }
