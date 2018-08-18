@@ -84,8 +84,6 @@ defmodule BijakhqWeb.Api.UserController do
     # user = id == to_string(user.id) and user || Accounts.get(id)
     # profile = Accounts.get(user.id);
     # render(conn, "show_me.json", %{user: user, profile: profile})
-    user = user |> Repo.preload(:referrer)
-    IO.inspect user
     user = add_balance_to_user(user)
     render(conn, "show_me.json", %{user: user})
   end
@@ -98,6 +96,7 @@ defmodule BijakhqWeb.Api.UserController do
   end
 
   def add_balance_to_user(user)do
+    user = user |> Repo.preload(:referrer)
     balance = Payments.get_balance_by_user_id(user.id)
     user |> Map.put(:balance, balance)
   end
@@ -112,6 +111,7 @@ defmodule BijakhqWeb.Api.UserController do
     # IO.inspect uploaded
 
     with {:ok, user} <- Accounts.upload_image(user, user_params) do
+      user = add_balance_to_user(user)
       render(conn, "show_me.json", user: user)
     end
     # render(conn, "show_me.json", user: user)
