@@ -20,4 +20,8 @@ defmodule BijakhqWeb.Api.ReferralView do
       referrer: render_one(referral.referrer, UserView, "user.json")
     }
   end
+
+  def render("error.json", %{error: message}) do
+    %{error: %{detail: message}}
+  end
 end

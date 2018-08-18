@@ -21,4 +21,6 @@ defmodule Bijakhq.Accounts.Referral do
     |> cast(attrs, [:user_id, :referred_by, :remarks])
     |> validate_required([:user_id, :referred_by])
   end
+
+
 end
