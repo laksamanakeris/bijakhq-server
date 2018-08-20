@@ -29,12 +29,25 @@ defmodule BijakhqWeb.Api.UserView do
       # email: user.email,
       username: user.username,
       profile_picture: UserView.check_profile_picture(user.profile_picture),
-      rank_weekly: user.rank_weekly,
-      rank_alltime: user.rank_alltime,
       balance: user.balance,
       lives: user.lives,
       referred: user.referred,
-      referrer: render_one(user.referrer, UserView, "user.json")
+      referrer: render_one(user.referrer, UserView, "user.json"),
+      leaderboard: render_one(user.leaderboard, UserView, "leaderboard.json"),
+    }
+  end
+
+  def render("leaderboard.json", %{user: leaderboard} ) do
+    %{alltime: alltime, weekly: weekly} = leaderboard
+    %{
+      alltime: %{
+        ranking: alltime.rank,
+        amounts: alltime.amounts
+      },
+      weekly: %{
+        ranking: weekly.rank,
+        amounts: weekly.amounts
+      },
     }
   end
 

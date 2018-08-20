@@ -665,7 +665,7 @@ defmodule Bijakhq.Quizzes do
           username: dri.username,
           user_id: dri.id,
           amounts: sum(res.amount),
-          rank: 1001
+          rank: 101
           },
         group_by: dri.id,
         order_by: [desc: sum(res.amount)]
@@ -688,7 +688,7 @@ defmodule Bijakhq.Quizzes do
           username: dri.username,
           user_id: dri.id,
           amounts: sum(res.amount),
-          rank: 1001
+          rank: 101
           },
         group_by: dri.id,
         order_by: [desc: sum(res.amount)]
@@ -712,7 +712,7 @@ defmodule Bijakhq.Quizzes do
     user_data = get_user_ranking_weekly(user_id)
     case user_data do
       nil ->
-        nil
+        %{amounts: 0, rank: 101, user_id: user_id}
       _ ->
         list = list_quiz_scores_weekly()
         # IO.inspect list
@@ -731,7 +731,7 @@ defmodule Bijakhq.Quizzes do
     user_data = get_user_ranking_alltime(user_id)
     case user_data do
       nil ->
-        nil
+        %{amounts: 0, rank: 101, user_id: user_id}
       _ ->
         list = list_quiz_scores_all_time()
         # IO.inspect list

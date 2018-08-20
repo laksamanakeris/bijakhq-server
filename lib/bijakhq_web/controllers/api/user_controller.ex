@@ -4,6 +4,7 @@ defmodule BijakhqWeb.Api.UserController do
   import BijakhqWeb.Api.Authorize
   alias Phauxth.Log
   alias Bijakhq.{Accounts, Repo}
+  alias Bijakhq.Quizzes
   alias Bijakhq.Sms
   alias Bijakhq.Sms.NexmoRequest
   alias Bijakhq.ImageFile
@@ -73,7 +74,7 @@ defmodule BijakhqWeb.Api.UserController do
     end
   end
 
-  def show(conn, %{"id" => id}) do
+  def delete(conn, %{"id" => id}) do
     user = Accounts.get(id)
     {:ok, _user} = Accounts.delete_user(user)
 
@@ -84,13 +85,17 @@ defmodule BijakhqWeb.Api.UserController do
     # user = id == to_string(user.id) and user || Accounts.get(id)
     # profile = Accounts.get(user.id);
     # render(conn, "show_me.json", %{user: user, profile: profile})
-    user = add_balance_to_user(user)
+    user =
+        add_balance_to_user(user)
+        |> add_leaderboard
     render(conn, "show_me.json", %{user: user})
   end
 
   def update_me(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"username" => username} = user_params) do
     with {:ok, user} <- Accounts.update_username(user, user_params) do
-      user = add_balance_to_user(user)
+      user =
+        add_balance_to_user(user)
+        |> add_leaderboard
       render(conn, "show_me.json", %{user: user})
     end
   end
@@ -99,6 +104,13 @@ defmodule BijakhqWeb.Api.UserController do
     user = user |> Repo.preload(:referrer)
     balance = Payments.get_balance_by_user_id(user.id)
     user |> Map.put(:balance, balance)
+  end
+
+  def add_leaderboard(user) do
+    weekly = Quizzes.get_user_leaderboard_weekly(user.id)
+    alltime = Quizzes.get_user_leaderboard_all_time(user.id)
+    leaderboard = %{alltime: alltime, weekly: weekly}
+    user |> Map.put(:leaderboard, leaderboard)
   end
 
   def upload_image_profile(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"profile_picture" => _params} = user_params) do
