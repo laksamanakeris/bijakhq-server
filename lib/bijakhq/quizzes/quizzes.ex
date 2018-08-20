@@ -604,7 +604,7 @@ defmodule Bijakhq.Quizzes do
     QuizScore.changeset(quiz_score, %{})
   end
 
-  def list_quiz_scores_weekly do
+  def score_queries do
     query = from r in QuizScore,
         join: d in User,
         where: r.user_id == d.id
@@ -612,37 +612,44 @@ defmodule Bijakhq.Quizzes do
     query = from [r, d] in query,
         join: game in QuizSession,
         where: r.game_id == game.id
+
+    query
+  end
+
+
+  def list_quiz_scores_weekly do
+    query = score_queries()
 
     query = from [res, dri, rac] in query,
         where: res.inserted_at >= ^Timex.beginning_of_week(Timex.now),
         where: res.inserted_at <= ^Timex.end_of_week(Timex.now),
         select: %{
           user: dri,
-          amounts: sum(res.amount)
+          user_id: dri.id,
+          amounts: sum(res.amount),
+          rank: fragment("rank() OVER (ORDER BY sum(q0.amount) DESC)")
           },
         group_by: dri.id,
-        order_by: [desc: sum(res.amount)]
+        order_by: [desc: sum(res.amount)],
+        limit: 100
 
     Repo.all query
   end
 
   def list_quiz_scores_all_time do
-    query = from r in QuizScore,
-        join: d in User,
-        where: r.user_id == d.id
-
-    query = from [r, d] in query,
-        join: game in QuizSession,
-        where: r.game_id == game.id
+    query = score_queries()
 
     query = from [res, dri, rac] in query,
         # where: rac.round <= 3,
         select: %{
           user: dri,
-          amounts: sum(res.amount)
+          user_id: dri.id,
+          amounts: sum(res.amount),
+          rank: fragment("rank() OVER (ORDER BY sum(q0.amount) DESC)")
           },
         group_by: dri.id,
-        order_by: [desc: sum(res.amount)]
+        order_by: [desc: sum(res.amount)],
+        limit: 100
 
     Repo.all query
   end
@@ -658,13 +665,38 @@ defmodule Bijakhq.Quizzes do
           username: dri.username,
           user_id: dri.id,
           amounts: sum(res.amount),
-          rank: fragment("rank() OVER (ORDER BY sum(q0.amount) DESC)")
-          # rank: fragment("rank() OVER (PARTITION BY user_id ORDER BY username DESC)")
+          rank: 1001
           },
         group_by: dri.id,
         order_by: [desc: sum(res.amount)]
 
-    Repo.all query
+    query = from res in query,
+          where: res.user_id == ^user_id
+
+    Repo.one query
+  end
+
+  def get_user_ranking_weekly(user_id) do
+    query = from r in QuizScore,
+        join: d in User,
+        where: r.user_id == d.id
+
+    query = from [res, dri] in query,
+      where: res.inserted_at >= ^Timex.beginning_of_week(Timex.now),
+      where: res.inserted_at <= ^Timex.end_of_week(Timex.now),
+        select: %{
+          username: dri.username,
+          user_id: dri.id,
+          amounts: sum(res.amount),
+          rank: 1001
+          },
+        group_by: dri.id,
+        order_by: [desc: sum(res.amount)]
+
+    query = from res in query,
+          where: res.user_id == ^user_id
+
+    Repo.one query
   end
 
 
@@ -676,5 +708,42 @@ defmodule Bijakhq.Quizzes do
     end
   end
 
+  def get_user_leaderboard_weekly(user_id) do
+    user_data = get_user_ranking_weekly(user_id)
+    case user_data do
+      nil ->
+        nil
+      _ ->
+        list = list_quiz_scores_weekly()
+        # IO.inspect list
+        dash = Enum.find(list, fn(x) -> x.user_id == user_data.user_id end)
+        case dash do
+          nil ->
+            user_data
+          _ ->
+            %{amounts: amounts, rank: rank, user_id: user_id, user: user} = dash
+            %{amounts: amounts, rank: rank, user_id: user_id, username: user.username}
+        end
+    end
+  end
+
+  def get_user_leaderboard_all_time(user_id) do
+    user_data = get_user_ranking_alltime(user_id)
+    case user_data do
+      nil ->
+        nil
+      _ ->
+        list = list_quiz_scores_all_time()
+        # IO.inspect list
+        dash = Enum.find(list, fn(x) -> x.user_id == user_data.user_id end)
+        case dash do
+          nil ->
+            user_data
+          _ ->
+            %{amounts: amounts, rank: rank, user_id: user_id, user: user} = dash
+            %{amounts: amounts, rank: rank, user_id: user_id, username: user.username}
+        end
+    end
+  end
 
 end
