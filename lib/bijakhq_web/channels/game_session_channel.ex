@@ -92,6 +92,20 @@ defmodule BijakhqWeb.GameSessionChannel do
     end
   end
 
+  def handle_in("question:result:admin:show", payload, socket) do
+    %{"question_id" => question_id} = payload
+
+    with game = Server.get_game_state do
+      # IO.inspect game
+      questions = game.questions
+      question = Enum.at( questions , question_id)
+
+      response = Phoenix.View.render_one(question, BijakhqWeb.Api.QuizQuestionView, "soalan_jawapan.json")
+      broadcast socket, "question:result:admin:show", response
+      {:reply, {:ok, response}, socket}
+    end
+  end
+
   def handle_in("question:result:show", payload, socket) do
     %{"question_id" => question_id} = payload
 
@@ -146,10 +160,17 @@ defmodule BijakhqWeb.GameSessionChannel do
   def handle_in("game:result:show", payload, socket) do
 
     winners = Players.get_game_result()
-    IO.inspect winners
     response = Phoenix.View.render_one(winners, BijakhqWeb.Api.UserView, "game_result_index.json")
     broadcast socket, "game:result:show", response
     {:noreply, socket}
+  end
+
+  def handle_in("game:result:admin:show", payload, socket) do
+
+    winners = Players.get_game_result()
+    response = Phoenix.View.render_one(winners, BijakhqWeb.Api.UserView, "game_result_index.json")
+    broadcast socket, "game:result:admin:show", response
+    {:reply, {:ok, response}, socket}
   end
 
   def handle_in("game:result:end", payload, socket) do
