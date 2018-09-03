@@ -16,7 +16,7 @@ defmodule BijakhqWeb.Api.FallbackController do
   def call(conn, {:error, :not_found}) do
     conn
     |> put_status(:not_found)
-    |> put_view(BijakhqWeb.Api.ErrorView)
+    |> put_view(BijakhqWeb.ErrorView)
     |> render(:"404")
   end
 end
