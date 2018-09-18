@@ -10,8 +10,8 @@ defmodule BijakhqWeb.Api.PaymentController do
   plug :role_check, [roles: ["admin"]] when action in [:index, :create, :show, :update, :delete]
 
   def index(conn, _params) do
-    payment_history = Payments.list_payment_history()
-    render(conn, "index.json", payment_history: payment_history)
+    payments = Payments.list_payments()
+    render(conn, "index.json", payments: payments)
   end
 
   # def create(conn, %{"payment" => payment_params}) do

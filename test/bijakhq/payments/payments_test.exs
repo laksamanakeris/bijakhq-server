@@ -3,7 +3,7 @@ defmodule Bijakhq.PaymentsTest do
 
   alias Bijakhq.Payments
 
-  describe "payment_history" do
+  describe "payments" do
     alias Bijakhq.Payments.Payment
 
     @valid_attrs %{amount: 120.5, payment_at: "2010-04-17 14:00:00.000000Z", remarks: "some remarks", updated_by: 42, user_id: 42}
@@ -19,9 +19,9 @@ defmodule Bijakhq.PaymentsTest do
       payment
     end
 
-    test "list_payment_history/0 returns all payment_history" do
+    test "list_payments/0 returns all payments" do
       payment = payment_fixture()
-      assert Payments.list_payment_history() == [payment]
+      assert Payments.list_payments() == [payment]
     end
 
     test "get_payment!/1 returns the payment with given id" do

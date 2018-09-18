@@ -13,15 +13,15 @@ defmodule Bijakhq.Payments do
   alias Bijakhq.Payments
 
   @doc """
-  Returns the list of payment_history.
+  Returns the list of payments.
 
   ## Examples
 
-      iex> list_payment_history()
+      iex> list_payments()
       [%Payment{}, ...]
 
   """
-  def list_payment_history do
+  def list_payments do
     Repo.all(Payment) |> Repo.preload([:user, :update_by])
   end
 

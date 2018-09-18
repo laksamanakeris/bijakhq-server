@@ -3,8 +3,8 @@ defmodule BijakhqWeb.Api.PaymentView do
   alias BijakhqWeb.Api.PaymentView
   alias BijakhqWeb.Api.UserView
 
-  def render("index.json", %{payment_history: payment_history}) do
-    %{data: render_many(payment_history, PaymentView, "payment.json")}
+  def render("index.json", %{payments: payments}) do
+    %{data: render_many(payments, PaymentView, "payment.json")}
   end
 
   def render("show.json", %{payment: payment}) do
