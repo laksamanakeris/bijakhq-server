@@ -36,6 +36,8 @@ defmodule Bijakhq.Accounts.User do
     field :rank_weekly, :integer
     field :rank_alltime, :integer
 
+    field :paypal_email, :string
+
     timestamps()
 
     has_many :scores, QuizScore, foreign_key: :user_id
