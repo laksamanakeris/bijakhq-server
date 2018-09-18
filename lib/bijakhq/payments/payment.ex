@@ -5,7 +5,7 @@ defmodule Bijakhq.Payments.Payment do
   alias Bijakhq.Accounts.User
 
 
-  schema "payment_history" do
+  schema "payments" do
     field :amount, :float
     field :payment_at, :utc_datetime
     field :remarks, :string
