@@ -15,7 +15,7 @@ defmodule BijakhqWeb.Api.PaymentStatusController do
     with {:ok, %PaymentStatus{} = payment_status} <- Payments.create_payment_status(payment_status_params) do
       conn
       |> put_status(:created)
-      |> put_resp_header("location", payment_status_path(conn, :show, payment_status))
+      |> put_resp_header("location", api_payment_status_path(conn, :show, payment_status))
       |> render("show.json", payment_status: payment_status)
     end
   end
