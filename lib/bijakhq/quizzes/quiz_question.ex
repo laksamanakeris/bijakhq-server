@@ -3,6 +3,7 @@ defmodule Bijakhq.Quizzes.QuizQuestion do
   import Ecto.Changeset
 
   alias Bijakhq.Quizzes.QuizCategory
+  alias Bijakhq.Quizzes.QuizSession
 
 
   schema "quiz_questions" do
@@ -15,6 +16,8 @@ defmodule Bijakhq.Quizzes.QuizQuestion do
     # field :category_id, :id
 
     belongs_to :category, QuizCategory, foreign_key: :category_id
+    # has_many :games, QuizGameQuestion, foreign_key: :user_id
+    many_to_many :games, QuizSession, join_through: "quiz_session_question", join_keys: [question_id: :id, session_id: :id]
 
     timestamps()
   end
