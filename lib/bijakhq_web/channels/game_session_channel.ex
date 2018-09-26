@@ -82,6 +82,23 @@ defmodule BijakhqWeb.GameSessionChannel do
     end
   end
 
+  def handle_in("question:admin:show", payload, socket) do
+    %{"question_id" => question_id} = payload
+
+    with game = Server.get_game_state do
+      # IO.inspect game
+      questions = game.questions
+      question = Enum.at( questions , question_id)
+
+      # complete the payload
+      question = Map.put(question, :question_id, question_id)
+
+      response = Phoenix.View.render_one(question, BijakhqWeb.Api.QuizQuestionView, "soalan.json")
+      broadcast socket, "question:admin:show", response
+      {:reply, {:ok, payload}, socket}
+    end
+  end
+
   def handle_in("question:end", payload, socket) do
     %{"question_id" => question_id} = payload
     IO.inspect payload
