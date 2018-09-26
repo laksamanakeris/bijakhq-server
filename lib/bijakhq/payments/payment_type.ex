@@ -14,7 +14,7 @@ defmodule Bijakhq.Payments.PaymentType do
   @doc false
   def changeset(payment_type, attrs) do
     payment_type
-    |> cast(attrs, [:name, :description, :configurations])
+    |> cast(attrs, [:name, :description, :configuration])
     |> validate_required([:name])
   end
 end
