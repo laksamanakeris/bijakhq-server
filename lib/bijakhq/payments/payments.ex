@@ -218,4 +218,101 @@ defmodule Bijakhq.Payments do
   def change_payment_status(%PaymentStatus{} = payment_status) do
     PaymentStatus.changeset(payment_status, %{})
   end
+
+
+  alias Bijakhq.Payments.PaymentType
+
+  @doc """
+  Returns the list of payment_types.
+
+  ## Examples
+
+      iex> list_payment_types()
+      [%PaymentType{}, ...]
+
+  """
+  def list_payment_types do
+    Repo.all(PaymentType)
+  end
+
+  @doc """
+  Gets a single payment_type.
+
+  Raises `Ecto.NoResultsError` if the Payment type does not exist.
+
+  ## Examples
+
+      iex> get_payment_type!(123)
+      %PaymentType{}
+
+      iex> get_payment_type!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_payment_type!(id), do: Repo.get!(PaymentType, id)
+
+  @doc """
+  Creates a payment_type.
+
+  ## Examples
+
+      iex> create_payment_type(%{field: value})
+      {:ok, %PaymentType{}}
+
+      iex> create_payment_type(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_payment_type(attrs \\ %{}) do
+    %PaymentType{}
+    |> PaymentType.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a payment_type.
+
+  ## Examples
+
+      iex> update_payment_type(payment_type, %{field: new_value})
+      {:ok, %PaymentType{}}
+
+      iex> update_payment_type(payment_type, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_payment_type(%PaymentType{} = payment_type, attrs) do
+    payment_type
+    |> PaymentType.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a PaymentType.
+
+  ## Examples
+
+      iex> delete_payment_type(payment_type)
+      {:ok, %PaymentType{}}
+
+      iex> delete_payment_type(payment_type)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_payment_type(%PaymentType{} = payment_type) do
+    Repo.delete(payment_type)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking payment_type changes.
+
+  ## Examples
+
+      iex> change_payment_type(payment_type)
+      %Ecto.Changeset{source: %PaymentType{}}
+
+  """
+  def change_payment_type(%PaymentType{} = payment_type) do
+    PaymentType.changeset(payment_type, %{})
+  end
 end
