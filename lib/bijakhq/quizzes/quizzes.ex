@@ -118,7 +118,7 @@ defmodule Bijakhq.Quizzes do
 
   """
   def list_quiz_questions do
-    Repo.all(QuizQuestion)
+    Repo.all(QuizQuestion) |> Repo.preload([:games])
   end
 
   @doc """
@@ -135,7 +135,7 @@ defmodule Bijakhq.Quizzes do
       ** (Ecto.NoResultsError)
 
   """
-  def get_quiz_question!(id), do: Repo.get(QuizQuestion, id)
+  def get_quiz_question!(id), do: Repo.get(QuizQuestion, id) |> Repo.preload([:games])
 
   @doc """
   Creates a quiz_question.
