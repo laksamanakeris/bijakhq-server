@@ -92,10 +92,11 @@ defmodule BijakhqWeb.GameSessionChannel do
 
       # complete the payload
       question = Map.put(question, :question_id, question_id)
+      question = Map.put(question, :description, question.question.description)
 
-      response = Phoenix.View.render_one(question, BijakhqWeb.Api.QuizQuestionView, "soalan.json")
+      response = Phoenix.View.render_one(question, BijakhqWeb.Api.QuizQuestionView, "soalan_details.json")
       broadcast socket, "question:admin:show", response
-      {:reply, {:ok, payload}, socket}
+      {:reply, {:ok, response}, socket}
     end
   end
 
