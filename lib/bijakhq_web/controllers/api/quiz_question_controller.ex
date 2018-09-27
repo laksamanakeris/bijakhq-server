@@ -18,6 +18,9 @@ defmodule BijakhqWeb.Api.QuizQuestionController do
 
   def create(conn, %{"question" => quiz_question_params}) do
     with {:ok, %QuizQuestion{} = quiz_question} <- Quizzes.create_quiz_question(quiz_question_params) do
+
+      quiz_question = Quizzes.get_quiz_question!(quiz_question.id)
+
       conn
       |> put_status(:created)
       |> put_resp_header("location", api_quiz_question_path(conn, :show, quiz_question))
