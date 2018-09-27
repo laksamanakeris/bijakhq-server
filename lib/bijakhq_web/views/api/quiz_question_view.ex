@@ -29,6 +29,16 @@ defmodule BijakhqWeb.Api.QuizQuestionView do
       answers: render_many(quiz_question.answers_sequence.answers, BijakhqWeb.Api.QuizQuestionView , "jawapan.json"),
       question_id: quiz_question.question_id,
       game_id: quiz_question.session_id,
+    }
+  end
+
+  def render("soalan_details.json", %{quiz_question: quiz_question}) do
+    %{
+      game_question_id: quiz_question.id,
+      question: quiz_question.answers_sequence.question,
+      answers: render_many(quiz_question.answers_sequence.answers, BijakhqWeb.Api.QuizQuestionView , "jawapan.json"),
+      question_id: quiz_question.question_id,
+      game_id: quiz_question.session_id,
       description: quiz_question.description,
     }
   end
