@@ -243,7 +243,7 @@ defmodule Bijakhq.Quizzes do
   """
   def get_quiz_session!(id) do
     Repo.get(QuizSession, id)
-    |> Repo.preload([game_questions: (from q in QuizGameQuestion, order_by: [asc: q.sequence] )])
+    |> Repo.preload([game_questions: (from q in QuizGameQuestion, order_by: [asc: q.sequence], preload: :question )])
 
   end
 
