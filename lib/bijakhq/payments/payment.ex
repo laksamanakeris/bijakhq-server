@@ -12,6 +12,11 @@ defmodule Bijakhq.Payments.Payment do
     field :payment_at, :utc_datetime
     field :remarks, :string
 
+    field :reference_id, :string
+    field :reference_details, :string
+    field :batch_paypal_email, :string
+    field :batch_paypal_id, :integer
+
     belongs_to :user, User, foreign_key: :user_id
     belongs_to :update_by, User, foreign_key: :updated_by
     belongs_to :status, PaymentStatus, foreign_key: :payment_status
