@@ -17,6 +17,12 @@ defmodule Bijakhq.Payments.PaymentStatus do
   def changeset(payment_status, attrs) do
     payment_status
     |> cast(attrs, [:name, :description])
-    |> validate_required([:name, :description])
+    |> validate_required([:name])
+    |> unique_name
+  end
+
+  defp unique_name(changeset) do
+    validate_length(changeset, :name, min: 3)
+    |> unique_constraint(:name)
   end
 end
