@@ -8,10 +8,11 @@ defmodule BijakhqWeb.Api.PaymentController do
   action_fallback BijakhqWeb.Api.FallbackController
 
   plug :role_check, [roles: ["admin"]] when action in [:index, :create, :show, :update, :delete]
+  plug :user_check when action in [:request_payment]
 
   def index(conn, _params) do
-    payment_history = Payments.list_payment_history()
-    render(conn, "index.json", payment_history: payment_history)
+    payments = Payments.list_payments()
+    render(conn, "index.json", payments: payments)
   end
 
   # def create(conn, %{"payment" => payment_params}) do
@@ -42,6 +43,12 @@ defmodule BijakhqWeb.Api.PaymentController do
     payment = Payments.get_payment!(id)
     with {:ok, %Payment{}} <- Payments.delete_payment(payment) do
       send_resp(conn, :no_content, "")
+    end
+  end
+
+  def request_payment(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"paypal_email" => email}) do
+    with {:ok, balance} <- Payments.request_payment(user, email) do
+      render(conn, "balance.json", balance: balance)
     end
   end
 end

@@ -18,7 +18,7 @@ defmodule BijakhqWeb.Api.PaymentControllerTest do
   end
 
   describe "index" do
-    test "lists all payment_history", %{conn: conn} do
+    test "lists all payments", %{conn: conn} do
       conn = get conn, payment_path(conn, :index)
       assert json_response(conn, 200)["data"] == []
     end
