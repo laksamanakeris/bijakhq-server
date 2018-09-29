@@ -19,4 +19,11 @@ defmodule BijakhqWeb.Api.FallbackController do
     |> put_view(BijakhqWeb.ErrorView)
     |> render(:"404")
   end
+
+  def call(conn, {:error, :unauthorized, message}) do
+    conn
+    |> put_status(:unauthorized)
+    |> put_view(BijakhqWeb.ErrorView)
+    |> render(:"403", message)
+  end
 end

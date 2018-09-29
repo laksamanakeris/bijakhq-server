@@ -24,4 +24,8 @@ defmodule BijakhqWeb.Api.PaymentView do
       update_by: render_one(payment.update_by, UserView, "user.json")
     }
   end
+
+  def render("balance.json", %{balance: balance}) do
+    %{balance: balance}
+  end
 end

@@ -44,6 +44,7 @@ defmodule BijakhqWeb.Router do
     post "/users/me/upload", UserController, :upload_image_profile
     post "/users/username/available", UserController, :check_username
     post "/users/referral", ReferralController, :add_referral
+    post "/users/me/payment", PaymentController, :request_payment
     get "/users/me", UserController, :show_me
     put "/users/me", UserController, :update_me
 
