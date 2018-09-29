@@ -25,7 +25,7 @@ defmodule Bijakhq.Payments do
 
   """
   def list_payments do
-    Repo.all(Payment) |> Repo.preload([:user, :update_by])
+    Repo.all(Payment) |> Repo.preload([:user, :update_by, :status, :type])
   end
 
   @doc """
@@ -43,7 +43,7 @@ defmodule Bijakhq.Payments do
 
   """
   def get_payment!(id) do
-    Repo.get(Payment, id) |> Repo.preload([:user, :update_by])
+    Repo.get(Payment, id) |> Repo.preload([:user, :update_by, :status, :type])
   end
 
   @doc """
