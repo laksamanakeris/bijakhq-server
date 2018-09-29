@@ -91,8 +91,8 @@ defmodule Bijakhq.Accounts.User do
     user
     |> cast(attrs, [:paypal_email])
     |> validate_required([:paypal_email])
-    |> validate_format(:email, ~r/@/)
-    |> validate_length(:email, max: 254)
+    |> validate_format(:paypal_email, ~r/@/)
+    |> validate_length(:paypal_email, max: 254)
   end
 
   defp unique_username(changeset) do
