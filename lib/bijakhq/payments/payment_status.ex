@@ -2,11 +2,14 @@ defmodule Bijakhq.Payments.PaymentStatus do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Bijakhq.Payments.Payment
+
 
   schema "payment_statuses" do
     field :description, :string
     field :name, :string
 
+    has_many :payments, Payment, foreign_key: :payment_status
     timestamps()
   end
 
