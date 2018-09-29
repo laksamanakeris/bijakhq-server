@@ -13,7 +13,7 @@ defmodule Bijakhq.Payments do
   alias Bijakhq.Quizzes
   alias Bijakhq.Payments
 
-  @minimum_payment 50
+  @minimum_payment 25
 
   @doc """
   Returns the list of payments.
