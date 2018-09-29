@@ -12,6 +12,8 @@ defmodule Bijakhq.Payments do
   alias Bijakhq.Quizzes
   alias Bijakhq.Payments
 
+  @minimum_payment 50
+
   @doc """
   Returns the list of payments.
 
@@ -314,5 +316,17 @@ defmodule Bijakhq.Payments do
   """
   def change_payment_type(%PaymentType{} = payment_type) do
     PaymentType.changeset(payment_type, %{})
+  end
+
+
+
+  def request_payment(user, _email) do
+    balance = Payments.get_balance_by_user_id(user.id) - 10000
+    if balance < 50 do
+      # {:error, :unauthorized, message: "Balance should be more than RM#{@minimum_payment}" }
+      {:error, :unauthorized, error: "Balance should be more than RM#{@minimum_payment}" }
+    else
+      {:ok, balance}
+    end
   end
 end
