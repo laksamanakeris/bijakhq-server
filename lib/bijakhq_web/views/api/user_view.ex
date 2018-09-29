@@ -28,6 +28,7 @@ defmodule BijakhqWeb.Api.UserView do
       id: user.id,
       # email: user.email,
       username: user.username,
+      paypal_email: user.paypal_email,
       profile_picture: UserView.check_profile_picture(user.profile_picture),
       balance: user.balance,
       lives: user.lives,

@@ -36,6 +36,8 @@ defmodule Bijakhq.Accounts.User do
     field :rank_weekly, :integer
     field :rank_alltime, :integer
 
+    field :paypal_email, :string
+
     timestamps()
 
     has_many :scores, QuizScore, foreign_key: :user_id
@@ -83,6 +85,14 @@ defmodule Bijakhq.Accounts.User do
     |> cast(attrs, [:username])
     |> validate_required([:username])
     |> unique_username
+  end
+
+  def update_paypal_email_changeset(%User{} = user, attrs)do
+    user
+    |> cast(attrs, [:paypal_email])
+    |> validate_required([:paypal_email])
+    |> validate_format(:paypal_email, ~r/@/)
+    |> validate_length(:paypal_email, max: 254)
   end
 
   defp unique_username(changeset) do

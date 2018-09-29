@@ -118,7 +118,7 @@ defmodule Bijakhq.Quizzes do
 
   """
   def list_quiz_questions do
-    Repo.all(QuizQuestion)
+    Repo.all(QuizQuestion) |> Repo.preload([:games])
   end
 
   @doc """
@@ -135,7 +135,7 @@ defmodule Bijakhq.Quizzes do
       ** (Ecto.NoResultsError)
 
   """
-  def get_quiz_question!(id), do: Repo.get(QuizQuestion, id)
+  def get_quiz_question!(id), do: Repo.get(QuizQuestion, id) |> Repo.preload([:games])
 
   @doc """
   Creates a quiz_question.
@@ -243,7 +243,7 @@ defmodule Bijakhq.Quizzes do
   """
   def get_quiz_session!(id) do
     Repo.get(QuizSession, id)
-    |> Repo.preload([game_questions: (from q in QuizGameQuestion, order_by: [asc: q.sequence] )])
+    |> Repo.preload([game_questions: (from q in QuizGameQuestion, order_by: [asc: q.sequence], preload: :question )])
 
   end
 
@@ -419,7 +419,7 @@ defmodule Bijakhq.Quizzes do
     query =
         from q in QuizGameQuestion,
         where: q.session_id == ^game_id,
-        preload: [:session, question: :category],
+        preload: [:session, question: [:category,:games]],
         order_by: [asc: q.sequence]
 
     Repo.all(query)
