@@ -19,5 +19,11 @@ defmodule Bijakhq.Payments.PaymentType do
     payment_type
     |> cast(attrs, [:name, :description, :configuration])
     |> validate_required([:name])
+    |> unique_name
+  end
+
+  defp unique_name(changeset) do
+    validate_length(changeset, :name, min: 3)
+    |> unique_constraint(:name)
   end
 end
