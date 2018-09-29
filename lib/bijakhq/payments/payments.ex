@@ -7,6 +7,7 @@ defmodule Bijakhq.Payments do
   alias Bijakhq.Repo
 
   alias Bijakhq.Payments.Payment
+  alias Bijakhq.Accounts
   alias Bijakhq.Accounts.User
   alias Bijakhq.Quizzes.QuizScore
   alias Bijakhq.Quizzes
@@ -320,13 +321,19 @@ defmodule Bijakhq.Payments do
 
 
 
-  def request_payment(user, _email) do
-    balance = Payments.get_balance_by_user_id(user.id) - 10000
+  def request_payment(user, paypal_email) do
+    balance = Payments.get_balance_by_user_id(user.id)
     if balance < 50 do
-      # {:error, :unauthorized, message: "Balance should be more than RM#{@minimum_payment}" }
       {:error, :unauthorized, error: "Balance should be more than RM#{@minimum_payment}" }
     else
-      {:ok, balance}
+      with {:ok, user} <- Accounts.update_paypal_email(user, %{"paypal_email" => paypal_email}) do
+        # Paypel ID = 1
+        params = %{amount: balance, updated_by: user.id, user_id: user.id, payment_type: 1}
+        with {:ok, payment} <- Payments.create_payment(params) do
+          balance = Payments.get_balance_by_user_id(user.id)
+          {:ok, balance}
+        end
+      end
     end
   end
 end

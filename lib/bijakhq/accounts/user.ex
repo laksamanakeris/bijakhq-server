@@ -87,6 +87,14 @@ defmodule Bijakhq.Accounts.User do
     |> unique_username
   end
 
+  def update_paypal_email_changeset(%User{} = user, attrs)do
+    user
+    |> cast(attrs, [:paypal_email])
+    |> validate_required([:paypal_email])
+    |> validate_format(:email, ~r/@/)
+    |> validate_length(:email, max: 254)
+  end
+
   defp unique_username(changeset) do
     validate_length(changeset, :username, min: 3)
     |> unique_constraint(:username)
