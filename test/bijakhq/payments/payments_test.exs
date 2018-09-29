@@ -132,4 +132,68 @@ defmodule Bijakhq.PaymentsTest do
       assert %Ecto.Changeset{} = Payments.change_payment_status(payment_status)
     end
   end
+
+  describe "payment_types" do
+    alias Bijakhq.Payments.PaymentType
+
+    @valid_attrs %{configuration: "some configuration", description: "some description", name: "some name"}
+    @update_attrs %{configuration: "some updated configuration", description: "some updated description", name: "some updated name"}
+    @invalid_attrs %{configuration: nil, description: nil, name: nil}
+
+    def payment_type_fixture(attrs \\ %{}) do
+      {:ok, payment_type} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Payments.create_payment_type()
+
+      payment_type
+    end
+
+    test "list_payment_types/0 returns all payment_types" do
+      payment_type = payment_type_fixture()
+      assert Payments.list_payment_types() == [payment_type]
+    end
+
+    test "get_payment_type!/1 returns the payment_type with given id" do
+      payment_type = payment_type_fixture()
+      assert Payments.get_payment_type!(payment_type.id) == payment_type
+    end
+
+    test "create_payment_type/1 with valid data creates a payment_type" do
+      assert {:ok, %PaymentType{} = payment_type} = Payments.create_payment_type(@valid_attrs)
+      assert payment_type.configuration == "some configuration"
+      assert payment_type.description == "some description"
+      assert payment_type.name == "some name"
+    end
+
+    test "create_payment_type/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Payments.create_payment_type(@invalid_attrs)
+    end
+
+    test "update_payment_type/2 with valid data updates the payment_type" do
+      payment_type = payment_type_fixture()
+      assert {:ok, payment_type} = Payments.update_payment_type(payment_type, @update_attrs)
+      assert %PaymentType{} = payment_type
+      assert payment_type.configuration == "some updated configuration"
+      assert payment_type.description == "some updated description"
+      assert payment_type.name == "some updated name"
+    end
+
+    test "update_payment_type/2 with invalid data returns error changeset" do
+      payment_type = payment_type_fixture()
+      assert {:error, %Ecto.Changeset{}} = Payments.update_payment_type(payment_type, @invalid_attrs)
+      assert payment_type == Payments.get_payment_type!(payment_type.id)
+    end
+
+    test "delete_payment_type/1 deletes the payment_type" do
+      payment_type = payment_type_fixture()
+      assert {:ok, %PaymentType{}} = Payments.delete_payment_type(payment_type)
+      assert_raise Ecto.NoResultsError, fn -> Payments.get_payment_type!(payment_type.id) end
+    end
+
+    test "change_payment_type/1 returns a payment_type changeset" do
+      payment_type = payment_type_fixture()
+      assert %Ecto.Changeset{} = Payments.change_payment_type(payment_type)
+    end
+  end
 end
