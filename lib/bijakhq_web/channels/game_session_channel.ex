@@ -54,9 +54,9 @@ defmodule BijakhqWeb.GameSessionChannel do
 
   def handle_in("game:details:admin:show", _payload, socket) do
     with response = Server.get_game_state do
-      IO.inspect response
       response = Phoenix.View.render_one(response, BijakhqWeb.Api.QuizSessionView, "game_start_details.json")
       # {:noreply, socket}
+      IO.inspect response
       broadcast socket, "game:details:admin:show", response
       {:reply, {:ok, response}, socket}
     end
@@ -101,7 +101,7 @@ defmodule BijakhqWeb.GameSessionChannel do
   end
 
   def handle_in("question:end", payload, socket) do
-    %{"question_id" => question_id} = payload
+    # %{"question_id" => question_id} = payload
     IO.inspect payload
     broadcast socket, "question:end", payload
     {:reply, {:ok, payload}, socket}
@@ -185,7 +185,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     # {:noreply, socket}
   end
 
-  def handle_in("game:result:show", payload, socket) do
+  def handle_in("game:result:show", _payload, socket) do
 
     winners = Players.get_game_result()
     response = Phoenix.View.render_one(winners, BijakhqWeb.Api.UserView, "game_result_index.json")
@@ -193,7 +193,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     {:noreply, socket}
   end
 
-  def handle_in("game:result:admin:show", payload, socket) do
+  def handle_in("game:result:admin:show", _payload, socket) do
 
     winners = Players.get_game_result()
     response = Phoenix.View.render_one(winners, BijakhqWeb.Api.UserView, "game_result_index.json")
@@ -201,35 +201,35 @@ defmodule BijakhqWeb.GameSessionChannel do
     {:reply, {:ok, response}, socket}
   end
 
-  def handle_in("game:result:end", payload, socket) do
+  def handle_in("game:result:end", _payload, socket) do
 
     with game_state = Server.get_game_state do
       session_id = Map.get(game_state, :session_id)
       Players.game_save_scores(session_id)
     end
 
-    broadcast socket, "game:result:end", payload
+    broadcast socket, "game:result:end", %{}
     {:noreply, socket}
   end
 
   # GAME SESSION
-  def handle_in("game:end", payload, socket) do
+  def handle_in("game:end", _payload, socket) do
 
     Server.game_end()
     # stop chat timer
     Chat.timer_end()
 
-    broadcast socket, "game:end", payload
+    broadcast socket, "game:end", %{}
     {:noreply, socket}
   end
 
   # Users
 
   def handle_in("user:answer", payload, socket) do
-
+    %{"question_id" => question_id, "answer_id" => answer_id} = payload
     user = socket.assigns.user
-    process_user_answer(user, payload)
-
+    # process_user_answer(user, payload)
+    Server.process_user_answer(user, question_id, answer_id)
     {:reply, {:ok, payload}, socket}
   end
 
