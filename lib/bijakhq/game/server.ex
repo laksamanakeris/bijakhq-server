@@ -5,6 +5,7 @@ defmodule Bijakhq.Game.Server do
 
   alias Bijakhq.Quizzes
   alias Bijakhq.Game.Players
+  alias Bijakhq.Game.Questions
 
   @name :game_server
 
@@ -17,7 +18,7 @@ defmodule Bijakhq.Game.Server do
     prize: 0,
     prize_text: "RM 0"
   }
-  # Client
+  # Client API
   def start_link, do: GenServer.start_link(__MODULE__, @initial_state, name: @name)
 
   def game_start(game_id) do
@@ -67,11 +68,32 @@ defmodule Bijakhq.Game.Server do
     GenServer.call(@name, {:update_game_state, new_game_state})
   end
 
+  def process_user_answer(user, question_id, answer_id) do
+    GenServer.cast(@name, {:process_user_answer, user, question_id, answer_id})
+  end
+
   # Server
   def init(game_state) do
     Logger.warn "Game server initialized"
     IO.inspect game_state
     {:ok, game_state}
+  end
+
+  def handle_cast({:process_user_answer, user, question_id, answer_id}, game_state) do
+    # check if user is player list
+    # get game state
+    # increment answer based on user selection
+    # if user's answer is correct - move player to next list
+    with Players.user_find(user) do
+      new_state = Questions.increment_question_answer(game_state, question_id, answer_id)
+      question = get_question_by_id(new_state, question_id)
+      selected_answer = Enum.find(question.answers, fn u -> u.id == answer_id end)
+      if selected_answer.answer == true do
+        Players.user_go_to_next_question(user)
+      end
+      game_state = new_state
+      {:noreply, game_state}
+    end
   end
 
   def handle_cast(new_state, game_state) do
@@ -129,6 +151,13 @@ defmodule Bijakhq.Game.Server do
     players = Players.set_game_result(result)
     # IO.inspect result
     {:reply, players, game_state}
+  end
+
+  defp get_question_by_id(game_state, question_id) do
+    # IO.inspect game_state
+    questions = game_state.questions
+    question = Enum.at(questions,question_id)
+    question.answers_sequence
   end
 
 end
