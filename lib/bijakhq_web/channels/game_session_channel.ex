@@ -179,7 +179,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     with game_result = Server.game_process_result() do
       # IO.inspect game
       response = Phoenix.View.render_one(game_result.results, BijakhqWeb.Api.UserView, "game_result_index.json")
-      IO.inspect response
+      broadcast socket, "game:result:process", response
       {:reply, {:ok, response}, socket}
     end
     # {:noreply, socket}
