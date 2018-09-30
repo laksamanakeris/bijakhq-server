@@ -133,7 +133,7 @@ defmodule Bijakhq.Game.Server do
     # amount = prize / total users
     # IO.inspect game_state
     prize = Map.get(game_state, :prize)
-    users = Players.users_in_channel();
+    users = Players.users_next_round();
     total_users = Enum.count(users)
 
     result =
