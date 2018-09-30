@@ -34,7 +34,7 @@ defmodule Bijakhq.Game.Players do
   end
 
   def user_go_to_next_question(user) do
-    GenServer.call(@name, {:user_go_to_next_question, user})
+    GenServer.cast(@name, {:user_go_to_next_question, user})
   end
 
   def users_ready_next_question() do
@@ -89,7 +89,7 @@ defmodule Bijakhq.Game.Players do
     {:reply, new_state, new_state}
   end
 
-  def handle_call({:user_go_to_next_question, user}, _from, players_state) do
+  def handle_cast({:user_go_to_next_question, user}, players_state) do
 
     %{ quest_now: _quest_now, quest_next: quest_next } = players_state
 
@@ -103,7 +103,8 @@ defmodule Bijakhq.Game.Players do
     quest_next = Enum.uniq(quest_next)
 
     new_state = Map.put(players_state, :quest_next, quest_next)
-    {:reply, new_state, new_state}
+    # {:reply, new_state, new_state}
+    {:noreply, new_state}
   end
 
   def handle_call(:users_in_channel, _from, players_state) do
