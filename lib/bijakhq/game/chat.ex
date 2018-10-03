@@ -6,7 +6,7 @@ defmodule Bijakhq.Game.Chat do
   alias Bijakhq.Quizzes
 
   @name :game_chat
-  @interval_time 1_000 * 1
+  @interval_time 2_500 * 1
 
   # This is chat state
   @chat_state %{

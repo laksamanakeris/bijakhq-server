@@ -54,9 +54,9 @@ defmodule BijakhqWeb.GameSessionChannel do
 
   def handle_in("game:details:admin:show", _payload, socket) do
     with response = Server.get_game_state do
-      IO.inspect response
       response = Phoenix.View.render_one(response, BijakhqWeb.Api.QuizSessionView, "game_start_details.json")
       # {:noreply, socket}
+      IO.inspect response
       broadcast socket, "game:details:admin:show", response
       {:reply, {:ok, response}, socket}
     end
@@ -101,7 +101,7 @@ defmodule BijakhqWeb.GameSessionChannel do
   end
 
   def handle_in("question:end", payload, socket) do
-    %{"question_id" => question_id} = payload
+    # %{"question_id" => question_id} = payload
     IO.inspect payload
     broadcast socket, "question:end", payload
     {:reply, {:ok, payload}, socket}
@@ -179,13 +179,13 @@ defmodule BijakhqWeb.GameSessionChannel do
     with game_result = Server.game_process_result() do
       # IO.inspect game
       response = Phoenix.View.render_one(game_result.results, BijakhqWeb.Api.UserView, "game_result_index.json")
-      IO.inspect response
+      broadcast socket, "game:result:process", response
       {:reply, {:ok, response}, socket}
     end
     # {:noreply, socket}
   end
 
-  def handle_in("game:result:show", payload, socket) do
+  def handle_in("game:result:show", _payload, socket) do
 
     winners = Players.get_game_result()
     response = Phoenix.View.render_one(winners, BijakhqWeb.Api.UserView, "game_result_index.json")
@@ -193,7 +193,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     {:noreply, socket}
   end
 
-  def handle_in("game:result:admin:show", payload, socket) do
+  def handle_in("game:result:admin:show", _payload, socket) do
 
     winners = Players.get_game_result()
     response = Phoenix.View.render_one(winners, BijakhqWeb.Api.UserView, "game_result_index.json")
@@ -201,35 +201,35 @@ defmodule BijakhqWeb.GameSessionChannel do
     {:reply, {:ok, response}, socket}
   end
 
-  def handle_in("game:result:end", payload, socket) do
+  def handle_in("game:result:end", _payload, socket) do
 
     with game_state = Server.get_game_state do
       session_id = Map.get(game_state, :session_id)
       Players.game_save_scores(session_id)
     end
 
-    broadcast socket, "game:result:end", payload
+    broadcast socket, "game:result:end", %{}
     {:noreply, socket}
   end
 
   # GAME SESSION
-  def handle_in("game:end", payload, socket) do
+  def handle_in("game:end", _payload, socket) do
 
     Server.game_end()
     # stop chat timer
     Chat.timer_end()
 
-    broadcast socket, "game:end", payload
+    broadcast socket, "game:end", %{}
     {:noreply, socket}
   end
 
   # Users
 
   def handle_in("user:answer", payload, socket) do
-
+    %{"question_id" => question_id, "answer_id" => answer_id} = payload
     user = socket.assigns.user
-    process_user_answer(user, payload)
-
+    # process_user_answer(user, payload)
+    Server.process_user_answer(user, question_id, answer_id)
     {:reply, {:ok, payload}, socket}
   end
 
@@ -296,78 +296,5 @@ defmodule BijakhqWeb.GameSessionChannel do
     end
   end
 
-  def process_user_answer(user, answer_payload) do
-
-    %{"game_id" => game_id, "question_id" => question_id, "answer_id" => answer_id} = answer_payload
-
-    # check if user is player list
-    # get game state
-    # increment answer based on user selection
-    # if user's answer is correct - move player to next list
-
-    with Players.user_find(user) do
-      increment_question_answer(question_id, answer_id)
-      question = get_question_by_id(question_id)
-      selected_answer = Enum.find(question.answers, fn u -> u.id == answer_id end)
-      if selected_answer.answer == true do
-        Players.user_go_to_next_question(user)
-      end
-    end
-
-  end
-
-  def get_question_by_id(question_id) do
-    with game = Server.get_game_state do
-      # IO.inspect game
-      questions = game.questions
-      question = Enum.at(questions,question_id)
-      question.answers_sequence
-    end
-  end
-
-  def increment_question_answer(question_id, answer_id) do
-    with game = Server.get_game_state do
-      # IO.inspect game
-      # IO.puts "=============================================================================="
-      questions = game.questions
-      question = Enum.at( questions , question_id)
-      question = Map.put(question, :question_id, question_id)
-
-      old_value = question.answers_sequence.answers
-
-      # IO.inspect old_value
-      # IO.puts "=============================================================================="
-      new_value = Enum.map(old_value, fn(subj) ->
-        %{id: id} = subj
-        if id == answer_id do
-          %{subj | total_answered: subj.total_answered + 1}
-        else
-          subj
-        end
-      end)
-
-      # IO.inspect new_value
-      # IO.puts "=============================================================================="
-
-      # update question
-      answers_sequence = %{question.answers_sequence | answers: new_value}
-      question = %{question | answers_sequence: answers_sequence}
-
-      # update questions list
-      old_question_list = questions
-
-      new_question_list = Enum.map(old_question_list, fn(subj) ->
-        %{id: id} = subj
-        if id == question.id do
-          question
-        else
-          subj
-        end
-      end)
-
-      game = %{game | questions: new_question_list}
-      Server.update_game_state(game)
-    end
-  end
 
 end
