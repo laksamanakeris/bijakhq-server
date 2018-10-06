@@ -408,7 +408,7 @@ defmodule Bijakhq.Quizzes do
   end
 
   def get_game_question_by!(attrs) do
-    QuizGameQuestion |> order_by(asc: :sequence) |> Repo.get_by(attrs) |> Repo.preload([:session, question: :category])
+    QuizGameQuestion |> order_by(asc: :sequence) |> Repo.get_by(attrs) |> Repo.preload([:session, question: [:category,:games]])
   end
 
   def get_game_question_basic_by!(attrs) do
