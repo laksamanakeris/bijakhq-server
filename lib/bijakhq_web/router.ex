@@ -17,10 +17,16 @@ defmodule BijakhqWeb.Router do
     plug Phauxth.Authenticate, method: :token, max_age: @max_age
   end
 
+  pipeline :api_admin do
+    plug BijakhqWeb.Plug.RequireAdmin
+  end
+
   scope host: "api.", alias: BijakhqWeb.Api, as: :api do
     pipe_through :api
 
     scope "/admin" do
+      pipe_through :api_admin
+
       resources "/users", UserController, except: [:new, :edit]
       resources "/referrals", ReferralController, except: [:new, :edit]
 
