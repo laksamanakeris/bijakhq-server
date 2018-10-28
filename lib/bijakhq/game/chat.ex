@@ -4,6 +4,7 @@ defmodule Bijakhq.Game.Chat do
   require Logger
 
   alias Bijakhq.Quizzes
+  alias BijakhqWeb.Presence
 
   @name :game_chat
   @interval_time 2_500 * 1
@@ -32,6 +33,10 @@ defmodule Bijakhq.Game.Chat do
 
   def viewer_remove() do
     GenServer.cast(@name, :viewer_remove)
+  end
+
+  def viewer_update(count) do
+    GenServer.cast(@name, {:viewer_update, count})
   end
 
   def timer_start do
@@ -84,6 +89,12 @@ defmodule Bijakhq.Game.Chat do
     {:noreply, new_state}
   end
 
+  def handle_cast({:viewer_update, count}, chat_state) do
+    Logger.warn "Viewer::update"
+    new_state = Map.put(chat_state, :current_viewing, count)
+    {:noreply, new_state}
+  end
+
 
   # Timer stuff
 
@@ -106,8 +117,9 @@ defmodule Bijakhq.Game.Chat do
 
   def handle_info(:update, chat_state) do
     # Logger.warn "update"
+    current_viewing = Presence.list("game_session:lobby") |> Map.size
 
-    %{ timer_ref: _timer_ref, messages: messages, current_viewing: current_viewing} = chat_state
+    %{ timer_ref: _timer_ref, messages: messages, current_viewing: _current_viewing} = chat_state
     broadcast(%{messages: messages, current_viewing: current_viewing})
 
     timer_ref = schedule_timer @interval_time
