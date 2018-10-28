@@ -263,7 +263,6 @@ defmodule BijakhqWeb.GameSessionChannel do
 
   def handle_info(:after_join, socket) do
     push socket, "presence_state", Presence.list(socket)
-    Chat.viewer_add()
 
     user = socket.assigns.user
     add_user_to_game_player_list(user)
@@ -280,11 +279,7 @@ defmodule BijakhqWeb.GameSessionChannel do
 
   def terminate(_reason, socket) do
     Logger.warn "Player::leave"
-    # IO.inspect user_id
-    # IO.inspect room_id
-    IO.puts "========================"
-    Chat.viewer_remove()
-    {:ok, socket}
+    {:noreply, socket}
   end
 
   def add_user_to_game_player_list(user) do
