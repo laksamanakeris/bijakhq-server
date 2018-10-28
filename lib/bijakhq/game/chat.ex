@@ -7,6 +7,7 @@ defmodule Bijakhq.Game.Chat do
   alias BijakhqWeb.Presence
 
   @name :game_chat
+  @room_name "game_session:lobby"
   @interval_time 2_500 * 1
 
   # This is chat state
@@ -91,7 +92,7 @@ defmodule Bijakhq.Game.Chat do
 
   def handle_info(:update, chat_state) do
     # Logger.warn "update"
-    current_viewing = Presence.list("game_session:lobby") |> Map.size
+    current_viewing = Presence.list(@room_name) |> Map.size
 
     %{ timer_ref: _timer_ref, messages: messages} = chat_state
     broadcast(%{messages: messages, current_viewing: current_viewing})
