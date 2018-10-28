@@ -12,8 +12,7 @@ defmodule Bijakhq.Game.Chat do
   # This is chat state
   @chat_state %{
     timer_ref: nil,
-    messages: [],
-    current_viewing: 0
+    messages: []
   }
   # Client
   def start_link, do: GenServer.start_link(__MODULE__, @chat_state, name: @name)
@@ -58,43 +57,18 @@ defmodule Bijakhq.Game.Chat do
 
   def handle_call({:get_messages}, _from, chat_state) do
     # IO.inspect chat_state
-    %{ timer_ref: _timer_ref, messages: messages, current_viewing: current_viewing} = chat_state
-    {:reply, %{messages: messages, current_viewing: current_viewing}, chat_state}
+    %{ timer_ref: _timer_ref, messages: messages} = chat_state
+    {:reply, %{messages: messages}, chat_state}
   end
 
   def handle_call({:add_message, message}, _from, chat_state) do
     # IO.inspect message
     # IO.inspect chat_state
-    %{ timer_ref: _timer_ref, messages: messages, current_viewing: _} = chat_state
+    %{ timer_ref: _timer_ref, messages: messages} = chat_state
     messages = messages ++ [message]
     new_state = Map.put(chat_state, :messages, messages)
     {:reply, messages, new_state}
   end
-
-  # Viewer stuff
-
-  def handle_cast(:viewer_add, chat_state) do
-    Logger.warn "Viewer::add"
-    %{ timer_ref: _timer_ref, messages: _messages, current_viewing: current_viewing} = chat_state
-    current_viewing = current_viewing + 1
-    new_state = Map.put(chat_state, :current_viewing, current_viewing)
-    {:noreply, new_state}
-  end
-
-  def handle_cast(:viewer_remove, chat_state) do
-    Logger.warn "Viewer::remove"
-    %{ timer_ref: _timer_ref, messages: _messages, current_viewing: current_viewing} = chat_state
-    current_viewing = current_viewing - 1
-    new_state = Map.put(chat_state, :current_viewing, current_viewing)
-    {:noreply, new_state}
-  end
-
-  def handle_cast({:viewer_update, count}, chat_state) do
-    Logger.warn "Viewer::update"
-    new_state = Map.put(chat_state, :current_viewing, count)
-    {:noreply, new_state}
-  end
-
 
   # Timer stuff
 
@@ -107,7 +81,7 @@ defmodule Bijakhq.Game.Chat do
 
   def handle_cast(:timer_stop, chat_state) do
     Logger.warn "Timer Stop"
-    %{ timer_ref: timer_ref, messages: _messages, current_viewing: _current_viewing} = chat_state
+    %{ timer_ref: timer_ref, messages: _messages} = chat_state
     cancel_timer(timer_ref)
     # new_state = Map.put(chat_state, :timer_ref, nil)
     # Reset timer
@@ -119,11 +93,11 @@ defmodule Bijakhq.Game.Chat do
     # Logger.warn "update"
     current_viewing = Presence.list("game_session:lobby") |> Map.size
 
-    %{ timer_ref: _timer_ref, messages: messages, current_viewing: _current_viewing} = chat_state
+    %{ timer_ref: _timer_ref, messages: messages} = chat_state
     broadcast(%{messages: messages, current_viewing: current_viewing})
 
     timer_ref = schedule_timer @interval_time
-    new_state = %{ timer_ref: timer_ref, messages: [], current_viewing: current_viewing }
+    new_state = %{ timer_ref: timer_ref, messages: []}
     {:noreply, new_state}
   end
 
