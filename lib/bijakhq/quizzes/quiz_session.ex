@@ -22,7 +22,7 @@ defmodule Bijakhq.Quizzes.QuizSession do
 
     has_many :game_questions, QuizGameQuestion, foreign_key: :session_id
     has_many :scores, QuizScore, foreign_key: :game_id
-    many_to_many :questions, QuizQuestion, join_through: "quiz_session_question"
+    many_to_many :questions, QuizQuestion, join_through: "quiz_session_question", join_keys: [session_id: :id, question_id: :id]
 
     timestamps()
   end
