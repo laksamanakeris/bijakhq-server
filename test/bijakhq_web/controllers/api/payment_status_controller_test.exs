@@ -19,17 +19,17 @@ defmodule BijakhqWeb.Api.PaymentStatusControllerTest do
 
   describe "index" do
     test "lists all payment_statuses", %{conn: conn} do
-      conn = get conn, payment_status_path(conn, :index)
+      conn = get conn, api_payment_status_path(conn, :index)
       assert json_response(conn, 200)["data"] == []
     end
   end
 
   describe "create payment_status" do
     test "renders payment_status when data is valid", %{conn: conn} do
-      conn = post conn, payment_status_path(conn, :create), payment_status: @create_attrs
+      conn = post conn, api_payment_status_path(conn, :create), payment_status: @create_attrs
       assert %{"id" => id} = json_response(conn, 201)["data"]
 
-      conn = get conn, payment_status_path(conn, :show, id)
+      conn = get conn, api_payment_status_path(conn, :show, id)
       assert json_response(conn, 200)["data"] == %{
         "id" => id,
         "description" => "some description",
@@ -37,7 +37,7 @@ defmodule BijakhqWeb.Api.PaymentStatusControllerTest do
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
-      conn = post conn, payment_status_path(conn, :create), payment_status: @invalid_attrs
+      conn = post conn, api_payment_status_path(conn, :create), payment_status: @invalid_attrs
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
@@ -46,10 +46,10 @@ defmodule BijakhqWeb.Api.PaymentStatusControllerTest do
     setup [:create_payment_status]
 
     test "renders payment_status when data is valid", %{conn: conn, payment_status: %PaymentStatus{id: id} = payment_status} do
-      conn = put conn, payment_status_path(conn, :update, payment_status), payment_status: @update_attrs
+      conn = put conn, api_payment_status_path(conn, :update, payment_status), payment_status: @update_attrs
       assert %{"id" => ^id} = json_response(conn, 200)["data"]
 
-      conn = get conn, payment_status_path(conn, :show, id)
+      conn = get conn, api_payment_status_path(conn, :show, id)
       assert json_response(conn, 200)["data"] == %{
         "id" => id,
         "description" => "some updated description",
@@ -57,7 +57,7 @@ defmodule BijakhqWeb.Api.PaymentStatusControllerTest do
     end
 
     test "renders errors when data is invalid", %{conn: conn, payment_status: payment_status} do
-      conn = put conn, payment_status_path(conn, :update, payment_status), payment_status: @invalid_attrs
+      conn = put conn, api_payment_status_path(conn, :update, payment_status), payment_status: @invalid_attrs
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
@@ -66,10 +66,10 @@ defmodule BijakhqWeb.Api.PaymentStatusControllerTest do
     setup [:create_payment_status]
 
     test "deletes chosen payment_status", %{conn: conn, payment_status: payment_status} do
-      conn = delete conn, payment_status_path(conn, :delete, payment_status)
+      conn = delete conn, api_payment_status_path(conn, :delete, payment_status)
       assert response(conn, 204)
       assert_error_sent 404, fn ->
-        get conn, payment_status_path(conn, :show, payment_status)
+        get conn, api_payment_status_path(conn, :show, payment_status)
       end
     end
   end
