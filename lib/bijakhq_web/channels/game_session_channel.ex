@@ -265,7 +265,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     push socket, "presence_state", Presence.list(socket)
 
     user = socket.assigns.user
-    add_user_to_game_player_list(user)
+    Players.user_joined(user)
     # IO.inspect socket
 
     {:ok, _} = Presence.track(socket, "user:#{user.id}", %{
@@ -281,15 +281,5 @@ defmodule BijakhqWeb.GameSessionChannel do
     Logger.warn "Player::leave"
     {:noreply, socket}
   end
-
-  def add_user_to_game_player_list(user) do
-    game_state = Server.get_game_state
-    game_started = Map.get(game_state, :game_started)
-    Logger.warn "Connected user is #{user.role}"
-    if game_started == false and user.role != "admin" do
-      Players.user_joined(user)
-    end
-  end
-
 
 end
