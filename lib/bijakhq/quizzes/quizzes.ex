@@ -520,42 +520,26 @@ defmodule Bijakhq.Quizzes do
 
 
   # get upcoming game
-  def get_upcoming_game(show_hidden) do
+  def get_upcoming_game(show_hidden \\ false) do
 
     now = Timex.now
     query =
         from q in QuizSession,
-        where: q.is_completed == false and q.is_active != true and q.time > ^now,
+        where: q.is_completed == false and q.is_active != true and q.time > ^now and q.is_hidden == ^show_hidden,
         preload: [:game_questions],
         order_by: [asc: q.time]
     
-    case show_hidden do
-      true ->
-        query = from q in query, where: q.is_hidden == true
-        Repo.all(query)
-      false ->
-        query = from q in query, where: q.is_hidden == false
-        Repo.all(query)
-    end
+    Repo.all(query)
   end
 
-  def get_current_game(show_hidden) do
+  def get_current_game(show_hidden \\ false) do
     query =
         from q in QuizSession,
-        where: q.is_active == true,
+        where: q.is_active == true and q.is_hidden == ^show_hidden,
         preload: [:game_questions],
         order_by: [asc: q.time]
     
-    case show_hidden do
-      true ->
-        IO.puts "========================================="
-        query = from q in query, where: q.is_hidden == true
-        Repo.one(query)
-      false ->
-        query = from q in query, where: q.is_hidden == false
-        Repo.one(query)
-    end
-    
+    Repo.one(query)
   end
 
   def activate_game_session(game_id) do
