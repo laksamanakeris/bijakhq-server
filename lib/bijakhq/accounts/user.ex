@@ -18,7 +18,8 @@ defmodule Bijakhq.Accounts.User do
     field :confirmed_at, :utc_datetime
     field :reset_sent_at, :utc_datetime
 
-    field :role, :string, default: "user"
+    field :role, :string, default: "user" # user or admin
+    field :is_tester, :boolean, default: false 
 
     field :country, :string, default: "MY"
     field :language, :string, default: "en"
@@ -46,7 +47,7 @@ defmodule Bijakhq.Accounts.User do
 
   def changeset(%User{} = user, attrs) do
     user
-    |> cast(attrs, [:email, :username, :phone, :profile_picture, :confirmed_at, :role, :country, :language, :games_played, :has_phone, :high_score, :lives, :referral_url, :referred, :referring_user_id, :win_count, :verification_id, :rank_weekly, :rank_alltime])
+    |> cast(attrs, [:email, :username, :phone, :profile_picture, :confirmed_at, :role, :is_tester, :country, :language, :games_played, :has_phone, :high_score, :lives, :referral_url, :referred, :referring_user_id, :win_count, :verification_id, :rank_weekly, :rank_alltime])
     |> validate_required([:username])
     |> unique_email
     |> unique_username
