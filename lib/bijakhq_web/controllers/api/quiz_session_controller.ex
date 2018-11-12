@@ -55,6 +55,7 @@ defmodule BijakhqWeb.Api.QuizSessionController do
 
   def show_hidden_game(user) do
     cond do
+      user == nil -> false # added safeguard if user not defined
       user.role == "admin" ->  true
       user.is_tester == true ->  true
       true -> false
