@@ -11,6 +11,7 @@ defmodule Bijakhq.Game.Server do
 
   @initial_state %{
     game_started: false,
+    is_hidden: false,
     session_id: nil,
     total_questions: 0,
     current_question: nil,
@@ -36,6 +37,7 @@ defmodule Bijakhq.Game.Server do
       current_question: nil,
       questions: game_questions,
       prize: game_details.prize,
+      is_hidden: game_details.is_hidden,
       prize_text: "RM #{game_details.prize}"
     }
 
@@ -72,6 +74,10 @@ defmodule Bijakhq.Game.Server do
     GenServer.cast(@name, {:process_user_answer, user, question_id, answer_id})
   end
 
+  def game_save_scores() do
+    GenServer.cast(@name, :game_save_scores)
+  end
+
   # Server
   def init(game_state) do
     Logger.warn "Game server initialized"
@@ -96,6 +102,18 @@ defmodule Bijakhq.Game.Server do
     end
   end
 
+  def handle_cast(:game_save_scores, game_state) do
+    # IO.inspect game_state
+    session_id = Map.get(game_state, :session_id)
+    is_hidden = Map.get(game_state, :is_hidden)
+    
+    if is_hidden == false do
+        Players.game_save_scores(session_id)
+    end
+
+    {:noreply, game_state}
+  end
+  
   def handle_cast(new_state, game_state) do
     game_state = new_state
     {:noreply, game_state}

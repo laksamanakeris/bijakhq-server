@@ -203,10 +203,7 @@ defmodule BijakhqWeb.GameSessionChannel do
 
   def handle_in("game:result:end", _payload, socket) do
 
-    with game_state = Server.get_game_state do
-      session_id = Map.get(game_state, :session_id)
-      Players.game_save_scores(session_id)
-    end
+    Server.game_save_scores()
 
     broadcast socket, "game:result:end", %{}
     {:noreply, socket}
