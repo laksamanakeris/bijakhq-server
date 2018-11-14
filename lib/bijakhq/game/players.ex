@@ -67,6 +67,7 @@ defmodule Bijakhq.Game.Players do
   end
 
   def game_save_scores(game_id) do
+    IO.puts "Players::game_save_scores -> #{game_id}"
     GenServer.call(@name, {:game_save_scores, game_id})
   end
 
