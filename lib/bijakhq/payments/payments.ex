@@ -336,4 +336,100 @@ defmodule Bijakhq.Payments do
       end
     end
   end
+
+  alias Bijakhq.Payments.PaymentBatch
+
+  @doc """
+  Returns the list of payment_batches.
+
+  ## Examples
+
+      iex> list_payment_batches()
+      [%PaymentBatch{}, ...]
+
+  """
+  def list_payment_batches do
+    Repo.all(PaymentBatch)
+  end
+
+  @doc """
+  Gets a single payment_batch.
+
+  Raises `Ecto.NoResultsError` if the Payment batch does not exist.
+
+  ## Examples
+
+      iex> get_payment_batch!(123)
+      %PaymentBatch{}
+
+      iex> get_payment_batch!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_payment_batch!(id), do: Repo.get!(PaymentBatch, id)
+
+  @doc """
+  Creates a payment_batch.
+
+  ## Examples
+
+      iex> create_payment_batch(%{field: value})
+      {:ok, %PaymentBatch{}}
+
+      iex> create_payment_batch(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_payment_batch(attrs \\ %{}) do
+    %PaymentBatch{}
+    |> PaymentBatch.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a payment_batch.
+
+  ## Examples
+
+      iex> update_payment_batch(payment_batch, %{field: new_value})
+      {:ok, %PaymentBatch{}}
+
+      iex> update_payment_batch(payment_batch, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_payment_batch(%PaymentBatch{} = payment_batch, attrs) do
+    payment_batch
+    |> PaymentBatch.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a PaymentBatch.
+
+  ## Examples
+
+      iex> delete_payment_batch(payment_batch)
+      {:ok, %PaymentBatch{}}
+
+      iex> delete_payment_batch(payment_batch)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_payment_batch(%PaymentBatch{} = payment_batch) do
+    Repo.delete(payment_batch)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking payment_batch changes.
+
+  ## Examples
+
+      iex> change_payment_batch(payment_batch)
+      %Ecto.Changeset{source: %PaymentBatch{}}
+
+  """
+  def change_payment_batch(%PaymentBatch{} = payment_batch) do
+    PaymentBatch.changeset(payment_batch, %{})
+  end
 end
