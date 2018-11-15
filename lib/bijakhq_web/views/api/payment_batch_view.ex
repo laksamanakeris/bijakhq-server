@@ -14,6 +14,8 @@ defmodule BijakhqWeb.Api.PaymentBatchView do
     %{id: payment_batch.id,
       date_processed: payment_batch.date_processed,
       description: payment_batch.description,
-      is_processed: payment_batch.is_processed}
+      is_processed: payment_batch.is_processed,
+      generated_request: payment_batch.generated_request
+    }
   end
 end
