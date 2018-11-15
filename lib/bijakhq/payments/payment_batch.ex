@@ -7,6 +7,7 @@ defmodule Bijakhq.Payments.PaymentBatch do
     field :date_processed, :naive_datetime
     field :description, :string
     field :is_processed, :boolean, default: false
+    field :generated_request, :json
 
     timestamps()
   end
@@ -14,7 +15,7 @@ defmodule Bijakhq.Payments.PaymentBatch do
   @doc false
   def changeset(payment_batch, attrs) do
     payment_batch
-    |> cast(attrs, [:date_processed, :description, :is_processed])
-    |> validate_required([:date_processed, :description, :is_processed])
+    |> cast(attrs, [:date_processed, :description, :is_processed, :generated_request])
+    |> validate_required([:date_processed, :description, :is_processed, :generated_request])
   end
 end
