@@ -196,4 +196,68 @@ defmodule Bijakhq.PaymentsTest do
       assert %Ecto.Changeset{} = Payments.change_payment_type(payment_type)
     end
   end
+
+  describe "payment_batches" do
+    alias Bijakhq.Payments.PaymentBatch
+
+    @valid_attrs %{date_processed: ~N[2010-04-17 14:00:00.000000], description: "some description", is_processed: true}
+    @update_attrs %{date_processed: ~N[2011-05-18 15:01:01.000000], description: "some updated description", is_processed: false}
+    @invalid_attrs %{date_processed: nil, description: nil, is_processed: nil}
+
+    def payment_batch_fixture(attrs \\ %{}) do
+      {:ok, payment_batch} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Payments.create_payment_batch()
+
+      payment_batch
+    end
+
+    test "list_payment_batches/0 returns all payment_batches" do
+      payment_batch = payment_batch_fixture()
+      assert Payments.list_payment_batches() == [payment_batch]
+    end
+
+    test "get_payment_batch!/1 returns the payment_batch with given id" do
+      payment_batch = payment_batch_fixture()
+      assert Payments.get_payment_batch!(payment_batch.id) == payment_batch
+    end
+
+    test "create_payment_batch/1 with valid data creates a payment_batch" do
+      assert {:ok, %PaymentBatch{} = payment_batch} = Payments.create_payment_batch(@valid_attrs)
+      assert payment_batch.date_processed == ~N[2010-04-17 14:00:00.000000]
+      assert payment_batch.description == "some description"
+      assert payment_batch.is_processed == true
+    end
+
+    test "create_payment_batch/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Payments.create_payment_batch(@invalid_attrs)
+    end
+
+    test "update_payment_batch/2 with valid data updates the payment_batch" do
+      payment_batch = payment_batch_fixture()
+      assert {:ok, payment_batch} = Payments.update_payment_batch(payment_batch, @update_attrs)
+      assert %PaymentBatch{} = payment_batch
+      assert payment_batch.date_processed == ~N[2011-05-18 15:01:01.000000]
+      assert payment_batch.description == "some updated description"
+      assert payment_batch.is_processed == false
+    end
+
+    test "update_payment_batch/2 with invalid data returns error changeset" do
+      payment_batch = payment_batch_fixture()
+      assert {:error, %Ecto.Changeset{}} = Payments.update_payment_batch(payment_batch, @invalid_attrs)
+      assert payment_batch == Payments.get_payment_batch!(payment_batch.id)
+    end
+
+    test "delete_payment_batch/1 deletes the payment_batch" do
+      payment_batch = payment_batch_fixture()
+      assert {:ok, %PaymentBatch{}} = Payments.delete_payment_batch(payment_batch)
+      assert_raise Ecto.NoResultsError, fn -> Payments.get_payment_batch!(payment_batch.id) end
+    end
+
+    test "change_payment_batch/1 returns a payment_batch changeset" do
+      payment_batch = payment_batch_fixture()
+      assert %Ecto.Changeset{} = Payments.change_payment_batch(payment_batch)
+    end
+  end
 end

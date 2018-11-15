@@ -36,6 +36,7 @@ defmodule BijakhqWeb.Router do
       resources "/payments", PaymentController, except: [:new, :edit]
       resources "/payment-statuses", PaymentStatusController, except: [:new, :edit]
       resources "/payment-types", PaymentTypeController, except: [:new, :edit]
+      resources "/payment_batches", PaymentBatchController, except: [:new, :edit]
 
       resources "/games", QuizSessionController, except: [:new, :edit] do
         get "/questions/:id/randomize_answers", GameQuestionController, :randomize_answers
@@ -43,7 +44,6 @@ defmodule BijakhqWeb.Router do
       end
       get "/games/leaderboard/weekly", QuizSessionController, :leaderboard_weekly
       get "/games/leaderboard/all-time", QuizSessionController, :leaderboard_alltime
-      resources "/payment_statuses", PaymentStatusController, except: [:new, :edit]
 
     end
 
