@@ -8,10 +8,10 @@ defmodule Bijakhq.Payments.PaymentBatch do
 
 
   schema "payment_batches" do
-    field :date_processed, :naive_datetime
     field :name, :string
     field :description, :string
     field :is_processed, :boolean, default: false
+    field :date_processed, :utc_datetime
     field :generated_request, :map
 
     has_many :items, PaymentBatchItem, foreign_key: :batch_id
