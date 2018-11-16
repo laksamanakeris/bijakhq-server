@@ -3,10 +3,17 @@ defmodule Bijakhq.Payments.PaymentBatchItem do
   import Ecto.Changeset
 
 
+  alias Bijakhq.Payments.Payment
+  alias Bijakhq.Payments.PaymentBatch
+
   schema "payment_batch_items" do
-    field :batch_id, :integer
-    field :payment_id, :integer
-    field :status, :integer
+    
+    field :status, :integer, default: 1  #1=pending, 2=accepted, 3=rejected
+
+    belongs_to :payment, Payment, foreign_key: :payment_id
+    belongs_to :batch, PaymentBatch, foreign_key: :batch_id
+    # field :batch_id, :integer
+    # field :payment_id, :integer
 
     timestamps()
   end
@@ -15,6 +22,6 @@ defmodule Bijakhq.Payments.PaymentBatchItem do
   def changeset(payment_batch_item, attrs) do
     payment_batch_item
     |> cast(attrs, [:batch_id, :payment_id, :status])
-    |> validate_required([:batch_id, :payment_id, :status])
+    |> validate_required([:batch_id, :payment_id])
   end
 end
