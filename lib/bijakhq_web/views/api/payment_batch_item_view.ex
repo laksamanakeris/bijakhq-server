@@ -1,6 +1,6 @@
-defmodule BijakhqWeb.PaymentBatchItemView do
+defmodule BijakhqWeb.Api.PaymentBatchItemView do
   use BijakhqWeb, :view
-  alias BijakhqWeb.PaymentBatchItemView
+  alias BijakhqWeb.Api.PaymentBatchItemView
 
   def render("index.json", %{payment_batch_items: payment_batch_items}) do
     %{data: render_many(payment_batch_items, PaymentBatchItemView, "payment_batch_item.json")}
