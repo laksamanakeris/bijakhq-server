@@ -23,5 +23,7 @@ defmodule Bijakhq.Payments.PaymentBatchItem do
     payment_batch_item
     |> cast(attrs, [:batch_id, :payment_id, :status])
     |> validate_required([:batch_id, :payment_id])
+    # Note that the constaint is placed on ONE of the fields.
+    |> unique_constraint(:batch_id, name: :index_batches_payments)
   end
 end
