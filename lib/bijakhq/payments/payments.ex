@@ -432,4 +432,100 @@ defmodule Bijakhq.Payments do
   def change_payment_batch(%PaymentBatch{} = payment_batch) do
     PaymentBatch.changeset(payment_batch, %{})
   end
+
+  alias Bijakhq.Payments.PaymentBatchItem
+
+  @doc """
+  Returns the list of payment_batch_items.
+
+  ## Examples
+
+      iex> list_payment_batch_items()
+      [%PaymentBatchItem{}, ...]
+
+  """
+  def list_payment_batch_items do
+    Repo.all(PaymentBatchItem)
+  end
+
+  @doc """
+  Gets a single payment_batch_item.
+
+  Raises `Ecto.NoResultsError` if the Payment batch item does not exist.
+
+  ## Examples
+
+      iex> get_payment_batch_item!(123)
+      %PaymentBatchItem{}
+
+      iex> get_payment_batch_item!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_payment_batch_item!(id), do: Repo.get!(PaymentBatchItem, id)
+
+  @doc """
+  Creates a payment_batch_item.
+
+  ## Examples
+
+      iex> create_payment_batch_item(%{field: value})
+      {:ok, %PaymentBatchItem{}}
+
+      iex> create_payment_batch_item(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_payment_batch_item(attrs \\ %{}) do
+    %PaymentBatchItem{}
+    |> PaymentBatchItem.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a payment_batch_item.
+
+  ## Examples
+
+      iex> update_payment_batch_item(payment_batch_item, %{field: new_value})
+      {:ok, %PaymentBatchItem{}}
+
+      iex> update_payment_batch_item(payment_batch_item, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_payment_batch_item(%PaymentBatchItem{} = payment_batch_item, attrs) do
+    payment_batch_item
+    |> PaymentBatchItem.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a PaymentBatchItem.
+
+  ## Examples
+
+      iex> delete_payment_batch_item(payment_batch_item)
+      {:ok, %PaymentBatchItem{}}
+
+      iex> delete_payment_batch_item(payment_batch_item)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_payment_batch_item(%PaymentBatchItem{} = payment_batch_item) do
+    Repo.delete(payment_batch_item)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking payment_batch_item changes.
+
+  ## Examples
+
+      iex> change_payment_batch_item(payment_batch_item)
+      %Ecto.Changeset{source: %PaymentBatchItem{}}
+
+  """
+  def change_payment_batch_item(%PaymentBatchItem{} = payment_batch_item) do
+    PaymentBatchItem.changeset(payment_batch_item, %{})
+  end
 end
