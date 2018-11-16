@@ -13,6 +13,7 @@ defmodule BijakhqWeb.Api.PaymentBatchView do
   def render("payment_batch.json", %{payment_batch: payment_batch}) do
     %{id: payment_batch.id,
       date_processed: payment_batch.date_processed,
+      name: payment_batch.name,
       description: payment_batch.description,
       is_processed: payment_batch.is_processed,
       generated_request: payment_batch.generated_request
