@@ -51,7 +51,7 @@ defmodule Bijakhq.Mixfile do
       {:arc_ecto, "~> 0.10.0"},
       {:arc_gcs, "~> 0.0.8"},
       {:cors_plug, "~> 1.5"},
-      {:pay_pal, git: "https://github.com/laksamanakeris/PayPal.git"},
+      {:pay_pal, github: "laksamanakeris/PayPal"},
       {:libcluster, "~> 2.1", only: :prod}
     ]
   end
