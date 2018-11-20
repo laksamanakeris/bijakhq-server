@@ -25,6 +25,7 @@ defmodule BijakhqWeb.Api.QuizSessionView do
       total_questions: questions_count,
       time: quiz_session.time,
       is_active: quiz_session.is_active,
+      is_hidden: quiz_session.is_hidden,
       is_completed: quiz_session.is_completed,
       stream_url: quiz_session.stream_url,
       completed_at: quiz_session.completed_at}

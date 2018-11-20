@@ -20,7 +20,7 @@ defmodule Bijakhq.Mixfile do
   def application do
     [
       mod: {Bijakhq.Application, []},
-      extra_applications: [:logger, :runtime_tools, :httpoison, :timex, :faker, :arc_ecto]
+      extra_applications: [:logger, :runtime_tools, :httpoison, :timex, :faker, :arc_ecto, :pay_pal]
     ]
   end
 
@@ -43,7 +43,7 @@ defmodule Bijakhq.Mixfile do
       {:phauxth, "~> 1.2"},
       {:bcrypt_elixir, "~> 1.0"},
       {:bamboo, "~> 0.8"},
-      {:cowboy, "~> 1.0"},
+      {:plug_cowboy, "~> 1.0"},
       {:httpoison, "~> 1.1.1", override: true},
       {:timex, "~> 3.1"},
       {:faker, "~> 0.10"},
@@ -51,6 +51,7 @@ defmodule Bijakhq.Mixfile do
       {:arc_ecto, "~> 0.10.0"},
       {:arc_gcs, "~> 0.0.8"},
       {:cors_plug, "~> 1.5"},
+      {:pay_pal, github: "laksamanakeris/PayPal"},
       {:libcluster, "~> 2.1", only: :prod}
     ]
   end
@@ -65,7 +66,7 @@ defmodule Bijakhq.Mixfile do
     [
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      "test": ["ecto.drop", "ecto.create", "ecto.migrate", "test"]
+      test: ["ecto.drop", "ecto.create", "ecto.migrate", "test"]
     ]
   end
 end

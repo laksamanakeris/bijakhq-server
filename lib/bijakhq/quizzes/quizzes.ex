@@ -520,7 +520,7 @@ defmodule Bijakhq.Quizzes do
 
 
   # get upcoming game
-  def get_upcoming_game do
+  def get_upcoming_game(show_hidden \\ false) do
 
     now = Timex.now
     query =
@@ -528,18 +528,34 @@ defmodule Bijakhq.Quizzes do
         where: q.is_completed == false and q.is_active != true and q.time > ^now,
         preload: [:game_questions],
         order_by: [asc: q.time]
-
-    Repo.all(query)
+    
+    case show_hidden do
+      true ->
+        # show all games
+        Repo.all(query)
+      false ->
+        # show all games except hidden
+        query = from q in query, where: q.is_hidden == false
+        Repo.all(query)
+    end
   end
 
-  def get_current_game do
+  def get_current_game(show_hidden \\ false) do
     query =
         from q in QuizSession,
         where: q.is_active == true,
         preload: [:game_questions],
         order_by: [asc: q.time]
-
-    Repo.one(query)
+    
+    case show_hidden do
+      true ->
+        # show all games
+        Repo.one(query)
+      false ->
+        # show all games except hidden
+        query = from q in query, where: q.is_hidden == false
+        Repo.one(query)
+    end
   end
 
   def activate_game_session(game_id) do
@@ -562,9 +578,9 @@ defmodule Bijakhq.Quizzes do
     |> Repo.update_all(set: [is_active: false])
   end
 
-  def get_game_now_status do
-    current = Quizzes.get_current_game
-    upcoming = Quizzes.get_upcoming_game
+  def get_game_now_status(show_hidden) do
+    current = Quizzes.get_current_game(show_hidden)
+    upcoming = Quizzes.get_upcoming_game(show_hidden)
 
     %{
       current: current,

@@ -5,6 +5,8 @@ defmodule Bijakhq.Game.Players do
 
   alias Bijakhq.Quizzes
   alias Bijakhq.Quizzes.QuizScore
+  alias Bijakhq.Game.Server
+  alias Bijakhq.Game.Player
 
   @name :game_players
   @players_state %{
@@ -14,12 +16,22 @@ defmodule Bijakhq.Game.Players do
   }
 
   def start_link() do
-   GenServer.start_link(__MODULE__, @players_state, name: @name)
+    :ets.new(:players, [:set, :public, :named_table])
+    GenServer.start_link(__MODULE__, @players_state, name: @name)
   end
 
   def user_joined(user) do
+    game_state = Server.get_game_state
+    game_started = Map.get(game_state, :game_started)
+    Logger.warn "Connected user is #{user.role}"
+    if game_started == false and user.role != "admin" do
+      player = %Bijakhq.Game.Player{id: user.id, lives: user.lives, high_score: user.high_score, role: user.role, username: user.username, win_count: user.win_count, profile_picture: user.profile_picture}
+      IO.inspect user
+      IO.inspect player
+      :ets.insert(:players, {player.id, player})
+      GenServer.call(@name, {:user_joined, player})
+    end
     # When user join - limit his life to 1 extra pergame only
-   GenServer.call(@name, {:user_joined, user})
   end
 
   def users_in_channel() do
@@ -55,6 +67,7 @@ defmodule Bijakhq.Game.Players do
   end
 
   def game_save_scores(game_id) do
+    IO.puts "Players::game_save_scores -> #{game_id}"
     GenServer.call(@name, {:game_save_scores, game_id})
   end
 

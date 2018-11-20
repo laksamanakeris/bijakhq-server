@@ -4,7 +4,9 @@ defmodule Bijakhq.Payments.Payment do
 
   alias Bijakhq.Accounts.User
   alias Bijakhq.Payments.PaymentType
+  alias Bijakhq.Payments.PaymentBatch
   alias Bijakhq.Payments.PaymentStatus
+  alias Bijakhq.Payments.PaymentBatchItem
 
 
   schema "payments" do
@@ -21,6 +23,10 @@ defmodule Bijakhq.Payments.Payment do
     belongs_to :update_by, User, foreign_key: :updated_by
     belongs_to :status, PaymentStatus, foreign_key: :payment_status
     belongs_to :type, PaymentType, foreign_key: :payment_type
+
+    has_many :batch_items, PaymentBatchItem, foreign_key: :payment_id
+    # Payment can have many batches - this will happen when there's issue processing the Paypal Payment 
+    many_to_many :batches, PaymentBatch, join_through: "payment_batch_items", join_keys: [batch_id: :id, payment_id: :id]
 
     timestamps()
   end

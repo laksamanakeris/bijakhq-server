@@ -46,9 +46,20 @@ defmodule BijakhqWeb.Api.QuizSessionController do
     end
   end
 
-  def now(conn,_params) do
-    game = Quizzes.get_game_now_status()
+  def now(%Plug.Conn{assigns: %{current_user: user}} = conn,_params) do
+    IO.inspect user
+    valid_show = show_hidden_game(user)
+    game = Quizzes.get_game_now_status(valid_show)
     render(conn, "now.json", game: game)
+  end
+
+  def show_hidden_game(user) do
+    cond do
+      user == nil -> false # added safeguard if user not defined
+      user.role == "admin" ->  true
+      user.is_tester == true ->  true
+      true -> false
+    end
   end
 
   def leaderboard_weekly(conn,_params) do
