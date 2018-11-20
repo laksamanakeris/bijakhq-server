@@ -4,6 +4,9 @@ run.config:
   engine.config:
     runtime: elixir-1.6
     erlang_runtime: erlang-20
+  
+  extra_packages:
+    - ImageMagick
 
   # we need nodejs in development
   # ensure inotify exists for hot-code reloading
@@ -33,6 +36,7 @@ deploy.config:
     web.main:
       - mix ecto.create --quiet
       - mix ecto.migrate
+      - chmod -R 0755 /app/_build/prod/lib/tzdata/priv/
 
 # add postgres as a data component
 data.db:
@@ -42,3 +46,4 @@ web.main:
   start: node-start mix phx.server
   writable_dirs:          # Timex and TZData need to write into its priv/ folder
     - priv
+    - app/_build/prod/lib

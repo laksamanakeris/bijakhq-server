@@ -3,17 +3,21 @@ defmodule BijakhqWeb.Api.UserController do
 
   import BijakhqWeb.Api.Authorize
   alias Phauxth.Log
-  alias Bijakhq.Accounts
+  alias Bijakhq.{Accounts, Repo}
+  alias Bijakhq.Quizzes
   alias Bijakhq.Sms
   alias Bijakhq.Sms.NexmoRequest
+  alias Bijakhq.ImageFile
+  alias Bijakhq.Payments
 
   action_fallback BijakhqWeb.Api.FallbackController
 
   # the following plugs are defined in the controllers/authorize.ex file
   # plug :user_check when action in [:index, :show]
-  plug :role_check, [roles: ["admin"]] when action in [:index, :delete]
+  plug :role_check, [roles: ["admin"]] when action in [:index, :update, :delete]
   plug :id_or_role, [roles: ["admin"]] when action in [:show]
-  plug :id_check when action in [:update, :delete]
+  # plug :id_check when action in [:update, :delete]
+  plug :user_check when action in [:upload_image_profile, :show_me, :update_me]
 
   def index(conn, _) do
     users = Accounts.list_users()
@@ -58,18 +62,20 @@ defmodule BijakhqWeb.Api.UserController do
     end
   end
 
-  def show(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"id" => id}) do
-    user = (id == to_string(user.id) and user) || Accounts.get(id)
+  def show(conn, %{"id" => id}) do
+    user = Accounts.get(id)
     render(conn, "show.json", user: user)
   end
 
-  def update(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"user" => user_params}) do
+  def update(conn, %{"id" => id, "user" => user_params}) do
+    user = Accounts.get(id)
     with {:ok, user} <- Accounts.update_user(user, user_params) do
       render(conn, "show.json", user: user)
     end
   end
 
-  def delete(%Plug.Conn{assigns: %{current_user: user}} = conn, _) do
+  def delete(conn, %{"id" => id}) do
+    user = Accounts.get(id)
     {:ok, _user} = Accounts.delete_user(user)
 
     send_resp(conn, :no_content, "")
@@ -79,6 +85,60 @@ defmodule BijakhqWeb.Api.UserController do
     # user = id == to_string(user.id) and user || Accounts.get(id)
     # profile = Accounts.get(user.id);
     # render(conn, "show_me.json", %{user: user, profile: profile})
+    user =
+        add_balance_to_user(user)
+        |> add_leaderboard
     render(conn, "show_me.json", %{user: user})
+  end
+
+  def update_me(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"username" => username} = user_params) do
+    with {:ok, user} <- Accounts.update_username(user, user_params) do
+      user =
+        add_balance_to_user(user)
+        |> add_leaderboard
+      render(conn, "show_me.json", %{user: user})
+    end
+  end
+
+  def add_balance_to_user(user)do
+    user = user |> Repo.preload(:referrer)
+    balance = Payments.get_balance_by_user_id(user.id)
+    user |> Map.put(:balance, balance)
+  end
+
+  def add_leaderboard(user) do
+    weekly = Quizzes.get_user_leaderboard_weekly(user.id)
+    alltime = Quizzes.get_user_leaderboard_all_time(user.id)
+    leaderboard = %{alltime: alltime, weekly: weekly}
+    user |> Map.put(:leaderboard, leaderboard)
+  end
+
+  def upload_image_profile(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"profile_picture" => _params} = user_params) do
+    IO.puts "===================================================================================="
+    IO.inspect user
+    IO.inspect user_params
+    IO.puts "===================================================================================="
+
+    # uploaded = ImageFile.store(params)
+    # IO.inspect uploaded
+
+    with {:ok, user} <- Accounts.upload_image(user, user_params) do
+      user = add_balance_to_user(user)
+      render(conn, "show_me.json", user: user)
+    end
+    # render(conn, "show_me.json", user: user)
+  end
+
+  def check_username(conn, %{"username" => username} = user_params) do
+    case result = Accounts.get_by(user_params) do
+      nil ->
+        # render(conn, "username_unavailable.json", nil)
+        response = %{available: true, message: "Username is available" }
+        render(conn, "username_available.json", %{response: response})
+      _ ->
+        # render(conn, "empty.json", nil)
+        response = %{available: false, message: "Username is not available" }
+        render(conn, "username_available.json", %{response: response})
+    end
   end
 end
