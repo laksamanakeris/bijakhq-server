@@ -51,20 +51,20 @@ defmodule Bijakhq.Game.Chat do
   def init(initial_data) do
     Logger.warn "Game chat initialized"
     chat_state = initial_data
-    IO.inspect chat_state
+    #IO.inspect chat_state
     # timer_start()
     {:ok, chat_state}
   end
 
   def handle_call({:get_messages}, _from, chat_state) do
-    # IO.inspect chat_state
+    # #IO.inspect chat_state
     %{ timer_ref: _timer_ref, messages: messages} = chat_state
     {:reply, %{messages: messages}, chat_state}
   end
 
   def handle_call({:add_message, message}, _from, chat_state) do
-    # IO.inspect message
-    # IO.inspect chat_state
+    # #IO.inspect message
+    # #IO.inspect chat_state
     %{ timer_ref: _timer_ref, messages: messages} = chat_state
     messages = messages ++ [message]
     new_state = Map.put(chat_state, :messages, messages)
@@ -107,7 +107,7 @@ defmodule Bijakhq.Game.Chat do
   defp cancel_timer(ref), do: Process.cancel_timer(ref)
   defp broadcast(messages) do
     # Logger.warn "broadcast"
-    # IO.inspect messages
+    # #IO.inspect messages
     BijakhqWeb.Endpoint.broadcast("game_session:lobby", "user:chat", messages)
   end
 

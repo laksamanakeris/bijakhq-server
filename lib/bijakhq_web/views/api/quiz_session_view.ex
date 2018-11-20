@@ -15,7 +15,7 @@ defmodule BijakhqWeb.Api.QuizSessionView do
   def render("quiz_session.json", %{quiz_session: quiz_session}) do
 
     questions_count = Enum.count(quiz_session.game_questions)
-    IO.inspect questions_count
+    #IO.inspect questions_count
 
     %{id: quiz_session.id,
       name: quiz_session.name,

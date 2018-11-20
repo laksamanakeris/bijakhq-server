@@ -66,7 +66,7 @@ defmodule BijakhqWeb.Api.ReferralController do
             {:ok, referral} = Accounts.create_referral(%{user_id: user.id, referred_by: referrer.id})
 
             with referral = Accounts.get_referral!(referral.id) do
-              IO.inspect referral
+              #IO.inspect referral
               render(conn, "show.json", referral: referral)
             end
         end

@@ -44,7 +44,7 @@ defmodule BijakhqWeb.GameSessionChannel do
 
     res = Server.game_start game_id
     with response = Server.get_game_state do
-      IO.inspect response
+      #IO.inspect response
       broadcast socket, "game:start", payload
       response = Phoenix.View.render_one(response, BijakhqWeb.Api.QuizSessionView, "game_start_details.json")
       # {:noreply, socket}
@@ -56,7 +56,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     with response = Server.get_game_state do
       response = Phoenix.View.render_one(response, BijakhqWeb.Api.QuizSessionView, "game_start_details.json")
       # {:noreply, socket}
-      IO.inspect response
+      #IO.inspect response
       broadcast socket, "game:details:admin:show", response
       {:reply, {:ok, response}, socket}
     end
@@ -69,7 +69,7 @@ defmodule BijakhqWeb.GameSessionChannel do
 
       Server.set_current_question(question_id)
       Players.users_ready_next_question()
-      # IO.inspect game
+      # #IO.inspect game
       questions = game.questions
       question = Enum.at( questions , question_id)
 
@@ -86,7 +86,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     %{"question_id" => question_id} = payload
 
     with game = Server.get_game_state do
-      # IO.inspect game
+      # #IO.inspect game
       questions = game.questions
       question = Enum.at( questions , question_id)
 
@@ -102,7 +102,7 @@ defmodule BijakhqWeb.GameSessionChannel do
 
   def handle_in("question:end", payload, socket) do
     # %{"question_id" => question_id} = payload
-    IO.inspect payload
+    #IO.inspect payload
     broadcast socket, "question:end", payload
     {:reply, {:ok, payload}, socket}
   end
@@ -111,7 +111,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     %{"question_id" => question_id} = payload
 
     with game = Server.get_game_state do
-      # IO.inspect game
+      # #IO.inspect game
       questions = game.questions
       question = Enum.at( questions , question_id)
 
@@ -124,7 +124,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     %{"question_id" => question_id} = payload
 
     with game = Server.get_game_state do
-      # IO.inspect game
+      # #IO.inspect game
       questions = game.questions
       question = Enum.at( questions , question_id)
 
@@ -138,17 +138,17 @@ defmodule BijakhqWeb.GameSessionChannel do
     %{"question_id" => question_id} = payload
 
     with game = Server.get_game_state do
-      # IO.inspect game
+      # #IO.inspect game
       questions = game.questions
       question = Enum.at( questions , question_id)
       # question = Map.put(question, :question_id, question_id)
 
-      # IO.inspect question
+      # #IO.inspect question
       # IO.puts "========================================================================"
 
       # # soalan = Bijakhq.MapHelpers.atomize_keys(question.answers_sequence)
       # soalan = question.answers_sequence
-      # # IO.inspect soalan
+      # # #IO.inspect soalan
       # answers = soalan.answers
 
       # [answer1, answer2, answer3] = answers
@@ -161,7 +161,7 @@ defmodule BijakhqWeb.GameSessionChannel do
       # # update the sequence again
       # question = Map.put(question, :answers_sequence, soalan)
 
-      # IO.inspect question
+      # #IO.inspect question
 
       response = Phoenix.View.render_one(question, BijakhqWeb.Api.QuizQuestionView, "soalan_jawapan.json")
       broadcast socket, "question:result:show", response
@@ -177,7 +177,7 @@ defmodule BijakhqWeb.GameSessionChannel do
   def handle_in("game:result:process", _payload, socket) do
     # broadcast socket, "game:result:show", payload
     with game_result = Server.game_process_result() do
-      # IO.inspect game
+      # #IO.inspect game
       response = Phoenix.View.render_one(game_result.results, BijakhqWeb.Api.UserView, "game_result_index.json")
       broadcast socket, "game:result:process", response
       {:reply, {:ok, response}, socket}
@@ -263,7 +263,7 @@ defmodule BijakhqWeb.GameSessionChannel do
 
     user = socket.assigns.user
     Players.user_joined(user)
-    # IO.inspect socket
+    # #IO.inspect socket
 
     {:ok, _} = Presence.track(socket, "user:#{user.id}", %{
       online_at: :os.system_time(:milli_seconds),

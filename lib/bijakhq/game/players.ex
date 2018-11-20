@@ -26,8 +26,8 @@ defmodule Bijakhq.Game.Players do
     Logger.warn "Connected user is #{user.role}"
     if game_started == false and user.role != "admin" do
       player = %Bijakhq.Game.Player{id: user.id, lives: user.lives, high_score: user.high_score, role: user.role, username: user.username, win_count: user.win_count, profile_picture: user.profile_picture}
-      IO.inspect user
-      IO.inspect player
+      #IO.inspect user
+      #IO.inspect player
       :ets.insert(:players, {player.id, player})
       GenServer.call(@name, {:user_joined, player})
     end
@@ -75,7 +75,7 @@ defmodule Bijakhq.Game.Players do
 
   def init(args) do
     Logger.warn "Game Players initialized"
-    IO.inspect args
+    #IO.inspect args
     # timer_start()
     {:ok, args}
   end
@@ -114,7 +114,7 @@ defmodule Bijakhq.Game.Players do
     player = Enum.find(player_list, fn u -> u.id == user.id end)
 
     # Enum.find(player_list, fn(element) ->
-    #   IO.inspect element
+    #   #IO.inspect element
     #   # match?(user, element)
     # end)
     {:reply, player, players_state}
@@ -142,7 +142,7 @@ defmodule Bijakhq.Game.Players do
     Enum.map(results, fn(subj) ->
       score = %{amount: subj.amounts, user_id: subj.id, game_id: game_id, completed_at: DateTime.utc_now}
       with {:ok, %QuizScore{} = quiz_score} <- Bijakhq.Quizzes.create_quiz_score(score) do
-        IO.inspect quiz_score
+        #IO.inspect quiz_score
       end
 
     end)

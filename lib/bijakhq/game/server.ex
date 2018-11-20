@@ -26,7 +26,7 @@ defmodule Bijakhq.Game.Server do
 
     # Game state format - @initial_state
     game_data = Quizzes.get_initial_game_state(game_id)
-    IO.inspect game_data
+    #IO.inspect game_data
 
     %{ game_details: game_details, game_questions: game_questions } = game_data
 
@@ -81,7 +81,7 @@ defmodule Bijakhq.Game.Server do
   # Server
   def init(game_state) do
     Logger.warn "Game server initialized"
-    IO.inspect game_state
+    #IO.inspect game_state
     {:ok, game_state}
   end
 
@@ -103,7 +103,7 @@ defmodule Bijakhq.Game.Server do
   end
 
   def handle_cast(:game_save_scores, game_state) do
-    # IO.inspect game_state
+    # #IO.inspect game_state
     session_id = Map.get(game_state, :session_id)
     is_hidden = Map.get(game_state, :is_hidden)
     
@@ -120,14 +120,14 @@ defmodule Bijakhq.Game.Server do
   end
 
   def handle_call(:game_state, _from, game_state) do
-    # IO.inspect _from
-    # IO.inspect game_state
+    # #IO.inspect _from
+    # #IO.inspect game_state
     {:reply, game_state, game_state}
   end
 
   def handle_call({:update_game_state, new_game_state}, _from, game_state) do
-    # IO.inspect _from
-    # IO.inspect game_state
+    # #IO.inspect _from
+    # #IO.inspect game_state
     {:reply, new_game_state, new_game_state}
   end
 
@@ -149,7 +149,7 @@ defmodule Bijakhq.Game.Server do
     # get game_id
     # get list of users
     # amount = prize / total users
-    # IO.inspect game_state
+    # #IO.inspect game_state
     prize = Map.get(game_state, :prize)
     users = Players.users_next_round();
     total_users = Enum.count(users)
@@ -167,12 +167,12 @@ defmodule Bijakhq.Game.Server do
         []
       end
     players = Players.set_game_result(result)
-    # IO.inspect result
+    # #IO.inspect result
     {:reply, players, game_state}
   end
 
   defp get_question_by_id(game_state, question_id) do
-    # IO.inspect game_state
+    # #IO.inspect game_state
     questions = game_state.questions
     question = Enum.at(questions,question_id)
     question.answers_sequence

@@ -449,8 +449,8 @@ defmodule Bijakhq.Quizzes do
     game_questions = Quizzes.get_questions_by_game_id(game_id)
                     |> Quizzes.process_questions
 
-    IO.inspect game_details
-    IO.inspect game_questions
+    #IO.inspect game_details
+    #IO.inspect game_questions
   end
 
   def randomize_answer(quiz_question) do
@@ -496,7 +496,7 @@ defmodule Bijakhq.Quizzes do
   def update_game_questions_random_answers do
     questions = Quizzes.get_game_questions_with_empty_answers_sequence
     Enum.map(questions, fn(quest) ->
-        IO.inspect quest
+        #IO.inspect quest
         # question_randomized = Quizzes.randomize_answer(quest.question);
         # Quizzes.update_game_question(quest, %{answers_sequence: question_randomized, sequence: quest.sequence})
     end)
@@ -509,7 +509,7 @@ defmodule Bijakhq.Quizzes do
     game_questions = Enum.map(game_details.game_questions, fn(quest) ->
         atomized = Bijakhq.MapHelpers.atomize_keys(quest.answers_sequence)
         quest = Map.put(quest, :answers_sequence, atomized)
-        # IO.inspect quest
+        # #IO.inspect quest
       end)
 
     %{
@@ -731,7 +731,7 @@ defmodule Bijakhq.Quizzes do
         %{amounts: 0, rank: 101, user_id: user_id}
       _ ->
         list = list_quiz_scores_weekly()
-        # IO.inspect list
+        # #IO.inspect list
         dash = Enum.find(list, fn(x) -> x.user_id == user_data.user_id end)
         case dash do
           nil ->
@@ -750,7 +750,7 @@ defmodule Bijakhq.Quizzes do
         %{amounts: 0, rank: 101, user_id: user_id}
       _ ->
         list = list_quiz_scores_all_time()
-        # IO.inspect list
+        # #IO.inspect list
         dash = Enum.find(list, fn(x) -> x.user_id == user_data.user_id end)
         case dash do
           nil ->
