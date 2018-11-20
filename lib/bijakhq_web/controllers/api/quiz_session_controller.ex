@@ -4,11 +4,12 @@ defmodule BijakhqWeb.Api.QuizSessionController do
   import BijakhqWeb.Api.Authorize
   alias Bijakhq.Quizzes
   alias Bijakhq.Quizzes.QuizSession
-  alias Bijakhq.Quizzes.SessionQuestion
+  alias Bijakhq.Quizzes.QuizGameQuestion
 
   action_fallback BijakhqWeb.Api.FallbackController
 
   plug :role_check, [roles: ["admin"]] when action in [:index, :create, :show, :update, :delete, :list_questions, :show_question, :update_question]
+  plug :user_check when action in [:leaderboard_weekly, :leaderboard_alltime]
 
   def index(conn, _params) do
     quiz_sessions = Quizzes.list_quiz_sessions()
@@ -17,6 +18,7 @@ defmodule BijakhqWeb.Api.QuizSessionController do
 
   def create(conn, %{"game" => quiz_session_params}) do
     with {:ok, %QuizSession{} = quiz_session} <- Quizzes.create_quiz_session(quiz_session_params) do
+      quiz_session = Quizzes.get_quiz_session!(quiz_session.id)
       conn
       |> put_status(:created)
       |> put_resp_header("location", api_quiz_session_path(conn, :show, quiz_session))
@@ -44,24 +46,30 @@ defmodule BijakhqWeb.Api.QuizSessionController do
     end
   end
 
-  def list_questions(conn, %{"game_id" => id}) do
-    session_question = Quizzes.get_questions_by_game_id(id)
-    IO.inspect session_question
-    render(conn, "session_question.json", session_question: session_question)
+  def now(%Plug.Conn{assigns: %{current_user: user}} = conn,_params) do
+    IO.inspect user
+    valid_show = show_hidden_game(user)
+    game = Quizzes.get_game_now_status(valid_show)
+    render(conn, "now.json", game: game)
   end
 
-  def show_question(conn, %{"game_id" => game_id, "question_id" => question_id}) do
-    attrs = %{session_id: game_id, question_id: question_id}
-    quiz_session = Quizzes.get_game_question_by!(attrs)
-    IO.inspect quiz_session
-    render(conn, "session_question_show.json", session_question: quiz_session)
-  end
-
-  def update_question(conn, %{"game_id" => game_id, "question_id" => question_id, "question" => data}) do
-    attrs = %{session_id: game_id, question_id: question_id}
-    session_question = Quizzes.get_game_question_by!(attrs)
-    with {:ok, %SessionQuestion{} = session_question} <- Quizzes.update_session_question(session_question, data) do
-      render(conn, "session_question_show.json", session_question: session_question)
+  def show_hidden_game(user) do
+    cond do
+      user == nil -> false # added safeguard if user not defined
+      user.role == "admin" ->  true
+      user.is_tester == true ->  true
+      true -> false
     end
   end
+
+  def leaderboard_weekly(conn,_params) do
+    game = Quizzes.list_quiz_scores_weekly()
+    render(conn, "leaderboard.json", scores: game)
+  end
+
+  def leaderboard_alltime(conn,_params) do
+    game = Quizzes.list_quiz_scores_all_time()
+    render(conn, "leaderboard.json", scores: game)
+  end
+
 end

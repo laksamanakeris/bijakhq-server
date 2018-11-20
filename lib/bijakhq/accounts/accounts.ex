@@ -6,6 +6,7 @@ defmodule Bijakhq.Accounts do
   import Ecto.{Query, Changeset}, warn: false
   alias Phauxth.Log
   alias Bijakhq.{Accounts.User, Repo}
+  alias Bijakhq.Accounts.Referral
 
   def list_users do
     Repo.all(User)
@@ -23,6 +24,10 @@ defmodule Bijakhq.Accounts do
 
   def get_by(%{"phone" => phone}) do
     Repo.get_by(User, phone: phone)
+  end
+
+  def get_user_by_username(username) do
+    get_by(%{"username" => username})
   end
 
   def create_user(attrs) do
@@ -55,6 +60,24 @@ defmodule Bijakhq.Accounts do
     |> Repo.update()
   end
 
+  def update_username(%User{} = user, attrs) do
+    user
+    |> User.update_username_changeset(attrs)
+    |> Repo.update()
+  end
+
+  def update_paypal_email(%User{} = user, attrs) do
+    user
+    |> User.update_paypal_email_changeset(attrs)
+    |> Repo.update()
+  end
+
+  def upload_image(%User{} = user, attrs) do
+    user
+    |> User.upload_changeset(attrs)
+    |> Repo.update()
+  end
+
   def update_password(%User{} = user, attrs) do
     user
     |> User.create_changeset(attrs)
@@ -68,5 +91,33 @@ defmodule Bijakhq.Accounts do
 
   def change_user(%User{} = user) do
     User.changeset(user, %{})
+  end
+
+
+
+  def list_referrals do
+    Repo.all(Referral) |> Repo.preload([:user, :referrer])
+  end
+  def get_referral!(id), do: Repo.get!(Referral, id) |> Repo.preload([:user, :referrer])
+
+  def create_referral(attrs \\ %{}) do
+    %Referral{}
+    |> Referral.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def update_referral(%Referral{} = referral, attrs) do
+    referral
+    |> Referral.changeset(attrs)
+    |> Repo.update()
+    |> Repo.preload([:user, :referrer])
+  end
+
+  def delete_referral(%Referral{} = referral) do
+    Repo.delete(referral)
+  end
+
+  def change_referral(%Referral{} = referral) do
+    Referral.changeset(referral, %{})
   end
 end

@@ -6,10 +6,15 @@ defmodule BijakhqWeb.ErrorView do
   end
 
   def render("500.html", _assigns) do
+
     "Internal server error"
   end
 
   def render("error.json", %{error: message}) do
+    %{errors: %{detail: message}}
+  end
+
+  def render("403.json", %{error: message}) do
     %{errors: %{detail: message}}
   end
 

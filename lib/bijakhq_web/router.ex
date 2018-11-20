@@ -17,30 +17,46 @@ defmodule BijakhqWeb.Router do
     plug Phauxth.Authenticate, method: :token, max_age: @max_age
   end
 
+  pipeline :api_admin do
+    plug BijakhqWeb.Plug.RequireAdmin
+  end
+
   scope host: "api.", alias: BijakhqWeb.Api, as: :api do
     pipe_through :api
 
     scope "/admin" do
+      pipe_through :api_admin
+
       resources "/users", UserController, except: [:new, :edit]
+      resources "/referrals", ReferralController, except: [:new, :edit]
 
       resources "/categories", QuizCategoryController, except: [:new, :edit]
       resources "/questions", QuizQuestionController, except: [:new, :edit]
 
+      resources "/payments", PaymentController, except: [:new, :edit]
+      resources "/payment-statuses", PaymentStatusController, except: [:new, :edit]
+      resources "/payment-types", PaymentTypeController, except: [:new, :edit]
+      resources "/payment-batches", PaymentBatchController, except: [:new, :edit]
+      resources "/payment-batch-items", PaymentBatchItemController, except: [:new, :edit]
 
-      get "/games/:game_id/questions", QuizSessionController, :list_questions
-      get "/games/:game_id/questions/:question_id", QuizSessionController, :show_question
-      put "/games/:game_id/questions/:question_id", QuizSessionController, :update_question
-      resources "/games", QuizSessionController, except: [:new, :edit]
-
-      resources "/games_question", SessionQuestionController, except: [:new, :edit]
-
+      resources "/games", QuizSessionController, except: [:new, :edit] do
+        get "/questions/:id/randomize_answers", GameQuestionController, :randomize_answers
+        resources "/questions", GameQuestionController, except: [:new, :edit]
+      end
+      get "/games/leaderboard/weekly", QuizSessionController, :leaderboard_weekly
+      get "/games/leaderboard/all-time", QuizSessionController, :leaderboard_alltime
 
     end
 
     post "/sessions", SessionController, :create
     post "/users", UserController, :create_user
+    post "/users/me/upload", UserController, :upload_image_profile
+    post "/users/username/available", UserController, :check_username
+    post "/users/referral", ReferralController, :add_referral
+    post "/users/me/payment", PaymentController, :request_payment
     get "/users/me", UserController, :show_me
-    resources "/users", UserController, except: [:new, :edit]
+    put "/users/me", UserController, :update_me
+
     get "/confirm", ConfirmController, :index
     post "/password_resets", PasswordResetController, :create
     put "/password_resets/update", PasswordResetController, :update
@@ -50,8 +66,12 @@ defmodule BijakhqWeb.Router do
     post "/verification/:request_id", VerificationController, :verify
     post "/verification/:request_id/cancel", VerificationController, :cancel
 
-    resources "/categories", QuizCategoryController, except: [:new, :edit]
+    get "/categories", QuizCategoryController, :index
     resources "/questions", QuizQuestionController, except: [:new, :edit]
+
+    get "/games/now", QuizSessionController, :now
+    get "/games/leaderboard/weekly", QuizSessionController, :leaderboard_weekly
+    get "/games/leaderboard/all-time", QuizSessionController, :leaderboard_alltime
 
     get "/", SettingController, :landing
   end

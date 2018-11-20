@@ -4,9 +4,11 @@ defmodule Bijakhq.Game.Chat do
   require Logger
 
   alias Bijakhq.Quizzes
+  alias BijakhqWeb.Presence
 
   @name :game_chat
-  @interval_time 1_000 * 1
+  @room_name "game_session:lobby"
+  @interval_time 2_500 * 1
 
   # This is chat state
   @chat_state %{
@@ -23,6 +25,18 @@ defmodule Bijakhq.Game.Chat do
 
   def add_message(message) do
     GenServer.call(@name, {:add_message, message})
+  end
+
+  def viewer_add() do
+    GenServer.cast(@name, :viewer_add)
+  end
+
+  def viewer_remove() do
+    GenServer.cast(@name, :viewer_remove)
+  end
+
+  def viewer_update(count) do
+    GenServer.cast(@name, {:viewer_update, count})
   end
 
   def timer_start do
@@ -45,7 +59,7 @@ defmodule Bijakhq.Game.Chat do
   def handle_call({:get_messages}, _from, chat_state) do
     # IO.inspect chat_state
     %{ timer_ref: _timer_ref, messages: messages} = chat_state
-    {:reply, messages, chat_state}
+    {:reply, %{messages: messages}, chat_state}
   end
 
   def handle_call({:add_message, message}, _from, chat_state) do
@@ -56,7 +70,6 @@ defmodule Bijakhq.Game.Chat do
     new_state = Map.put(chat_state, :messages, messages)
     {:reply, messages, new_state}
   end
-
 
   # Timer stuff
 
@@ -71,18 +84,21 @@ defmodule Bijakhq.Game.Chat do
     Logger.warn "Timer Stop"
     %{ timer_ref: timer_ref, messages: _messages} = chat_state
     cancel_timer(timer_ref)
-    new_state = Map.put(chat_state, :timer_ref, nil)
-    {:noreply, new_state}
+    # new_state = Map.put(chat_state, :timer_ref, nil)
+    # Reset timer
+    {:noreply, @chat_state}
   end
 
+
   def handle_info(:update, chat_state) do
-    Logger.warn "update"
+    # Logger.warn "update"
+    current_viewing = Presence.list(@room_name) |> Map.size
 
     %{ timer_ref: _timer_ref, messages: messages} = chat_state
-    broadcast(%{messages: messages})
+    broadcast(%{messages: messages, current_viewing: current_viewing})
 
     timer_ref = schedule_timer @interval_time
-    new_state = %{ timer_ref: timer_ref, messages: [] }
+    new_state = %{ timer_ref: timer_ref, messages: []}
     {:noreply, new_state}
   end
 

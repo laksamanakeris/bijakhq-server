@@ -56,3 +56,8 @@ config :bijakhq, Bijakhq.Repo,
   hostname: System.get_env("DATA_DB_HOST") || "localhost",
   database: "bijakhq_dev",
   pool_size: 10
+
+config :pay_pal,
+  client_id: System.get_env("PAYPAL_CLIENT_ID") || "AbdL0pqJgcqd5cKzzHJEsJ-qE6fUHq1IOYBrjnoWPzHlZUoivEZdnUP9ttie0Zzp1Fcv4Ic1VKD-qhrG",
+  client_secret: System.get_env("PAYPAL_CLIENT_SECRET") || "EFqoDG-hQHswDzmjyWrNhTCBONRK3Ybdn_QWba5IddOG7WRMHkj72UU_dcTYYJ1HwVOCX8PLUmzGISaL",
+  environment: :sandbox

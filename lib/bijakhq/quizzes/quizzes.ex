@@ -8,6 +8,9 @@ defmodule Bijakhq.Quizzes do
 
   alias Bijakhq.Quizzes
   alias Bijakhq.Quizzes.QuizCategory
+  alias Bijakhq.Quizzes.QuizGameQuestion
+  alias Bijakhq.Quizzes.QuizScore
+  alias Bijakhq.Accounts.User
 
   @doc """
   Returns the list of quiz_categories.
@@ -36,7 +39,7 @@ defmodule Bijakhq.Quizzes do
       ** (Ecto.NoResultsError)
 
   """
-  def get_quiz_category!(id), do: Repo.get!(QuizCategory, id)
+  def get_quiz_category!(id), do: Repo.get(QuizCategory, id)
 
   @doc """
   Creates a quiz_category.
@@ -115,7 +118,7 @@ defmodule Bijakhq.Quizzes do
 
   """
   def list_quiz_questions do
-    Repo.all(QuizQuestion)
+    Repo.all(QuizQuestion) |> Repo.preload([:games])
   end
 
   @doc """
@@ -132,7 +135,7 @@ defmodule Bijakhq.Quizzes do
       ** (Ecto.NoResultsError)
 
   """
-  def get_quiz_question!(id), do: Repo.get!(QuizQuestion, id)
+  def get_quiz_question!(id), do: Repo.get(QuizQuestion, id) |> Repo.preload([:games])
 
   @doc """
   Creates a quiz_question.
@@ -221,7 +224,7 @@ defmodule Bijakhq.Quizzes do
 
   """
   def list_quiz_sessions do
-    Repo.all(QuizSession)
+    Repo.all(QuizSession) |> Repo.preload([:game_questions])
   end
 
   @doc """
@@ -238,7 +241,11 @@ defmodule Bijakhq.Quizzes do
       ** (Ecto.NoResultsError)
 
   """
-  def get_quiz_session!(id), do: Repo.get!(QuizSession, id)
+  def get_quiz_session!(id) do
+    Repo.get(QuizSession, id)
+    |> Repo.preload([game_questions: (from q in QuizGameQuestion, order_by: [asc: q.sequence], preload: :question )])
+
+  end
 
   @doc """
   Creates a quiz_session.
@@ -305,115 +312,134 @@ defmodule Bijakhq.Quizzes do
     QuizSession.changeset(quiz_session, %{})
   end
 
-  alias Bijakhq.Quizzes.SessionQuestion
 
   @doc """
-  Returns the list of quiz_session_question.
+  Returns the list of quiz_game_question.
 
   ## Examples
 
-      iex> list_quiz_session_question()
-      [%SessionQuestion{}, ...]
+      iex> list_quiz_game_question()
+      [%QuizGameQuestion{}, ...]
 
   """
-  def list_quiz_session_question do
-    Repo.all(SessionQuestion)
+  def list_quiz_game_question do
+    Repo.all(QuizGameQuestion)
   end
 
   @doc """
-  Gets a single session_question.
+  Gets a single game_question.
 
   Raises `Ecto.NoResultsError` if the Session question does not exist.
 
   ## Examples
 
-      iex> get_session_question!(123)
-      %SessionQuestion{}
+      iex> get_game_question!(123)
+      %QuizGameQuestion{}
 
-      iex> get_session_question!(456)
+      iex> get_game_question!(456)
       ** (Ecto.NoResultsError)
 
   """
-  def get_session_question!(id), do: Repo.get!(SessionQuestion, id)
+  def get_game_question!(id), do: Repo.get(QuizGameQuestion, id)
 
   @doc """
-  Creates a session_question.
+  Creates a game_question.
 
   ## Examples
 
-      iex> create_session_question(%{field: value})
-      {:ok, %SessionQuestion{}}
+      iex> create_game_question(%{field: value})
+      {:ok, %QuizGameQuestion{}}
 
-      iex> create_session_question(%{field: bad_value})
+      iex> create_game_question(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_session_question(attrs \\ %{}) do
-    %SessionQuestion{}
-    |> SessionQuestion.changeset_create(attrs)
+  def create_game_question(attrs \\ %{}) do
+    %QuizGameQuestion{}
+    |> QuizGameQuestion.changeset_create(attrs)
     |> Repo.insert()
   end
 
   @doc """
-  Updates a session_question.
+  Updates a game_question.
 
   ## Examples
 
-      iex> update_session_question(session_question, %{field: new_value})
-      {:ok, %SessionQuestion{}}
+      iex> update_game_question(game_question, %{field: new_value})
+      {:ok, %QuizGameQuestion{}}
 
-      iex> update_session_question(session_question, %{field: bad_value})
+      iex> update_game_question(game_question, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_session_question(%SessionQuestion{} = session_question, attrs) do
-    session_question
-    |> SessionQuestion.changeset(attrs)
+  def update_game_question(%QuizGameQuestion{} = game_question, attrs) do
+    game_question
+    |> QuizGameQuestion.changeset(attrs)
     |> Repo.update()
   end
 
   @doc """
-  Deletes a SessionQuestion.
+  Deletes a QuizGameQuestion.
 
   ## Examples
 
-      iex> delete_session_question(session_question)
-      {:ok, %SessionQuestion{}}
+      iex> delete_game_question(game_question)
+      {:ok, %QuizGameQuestion{}}
 
-      iex> delete_session_question(session_question)
+      iex> delete_game_question(game_question)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_session_question(%SessionQuestion{} = session_question) do
-    Repo.delete(session_question)
+  def delete_game_question(%QuizGameQuestion{} = game_question) do
+    Repo.delete(game_question)
   end
 
   @doc """
-  Returns an `%Ecto.Changeset{}` for tracking session_question changes.
+  Returns an `%Ecto.Changeset{}` for tracking game_question changes.
 
   ## Examples
 
-      iex> change_session_question(session_question)
-      %Ecto.Changeset{source: %SessionQuestion{}}
+      iex> change_game_question(game_question)
+      %Ecto.Changeset{source: %QuizGameQuestion{}}
 
   """
-  def change_session_question(%SessionQuestion{} = session_question) do
-    SessionQuestion.changeset(session_question, %{})
+  def change_game_question(%QuizGameQuestion{} = game_question) do
+    QuizGameQuestion.changeset(game_question, %{})
   end
 
   def get_game_question_by!(attrs) do
-    Repo.get_by(SessionQuestion, attrs) |> Repo.preload([:session, question: :category])
+    QuizGameQuestion |> order_by(asc: :sequence) |> Repo.get_by(attrs) |> Repo.preload([:session, question: [:category,:games]])
   end
 
   def get_game_question_basic_by!(attrs) do
-    Repo.get_by(SessionQuestion, attrs)
+    Repo.get_by(QuizGameQuestion, attrs)
   end
 
   def get_questions_by_game_id(game_id) do
     query =
-        from q in SessionQuestion,
+        from q in QuizGameQuestion,
         where: q.session_id == ^game_id,
-        preload: [:question]
+        preload: [:session, question: [:category,:games]],
+        order_by: [asc: q.sequence]
+
+    Repo.all(query)
+  end
+
+  def get_questions_by_game_id_basic(game_id) do
+    query =
+        from q in QuizGameQuestion,
+        where: q.session_id == ^game_id,
+        order_by: [asc: q.sequence]
+
+    Repo.all(query)
+  end
+
+  def get_game_questions_with_empty_answers_sequence do
+    query =
+        from q in QuizGameQuestion,
+        where: q.answers_sequence == ^%{},
+        preload: [:session, question: :category],
+        order_by: [asc: q.sequence]
 
     Repo.all(query)
   end
@@ -456,14 +482,284 @@ defmodule Bijakhq.Quizzes do
   end
 
   def get_questions_for_game(game_id) do
-    game_questions = Quizzes.get_questions_by_game_id(game_id)
-                    |> Quizzes.process_questions
+    Quizzes.get_questions_by_game_id(game_id)
   end
 
   def process_questions(questions_list) do
-    new_list = Enum.map(questions_list, fn(x) ->
+    Enum.map(questions_list, fn(x) ->
         quest = Quizzes.randomize_answer(x.question)
         Map.put(x, :soalan, quest)
-        end)
+    end)
   end
+
+  # Update game_question if "answers_sequence" is empty
+  def update_game_questions_random_answers do
+    questions = Quizzes.get_game_questions_with_empty_answers_sequence
+    Enum.map(questions, fn(quest) ->
+        IO.inspect quest
+        # question_randomized = Quizzes.randomize_answer(quest.question);
+        # Quizzes.update_game_question(quest, %{answers_sequence: question_randomized, sequence: quest.sequence})
+    end)
+  end
+
+  def get_initial_game_state(game_id) do
+    game_details = Quizzes.get_quiz_session!(game_id)
+    # game_details = Bijakhq.MapHelpers.atomize_keys(game_details.game_questions)
+
+    game_questions = Enum.map(game_details.game_questions, fn(quest) ->
+        atomized = Bijakhq.MapHelpers.atomize_keys(quest.answers_sequence)
+        quest = Map.put(quest, :answers_sequence, atomized)
+        # IO.inspect quest
+      end)
+
+    %{
+      game_details: game_details,
+      game_questions: game_questions
+    }
+  end
+
+
+  # get upcoming game
+  def get_upcoming_game(show_hidden \\ false) do
+
+    now = Timex.now
+    query =
+        from q in QuizSession,
+        where: q.is_completed == false and q.is_active != true and q.time > ^now,
+        preload: [:game_questions],
+        order_by: [asc: q.time]
+    
+    case show_hidden do
+      true ->
+        # show all games
+        Repo.all(query)
+      false ->
+        # show all games except hidden
+        query = from q in query, where: q.is_hidden == false
+        Repo.all(query)
+    end
+  end
+
+  def get_current_game(show_hidden \\ false) do
+    query =
+        from q in QuizSession,
+        where: q.is_active == true,
+        preload: [:game_questions],
+        order_by: [asc: q.time]
+    
+    case show_hidden do
+      true ->
+        # show all games
+        Repo.one(query)
+      false ->
+        # show all games except hidden
+        query = from q in query, where: q.is_hidden == false
+        Repo.one(query)
+    end
+  end
+
+  def activate_game_session(game_id) do
+    from(p in QuizSession, where: p.is_active == true)
+    |> Repo.update_all(set: [is_active: false])
+
+    quiz_session = Quizzes.get_quiz_session!(game_id)
+    case quiz_session do
+      nil -> nil
+      quiz_session ->
+        with {:ok, %QuizSession{} = quiz_session} <- Quizzes.update_quiz_session(quiz_session, %{is_active: true}) do
+          quiz_session
+        end
+    end
+
+  end
+
+  def stop_game_session do
+    from(p in QuizSession, where: p.is_active == true)
+    |> Repo.update_all(set: [is_active: false])
+  end
+
+  def get_game_now_status(show_hidden) do
+    current = Quizzes.get_current_game(show_hidden)
+    upcoming = Quizzes.get_upcoming_game(show_hidden)
+
+    %{
+      current: current,
+      upcoming: upcoming
+    }
+  end
+
+
+
+
+
+
+
+  def list_quiz_scores do
+    Repo.all(QuizScore)
+  end
+
+  def get_quiz_score!(id), do: Repo.get(QuizScore, id)
+
+  def create_quiz_score(attrs \\ %{}) do
+    %QuizScore{}
+    |> QuizScore.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def update_quiz_score(%QuizScore{} = quiz_score, attrs) do
+    quiz_score
+    |> QuizScore.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def delete_quiz_score(%QuizScore{} = quiz_score) do
+    Repo.delete(quiz_score)
+  end
+
+  def change_quiz_score(%QuizScore{} = quiz_score) do
+    QuizScore.changeset(quiz_score, %{})
+  end
+
+  def score_queries do
+    query = from r in QuizScore,
+        join: d in User,
+        where: r.user_id == d.id
+
+    query = from [r, d] in query,
+        join: game in QuizSession,
+        where: r.game_id == game.id
+
+    query
+  end
+
+
+  def list_quiz_scores_weekly do
+    query = score_queries()
+
+    query = from [res, dri, rac] in query,
+        where: res.inserted_at >= ^Timex.beginning_of_week(Timex.now),
+        where: res.inserted_at <= ^Timex.end_of_week(Timex.now),
+        select: %{
+          user: dri,
+          user_id: dri.id,
+          amounts: sum(res.amount),
+          rank: fragment("rank() OVER (ORDER BY sum(q0.amount) DESC)")
+          },
+        group_by: dri.id,
+        order_by: [desc: sum(res.amount)],
+        limit: 100
+
+    Repo.all query
+  end
+
+  def list_quiz_scores_all_time do
+    query = score_queries()
+
+    query = from [res, dri, rac] in query,
+        # where: rac.round <= 3,
+        select: %{
+          user: dri,
+          user_id: dri.id,
+          amounts: sum(res.amount),
+          rank: fragment("rank() OVER (ORDER BY sum(q0.amount) DESC)")
+          },
+        group_by: dri.id,
+        order_by: [desc: sum(res.amount)],
+        limit: 100
+
+    Repo.all query
+  end
+
+  def get_user_ranking_alltime(user_id) do
+    query = from r in QuizScore,
+        join: d in User,
+        where: r.user_id == d.id
+
+    query = from [res, dri] in query,
+        # where: dri.id == ^user_id,
+        select: %{
+          username: dri.username,
+          user_id: dri.id,
+          amounts: sum(res.amount),
+          rank: 101
+          },
+        group_by: dri.id,
+        order_by: [desc: sum(res.amount)]
+
+    query = from res in query,
+          where: res.user_id == ^user_id
+
+    Repo.one query
+  end
+
+  def get_user_ranking_weekly(user_id) do
+    query = from r in QuizScore,
+        join: d in User,
+        where: r.user_id == d.id
+
+    query = from [res, dri] in query,
+      where: res.inserted_at >= ^Timex.beginning_of_week(Timex.now),
+      where: res.inserted_at <= ^Timex.end_of_week(Timex.now),
+        select: %{
+          username: dri.username,
+          user_id: dri.id,
+          amounts: sum(res.amount),
+          rank: 101
+          },
+        group_by: dri.id,
+        order_by: [desc: sum(res.amount)]
+
+    query = from res in query,
+          where: res.user_id == ^user_id
+
+    Repo.one query
+  end
+
+
+  def get_total_amount_by_user_id(user_id) do
+    amount = Repo.one(from p in QuizScore, where: p.user_id == ^user_id, select: sum(p.amount))
+    case amount do
+      nil -> 0
+      _ -> amount
+    end
+  end
+
+  def get_user_leaderboard_weekly(user_id) do
+    user_data = get_user_ranking_weekly(user_id)
+    case user_data do
+      nil ->
+        %{amounts: 0, rank: 101, user_id: user_id}
+      _ ->
+        list = list_quiz_scores_weekly()
+        # IO.inspect list
+        dash = Enum.find(list, fn(x) -> x.user_id == user_data.user_id end)
+        case dash do
+          nil ->
+            user_data
+          _ ->
+            %{amounts: amounts, rank: rank, user_id: user_id, user: user} = dash
+            %{amounts: amounts, rank: rank, user_id: user_id, username: user.username}
+        end
+    end
+  end
+
+  def get_user_leaderboard_all_time(user_id) do
+    user_data = get_user_ranking_alltime(user_id)
+    case user_data do
+      nil ->
+        %{amounts: 0, rank: 101, user_id: user_id}
+      _ ->
+        list = list_quiz_scores_all_time()
+        # IO.inspect list
+        dash = Enum.find(list, fn(x) -> x.user_id == user_data.user_id end)
+        case dash do
+          nil ->
+            user_data
+          _ ->
+            %{amounts: amounts, rank: rank, user_id: user_id, user: user} = dash
+            %{amounts: amounts, rank: rank, user_id: user_id, username: user.username}
+        end
+    end
+  end
+
 end

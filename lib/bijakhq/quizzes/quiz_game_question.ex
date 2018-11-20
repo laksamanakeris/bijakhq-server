@@ -1,4 +1,4 @@
-defmodule Bijakhq.Quizzes.SessionQuestion do
+defmodule Bijakhq.Quizzes.QuizGameQuestion do
   use Ecto.Schema
   import Ecto.Changeset
   alias Bijakhq.Quizzes.QuizSession
@@ -21,15 +21,16 @@ defmodule Bijakhq.Quizzes.SessionQuestion do
   end
 
   @doc false
-  def changeset(session_question, attrs) do
-    session_question
+  def changeset(game_question, attrs) do
+    game_question
     |> cast(attrs, [:sequence, :is_completed, :total_correct, :answers_sequence, :answers_totals])
     |> validate_required([:sequence])
   end
 
-  def changeset_create(session_question, attrs) do
-    session_question
-    |> cast(attrs, [:session_id, :question_id])
+  def changeset_create(game_question, attrs) do
+    game_question
+    |> cast(attrs, [:session_id, :question_id, :sequence, :answers_sequence, :answers_totals])
     |> validate_required([:session_id, :question_id, :sequence])
+    |> unique_constraint(:game_id_question_id, name: :game_question_unique)
   end
 end

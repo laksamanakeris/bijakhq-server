@@ -68,4 +68,68 @@ defmodule Bijakhq.AccountsTest do
     attrs = %{password: "pass"}
     assert {:error, %Ecto.Changeset{}} = Accounts.update_password(user, attrs)
   end
+
+  describe "referrals" do
+    alias Bijakhq.Accounts.Referral
+
+    @valid_attrs %{referred_by: 42, remarks: "some remarks", user_id: 42}
+    @update_attrs %{referred_by: 43, remarks: "some updated remarks", user_id: 43}
+    @invalid_attrs %{referred_by: nil, remarks: nil, user_id: nil}
+
+    def referral_fixture(attrs \\ %{}) do
+      {:ok, referral} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Accounts.create_referral()
+
+      referral
+    end
+
+    test "list_referrals/0 returns all referrals" do
+      referral = referral_fixture()
+      assert Accounts.list_referrals() == [referral]
+    end
+
+    test "get_referral!/1 returns the referral with given id" do
+      referral = referral_fixture()
+      assert Accounts.get_referral!(referral.id) == referral
+    end
+
+    test "create_referral/1 with valid data creates a referral" do
+      assert {:ok, %Referral{} = referral} = Accounts.create_referral(@valid_attrs)
+      assert referral.referred_by == 42
+      assert referral.remarks == "some remarks"
+      assert referral.user_id == 42
+    end
+
+    test "create_referral/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Accounts.create_referral(@invalid_attrs)
+    end
+
+    test "update_referral/2 with valid data updates the referral" do
+      referral = referral_fixture()
+      assert {:ok, referral} = Accounts.update_referral(referral, @update_attrs)
+      assert %Referral{} = referral
+      assert referral.referred_by == 43
+      assert referral.remarks == "some updated remarks"
+      assert referral.user_id == 43
+    end
+
+    test "update_referral/2 with invalid data returns error changeset" do
+      referral = referral_fixture()
+      assert {:error, %Ecto.Changeset{}} = Accounts.update_referral(referral, @invalid_attrs)
+      assert referral == Accounts.get_referral!(referral.id)
+    end
+
+    test "delete_referral/1 deletes the referral" do
+      referral = referral_fixture()
+      assert {:ok, %Referral{}} = Accounts.delete_referral(referral)
+      assert_raise Ecto.NoResultsError, fn -> Accounts.get_referral!(referral.id) end
+    end
+
+    test "change_referral/1 returns a referral changeset" do
+      referral = referral_fixture()
+      assert %Ecto.Changeset{} = Accounts.change_referral(referral)
+    end
+  end
 end
