@@ -24,7 +24,7 @@ defmodule BijakhqWeb.UserSocket do
         IO.puts "=============================================================================================================="
         {:ok, socket}
       {:error, something} ->
-        IO.inspect something
+        #IO.inspect something
         :error
     end
   end

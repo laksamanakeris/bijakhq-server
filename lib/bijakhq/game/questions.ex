@@ -1,11 +1,11 @@
 defmodule Bijakhq.Game.Questions do
 
   def create_question_list(game_questions) do
-    IO.inspect game_questions
+    #IO.inspect game_questions
   end
 
   def increment_question_answer(game_state, question_id, answer_id) do
-    # IO.inspect game
+    # #IO.inspect game
       # IO.puts "=============================================================================="
       questions = game_state.questions
       question = Enum.at( questions , question_id)
@@ -13,7 +13,7 @@ defmodule Bijakhq.Game.Questions do
 
       old_value = question.answers_sequence.answers
 
-      # IO.inspect old_value
+      # #IO.inspect old_value
       # IO.puts "=============================================================================="
       new_value = Enum.map(old_value, fn(subj) ->
         %{id: id} = subj
@@ -24,7 +24,7 @@ defmodule Bijakhq.Game.Questions do
         end
       end)
 
-      # IO.inspect new_value
+      # #IO.inspect new_value
       # IO.puts "=============================================================================="
 
       # update question

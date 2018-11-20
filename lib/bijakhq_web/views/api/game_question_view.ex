@@ -30,7 +30,7 @@ defmodule BijakhqWeb.Api.GameQuestionView do
     answers_sequence = game_question.answers_sequence
     answers_sequence = Map.put(answers_sequence, :description, game_question.question.description)
     IO.puts "================================"
-    IO.inspect answers_sequence
+    #IO.inspect answers_sequence
     %{
       id: game_question.id,
       sequence: game_question.sequence,
