@@ -13,7 +13,7 @@ defmodule BijakhqWeb.Api.VerificationController do
 
   def authenticate(conn, %{"phone" => phone} = params) do
     #IO.inspect params
-    IO.puts "Phone number #{phone}"
+    #IO.puts "Phone number #{phone}"
 
     response = Nexmo.authenticate(phone);
 
