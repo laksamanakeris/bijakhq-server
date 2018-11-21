@@ -114,10 +114,10 @@ defmodule BijakhqWeb.Api.UserController do
   end
 
   def upload_image_profile(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"profile_picture" => _params} = user_params) do
-    IO.puts "===================================================================================="
+    #IO.puts "===================================================================================="
     #IO.inspect user
     #IO.inspect user_params
-    IO.puts "===================================================================================="
+    #IO.puts "===================================================================================="
 
     # uploaded = ImageFile.store(params)
     # #IO.inspect uploaded

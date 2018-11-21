@@ -144,7 +144,7 @@ defmodule BijakhqWeb.GameSessionChannel do
       # question = Map.put(question, :question_id, question_id)
 
       # #IO.inspect question
-      # IO.puts "========================================================================"
+      #IO.puts "========================================================================"
 
       # # soalan = Bijakhq.MapHelpers.atomize_keys(question.answers_sequence)
       # soalan = question.answers_sequence
