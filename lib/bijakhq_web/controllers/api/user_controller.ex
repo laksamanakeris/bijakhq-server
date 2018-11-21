@@ -47,16 +47,16 @@ defmodule BijakhqWeb.Api.UserController do
   #     "verificationId": "b693b2d7-0721-4186-be6a-dfe09cff0677"
   # }
   def create_user(conn, %{"country" => country,"language" => language, "username" => username, "request_id" => request_id} = user_params) do
-    IO.inspect user_params
+    #IO.inspect user_params
     nexmo_request = Sms.get_verified_request_id(request_id)
-    IO.inspect nexmo_request
+    #IO.inspect nexmo_request
     case nexmo_request do
       nil ->
         error(conn, :unauthorized, 401)
       _ ->
         params = %{phone: nexmo_request.phone, language: language, country: country, verification_id: request_id, username: username}
         with {:ok, user} <- Accounts.create_new_user(params) do
-          IO.inspect user
+          #IO.inspect user
           BijakhqWeb.Api.VerificationController.logged_in_user(conn, user, nexmo_request)
         end
     end
@@ -114,13 +114,13 @@ defmodule BijakhqWeb.Api.UserController do
   end
 
   def upload_image_profile(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"profile_picture" => _params} = user_params) do
-    IO.puts "===================================================================================="
-    IO.inspect user
-    IO.inspect user_params
-    IO.puts "===================================================================================="
+    #IO.puts "===================================================================================="
+    #IO.inspect user
+    #IO.inspect user_params
+    #IO.puts "===================================================================================="
 
     # uploaded = ImageFile.store(params)
-    # IO.inspect uploaded
+    # #IO.inspect uploaded
 
     with {:ok, user} <- Accounts.upload_image(user, user_params) do
       user = add_balance_to_user(user)

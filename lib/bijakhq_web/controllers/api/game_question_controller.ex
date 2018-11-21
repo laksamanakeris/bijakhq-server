@@ -15,7 +15,7 @@ defmodule BijakhqWeb.Api.GameQuestionController do
 
   def index(conn, _params, game) do
     quiz_game_question = Quizzes.get_questions_by_game_id(game.id)
-    # IO.inspect game_question
+    # #IO.inspect game_question
     # render(conn, "game_question.json", game_question: game_question)
 
     # quiz_game_question = Quizzes.list_quiz_game_question()
