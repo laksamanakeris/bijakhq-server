@@ -323,12 +323,13 @@ defmodule Bijakhq.Payments do
 
   def request_payment(user, paypal_email) do
     balance = Payments.get_balance_by_user_id(user.id)
-    if balance < 50 do
+    IO.inspect balance
+    if balance < @minimum_payment do
       {:error, :unauthorized, error: "Balance should be more than RM#{@minimum_payment}" }
     else
       with {:ok, user} <- Accounts.update_paypal_email(user, %{"paypal_email" => paypal_email}) do
-        # Paypel ID = 1
-        params = %{amount: balance, updated_by: user.id, user_id: user.id, payment_type: 1}
+        # Paypal ID = 1
+        params = %{amount: balance, updated_by: user.id, user_id: user.id, payment_type: 1, paypal_email: paypal_email}
         with {:ok, _payment} <- Payments.create_payment(params) do
           balance = Payments.get_balance_by_user_id(user.id)
           {:ok, balance}

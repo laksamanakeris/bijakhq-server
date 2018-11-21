@@ -14,10 +14,9 @@ defmodule Bijakhq.Payments.Payment do
     field :payment_at, :utc_datetime
     field :remarks, :string
 
-    field :reference_id, :string
-    field :reference_details, :string
-    field :batch_paypal_email, :string
-    field :batch_paypal_id, :integer
+    field :reference_id, :string # use for payment other than paypal - ie cash voucher etc, receipt etc
+    field :reference_details, :string # to save details/description about the paymemnt
+    field :paypal_email, :string # save user's paypal email when they request for cashout. Reason - maybe user will use different email every time they request for cashout
 
     belongs_to :user, User, foreign_key: :user_id
     belongs_to :update_by, User, foreign_key: :updated_by
@@ -34,7 +33,7 @@ defmodule Bijakhq.Payments.Payment do
   @doc false
   def changeset(payment, attrs) do
     payment
-    |> cast(attrs, [:amount, :user_id, :payment_at, :remarks, :updated_by, :payment_status, :payment_type])
+    |> cast(attrs, [:amount, :user_id, :payment_at, :remarks, :updated_by, :payment_status, :payment_type, :reference_id, :reference_details, :paypal_email])
     |> validate_required([:amount, :user_id, :updated_by, :payment_type ])
   end
 end
