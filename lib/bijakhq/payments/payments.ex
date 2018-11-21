@@ -323,7 +323,6 @@ defmodule Bijakhq.Payments do
 
   def request_payment(user, paypal_email) do
     balance = Payments.get_balance_by_user_id(user.id)
-    IO.inspect balance
     if balance < @minimum_payment do
       {:error, :unauthorized, error: "Balance should be more than RM#{@minimum_payment}" }
     else
