@@ -2,7 +2,7 @@ defmodule Bijakhq.Payments.PaymentStatus do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Bijakhq.Payments.Payment
+  alias Bijakhq.Payments.PaymentRequest
 
 
   @doc """
@@ -22,7 +22,7 @@ defmodule Bijakhq.Payments.PaymentStatus do
     field :description, :string
     field :name, :string
 
-    has_many :payments, Payment, foreign_key: :payment_status
+    has_many :payments, PaymentRequest, foreign_key: :payment_status
     timestamps()
   end
 
