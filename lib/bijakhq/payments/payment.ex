@@ -9,7 +9,8 @@ defmodule Bijakhq.Payments.Payment do
   alias Bijakhq.Payments.PaymentBatchItem
 
 
-  schema "payments" do
+  # This is list of payment request
+  schema "payment_requests" do
     field :amount, :float
     field :payment_at, :utc_datetime
     field :remarks, :string
