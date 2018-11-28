@@ -3,7 +3,7 @@ defmodule BijakhqWeb.Api.PaymentController do
 
   import BijakhqWeb.Api.Authorize
   alias Bijakhq.Payments
-  alias Bijakhq.Payments.Payment
+  alias Bijakhq.Payments.PaymentRequest
 
   action_fallback BijakhqWeb.Api.FallbackController
 
@@ -18,7 +18,7 @@ defmodule BijakhqWeb.Api.PaymentController do
   # def create(conn, %{"payment" => payment_params}) do
   def create(%Plug.Conn{assigns: %{current_user: admin}} = conn, %{"payment" => payment_params}) do
     Map.put(payment_params, :update_by, admin.id)
-    with {:ok, %Payment{} = payment} <- Payments.create_payment(payment_params) do
+    with {:ok, %PaymentRequest{} = payment} <- Payments.create_payment(payment_params) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", api_payment_path(conn, :show, payment))
@@ -34,14 +34,14 @@ defmodule BijakhqWeb.Api.PaymentController do
   def update(%Plug.Conn{assigns: %{current_user: admin}} = conn, %{"id" => id, "payment" => payment_params}) do
     payment = Payments.get_payment!(id)
     Map.put(payment_params, :update_by, admin.id)
-    with {:ok, %Payment{} = payment} <- Payments.update_payment(payment, payment_params) do
+    with {:ok, %PaymentRequest{} = payment} <- Payments.update_payment(payment, payment_params) do
       render(conn, "show.json", payment: payment)
     end
   end
 
   def delete(conn, %{"id" => id}) do
     payment = Payments.get_payment!(id)
-    with {:ok, %Payment{}} <- Payments.delete_payment(payment) do
+    with {:ok, %PaymentRequest{}} <- Payments.delete_payment(payment) do
       send_resp(conn, :no_content, "")
     end
   end

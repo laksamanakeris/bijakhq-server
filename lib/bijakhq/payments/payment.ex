@@ -1,4 +1,4 @@
-defmodule Bijakhq.Payments.Payment do
+defmodule Bijakhq.Payments.PaymentRequest do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -25,7 +25,7 @@ defmodule Bijakhq.Payments.Payment do
     belongs_to :type, PaymentType, foreign_key: :payment_type
 
     has_many :batch_items, PaymentBatchItem, foreign_key: :payment_id
-    # Payment can have many batches - this will happen when there's issue processing the Paypal Payment 
+    # PaymentRequest can have many batches - this will happen when there's issue processing the Paypal PaymentRequest 
     many_to_many :batches, PaymentBatch, join_through: "payment_batch_items", join_keys: [batch_id: :id, payment_id: :id]
 
     timestamps()

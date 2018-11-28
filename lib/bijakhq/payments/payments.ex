@@ -6,7 +6,7 @@ defmodule Bijakhq.Payments do
   import Ecto.Query, warn: false
   alias Bijakhq.Repo
 
-  alias Bijakhq.Payments.Payment
+  alias Bijakhq.Payments.PaymentRequest
   alias Bijakhq.Accounts
   # alias Bijakhq.Accounts.User
   # alias Bijakhq.Quizzes.QuizScore
@@ -21,29 +21,29 @@ defmodule Bijakhq.Payments do
   ## Examples
 
       iex> list_payments()
-      [%Payment{}, ...]
+      [%PaymentRequest{}, ...]
 
   """
   def list_payments do
-    Repo.all(Payment) |> Repo.preload([:user, :update_by, :status, :type])
+    Repo.all(PaymentRequest) |> Repo.preload([:user, :update_by, :status, :type])
   end
 
   @doc """
   Gets a single payment.
 
-  Raises `Ecto.NoResultsError` if the Payment does not exist.
+  Raises `Ecto.NoResultsError` if the PaymentRequest does not exist.
 
   ## Examples
 
       iex> get_payment!(123)
-      %Payment{}
+      %PaymentRequest{}
 
       iex> get_payment!(456)
       ** (Ecto.NoResultsError)
 
   """
   def get_payment!(id) do
-    Repo.get(Payment, id) |> Repo.preload([:user, :update_by, :status, :type])
+    Repo.get(PaymentRequest, id) |> Repo.preload([:user, :update_by, :status, :type])
   end
 
   @doc """
@@ -52,15 +52,15 @@ defmodule Bijakhq.Payments do
   ## Examples
 
       iex> create_payment(%{field: value})
-      {:ok, %Payment{}}
+      {:ok, %PaymentRequest{}}
 
       iex> create_payment(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
   def create_payment(attrs \\ %{}) do
-    %Payment{}
-    |> Payment.changeset(attrs)
+    %PaymentRequest{}
+    |> PaymentRequest.changeset(attrs)
     |> Repo.insert()
   end
 
@@ -70,31 +70,31 @@ defmodule Bijakhq.Payments do
   ## Examples
 
       iex> update_payment(payment, %{field: new_value})
-      {:ok, %Payment{}}
+      {:ok, %PaymentRequest{}}
 
       iex> update_payment(payment, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_payment(%Payment{} = payment, attrs) do
+  def update_payment(%PaymentRequest{} = payment, attrs) do
     payment
-    |> Payment.changeset(attrs)
+    |> PaymentRequest.changeset(attrs)
     |> Repo.update()
   end
 
   @doc """
-  Deletes a Payment.
+  Deletes a PaymentRequest.
 
   ## Examples
 
       iex> delete_payment(payment)
-      {:ok, %Payment{}}
+      {:ok, %PaymentRequest{}}
 
       iex> delete_payment(payment)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_payment(%Payment{} = payment) do
+  def delete_payment(%PaymentRequest{} = payment) do
     Repo.delete(payment)
   end
 
@@ -104,16 +104,16 @@ defmodule Bijakhq.Payments do
   ## Examples
 
       iex> change_payment(payment)
-      %Ecto.Changeset{source: %Payment{}}
+      %Ecto.Changeset{source: %PaymentRequest{}}
 
   """
-  def change_payment(%Payment{} = payment) do
-    Payment.changeset(payment, %{})
+  def change_payment(%PaymentRequest{} = payment) do
+    PaymentRequest.changeset(payment, %{})
   end
 
   # get amount from score
   def get_total_payment_to_user_id(user_id) do
-    amount = Repo.one(from p in Payment, where: p.user_id == ^user_id, select: sum(p.amount))
+    amount = Repo.one(from p in PaymentRequest, where: p.user_id == ^user_id, select: sum(p.amount))
     case amount do
       nil -> 0
       _ -> amount
