@@ -7,6 +7,7 @@ defmodule BijakhqWeb.UserSocket do
 
   ## Channels
   channel "game_session:*", BijakhqWeb.GameSessionChannel
+  channel "load_test:lobby", BijakhqWeb.LoadTestChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket, check_origin: false
@@ -27,6 +28,12 @@ defmodule BijakhqWeb.UserSocket do
         #IO.inspect something
         :error
     end
+  end
+
+  # Use this to connect
+  def connect(%{"username" => username}, socket) do
+    socket = assign(socket, :username, username)
+    {:ok, socket}
   end
 
   def id(_socket), do: nil
