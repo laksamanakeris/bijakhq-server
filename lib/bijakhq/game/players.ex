@@ -29,7 +29,14 @@ defmodule Bijakhq.Game.Players do
       #IO.inspect user
       #IO.inspect player
       :ets.insert(:players, {player.id, player})
+
+      # Save user to for analytics
+      Task.start(Bijakhq.Quizzes, :insert_or_update_game_user, [%{game_id: game_state.session_id, user_id: user.id, is_viewer: true, is_player: true}])
+      
       GenServer.call(@name, {:user_joined, player})
+    
+    else
+      Task.start(Bijakhq.Quizzes, :insert_or_update_game_user, [%{game_id: game_state.session_id, user_id: user.id, is_viewer: true}])
     end
     # When user join - limit his life to 1 extra pergame only
   end
