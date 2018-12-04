@@ -53,6 +53,7 @@ defmodule Bijakhq.Accounts.User do
     |> validate_required([:username])
     |> unique_email
     |> unique_username
+    |> validate_filter_word_username(:username)
   end
 
   def create_changeset(%User{} = user, attrs) do
@@ -70,8 +71,8 @@ defmodule Bijakhq.Accounts.User do
     user
     |> cast(attrs, [:phone, :language, :country, :verification_id, :username])
     |> validate_required([:phone, :language, :country, :verification_id, :username])
-    |> validate_filter_word_username(:username)
     |> unique_username
+    |> validate_filter_word_username(:username)
     |> unique_phone
   end
 
@@ -89,8 +90,8 @@ defmodule Bijakhq.Accounts.User do
     user
     |> cast(attrs, [:username])
     |> validate_required([:username])
-    |> validate_filter_word_username(:username)
     |> unique_username
+    |> validate_filter_word_username(:username)
   end
 
   def update_paypal_email_changeset(%User{} = user, attrs)do
