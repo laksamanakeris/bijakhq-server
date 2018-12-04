@@ -4,6 +4,8 @@ defmodule Bijakhq.Accounts.User do
   alias Bijakhq.Accounts.User
   alias Bijakhq.Quizzes.QuizScore
   use Arc.Ecto.Schema
+  
+  alias Bijakhq.Utils.WordFilter
 
   schema "users" do
     field :email, :string
@@ -59,6 +61,7 @@ defmodule Bijakhq.Accounts.User do
     |> validate_required([:email, :password])
     |> unique_email
     |> unique_username
+    |> validate_filter_word_username(:username)
     |> validate_password(:password)
     |> put_pass_hash
   end
@@ -67,6 +70,7 @@ defmodule Bijakhq.Accounts.User do
     user
     |> cast(attrs, [:phone, :language, :country, :verification_id, :username])
     |> validate_required([:phone, :language, :country, :verification_id, :username])
+    |> validate_filter_word_username(:username)
     |> unique_username
     |> unique_phone
   end
@@ -85,6 +89,7 @@ defmodule Bijakhq.Accounts.User do
     user
     |> cast(attrs, [:username])
     |> validate_required([:username])
+    |> validate_filter_word_username(:username)
     |> unique_username
   end
 
@@ -165,4 +170,13 @@ defmodule Bijakhq.Accounts.User do
   end
 
   defp strong_password?(_), do: {:error, "The password is too short"}
+
+  def validate_filter_word_username(changeset, field, options \\ []) do
+    validate_change(changeset, field, fn _, username ->
+      case WordFilter.has_profanity?(username) do
+        false -> []
+        true -> [{field, options[:message] || "This name contains a word that isn't allowed, Please enter different name"}]
+      end
+    end)
+  end
 end
