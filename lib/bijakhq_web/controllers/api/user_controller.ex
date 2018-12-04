@@ -133,6 +133,7 @@ defmodule BijakhqWeb.Api.UserController do
 
   def check_username(conn, %{"username" => username} = user_params) do
 
+    username = String.downcase(username)
     cond do
       Bijakhq.Utils.WordFilter.has_profanity?(username) == true ->
         response = %{available: false, message: "Username is not available" }
@@ -141,7 +142,7 @@ defmodule BijakhqWeb.Api.UserController do
         response = %{available: false, message: "Username is not available" }
         render(conn, "username_available.json", %{response: response})
       true ->
-        check_username_from_table(conn, user_params)
+        check_username_from_table(conn, %{"username" => username})
     end
   end
 
