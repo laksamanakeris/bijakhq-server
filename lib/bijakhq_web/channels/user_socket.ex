@@ -24,15 +24,14 @@ defmodule BijakhqWeb.UserSocket do
         #IO.puts "User connected: ID  > #{user.id}"
         #IO.puts "=============================================================================================================="
         {:ok, socket}
-      {:error, something} ->
+      {:error, _something} ->
         #IO.inspect something
         :error
     end
   end
 
   # Use this to connect
-  def connect(%{"username" => username}, socket) do
-    socket = assign(socket, :username, username)
+  def connect(_params, socket) do
     {:ok, socket}
   end
 
