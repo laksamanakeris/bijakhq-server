@@ -46,7 +46,7 @@ defmodule BijakhqWeb.Router do
       get "/games/leaderboard/weekly", QuizSessionController, :leaderboard_weekly
       get "/games/leaderboard/all-time", QuizSessionController, :leaderboard_alltime
 
-      resources "/quiz_game_users", QuizUserController
+      resources "/games-users", QuizUserController, except: [:new, :edit]
 
     end
 
