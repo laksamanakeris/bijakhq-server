@@ -278,4 +278,66 @@ defmodule Bijakhq.QuizzesTest do
   #     assert %Ecto.Changeset{} = Quizzes.change_session_question(session_question)
   #   end
   # end
+
+  describe "quiz_game_users" do
+    alias Bijakhq.Quizzes.QuizUser
+
+    @valid_attrs %{is_player: true, is_viewer: true}
+    @update_attrs %{is_player: false, is_viewer: false}
+    @invalid_attrs %{is_player: nil, is_viewer: nil}
+
+    def quiz_user_fixture(attrs \\ %{}) do
+      {:ok, quiz_user} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Quizzes.create_quiz_user()
+
+      quiz_user
+    end
+
+    test "list_quiz_game_users/0 returns all quiz_game_users" do
+      quiz_user = quiz_user_fixture()
+      assert Quizzes.list_quiz_game_users() == [quiz_user]
+    end
+
+    test "get_quiz_user!/1 returns the quiz_user with given id" do
+      quiz_user = quiz_user_fixture()
+      assert Quizzes.get_quiz_user!(quiz_user.id) == quiz_user
+    end
+
+    test "create_quiz_user/1 with valid data creates a quiz_user" do
+      assert {:ok, %QuizUser{} = quiz_user} = Quizzes.create_quiz_user(@valid_attrs)
+      assert quiz_user.is_player == true
+      assert quiz_user.is_viewer == true
+    end
+
+    test "create_quiz_user/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Quizzes.create_quiz_user(@invalid_attrs)
+    end
+
+    test "update_quiz_user/2 with valid data updates the quiz_user" do
+      quiz_user = quiz_user_fixture()
+      assert {:ok, quiz_user} = Quizzes.update_quiz_user(quiz_user, @update_attrs)
+      assert %QuizUser{} = quiz_user
+      assert quiz_user.is_player == false
+      assert quiz_user.is_viewer == false
+    end
+
+    test "update_quiz_user/2 with invalid data returns error changeset" do
+      quiz_user = quiz_user_fixture()
+      assert {:error, %Ecto.Changeset{}} = Quizzes.update_quiz_user(quiz_user, @invalid_attrs)
+      assert quiz_user == Quizzes.get_quiz_user!(quiz_user.id)
+    end
+
+    test "delete_quiz_user/1 deletes the quiz_user" do
+      quiz_user = quiz_user_fixture()
+      assert {:ok, %QuizUser{}} = Quizzes.delete_quiz_user(quiz_user)
+      assert_raise Ecto.NoResultsError, fn -> Quizzes.get_quiz_user!(quiz_user.id) end
+    end
+
+    test "change_quiz_user/1 returns a quiz_user changeset" do
+      quiz_user = quiz_user_fixture()
+      assert %Ecto.Changeset{} = Quizzes.change_quiz_user(quiz_user)
+    end
+  end
 end

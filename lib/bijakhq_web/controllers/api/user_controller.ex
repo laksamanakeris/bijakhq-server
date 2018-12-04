@@ -10,6 +10,8 @@ defmodule BijakhqWeb.Api.UserController do
   alias Bijakhq.ImageFile
   alias Bijakhq.Payments
 
+  alias Bijakhq.Utils.WordFilter
+
   action_fallback BijakhqWeb.Api.FallbackController
 
   # the following plugs are defined in the controllers/authorize.ex file
@@ -130,6 +132,21 @@ defmodule BijakhqWeb.Api.UserController do
   end
 
   def check_username(conn, %{"username" => username} = user_params) do
+
+    username = String.downcase(username)
+    cond do
+      Bijakhq.Utils.WordFilter.has_profanity?(username) == true ->
+        response = %{available: false, message: "Username is not available" }
+        render(conn, "username_available.json", %{response: response})
+      is_alphanumeric(username) == false ->
+        response = %{available: false, message: "Username is not available" }
+        render(conn, "username_available.json", %{response: response})
+      true ->
+        check_username_from_table(conn, %{"username" => username})
+    end
+  end
+
+  defp check_username_from_table(conn, user_params) do
     case result = Accounts.get_by(user_params) do
       nil ->
         # render(conn, "username_unavailable.json", nil)
@@ -140,5 +157,9 @@ defmodule BijakhqWeb.Api.UserController do
         response = %{available: false, message: "Username is not available" }
         render(conn, "username_available.json", %{response: response})
     end
+  end
+
+  defp is_alphanumeric(username) do
+    username =~ ~r/^[0-9A-Za-z]+$/
   end
 end

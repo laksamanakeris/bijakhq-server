@@ -762,4 +762,100 @@ defmodule Bijakhq.Quizzes do
     end
   end
 
+
+  alias Bijakhq.Quizzes.QuizUser
+
+  @doc """
+  Returns the list of quiz_game_users.
+
+  ## Examples
+
+      iex> list_quiz_game_users()
+      [%QuizUser{}, ...]
+
+  """
+  def list_quiz_game_users do
+    Repo.all(QuizUser)
+  end
+
+  @doc """
+  Gets a single quiz_user.
+
+  Raises `Ecto.NoResultsError` if the Quiz user does not exist.
+
+  ## Examples
+
+      iex> get_quiz_user!(123)
+      %QuizUser{}
+
+      iex> get_quiz_user!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_quiz_user!(id), do: Repo.get!(QuizUser, id)
+
+  @doc """
+  Creates a quiz_user.
+
+  ## Examples
+
+      iex> create_quiz_user(%{field: value})
+      {:ok, %QuizUser{}}
+
+      iex> create_quiz_user(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_quiz_user(attrs \\ %{}) do
+    %QuizUser{}
+    |> QuizUser.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a quiz_user.
+
+  ## Examples
+
+      iex> update_quiz_user(quiz_user, %{field: new_value})
+      {:ok, %QuizUser{}}
+
+      iex> update_quiz_user(quiz_user, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_quiz_user(%QuizUser{} = quiz_user, attrs) do
+    quiz_user
+    |> QuizUser.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a QuizUser.
+
+  ## Examples
+
+      iex> delete_quiz_user(quiz_user)
+      {:ok, %QuizUser{}}
+
+      iex> delete_quiz_user(quiz_user)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_quiz_user(%QuizUser{} = quiz_user) do
+    Repo.delete(quiz_user)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking quiz_user changes.
+
+  ## Examples
+
+      iex> change_quiz_user(quiz_user)
+      %Ecto.Changeset{source: %QuizUser{}}
+
+  """
+  def change_quiz_user(%QuizUser{} = quiz_user) do
+    QuizUser.changeset(quiz_user, %{})
+  end
 end

@@ -2,14 +2,27 @@ defmodule Bijakhq.Payments.PaymentStatus do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Bijakhq.Payments.Payment
+  alias Bijakhq.Payments.PaymentRequest
 
+
+  @doc """
+  List of payment statuses
+
+  statuses = [
+    %{name: "New", description: "New request"},
+    %{name: "Processed", description: "Payment request is being processed"},
+    %{name: "Pending confirmation", description: "Pending confirmation from Payment Provider"},
+    %{name: "Paid", description: "Paid"},
+    %{name: "Failed", description: "Payment request failed"}
+    %{name: "Canceled", description: "Payment request has been canceled"}
+  ]
+  """
 
   schema "payment_statuses" do
     field :description, :string
     field :name, :string
 
-    has_many :payments, Payment, foreign_key: :payment_status
+    has_many :payments, PaymentRequest, foreign_key: :payment_status
     timestamps()
   end
 
