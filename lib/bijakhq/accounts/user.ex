@@ -104,6 +104,7 @@ defmodule Bijakhq.Accounts.User do
 
   defp unique_username(changeset) do
     validate_length(changeset, :username, min: 3)
+    |> validate_format(:username, ~r/^[0-9A-Za-z]+$/) # only allow alphanumeric withput space
     |> unique_constraint(:username)
     |> downcase_username
   end
