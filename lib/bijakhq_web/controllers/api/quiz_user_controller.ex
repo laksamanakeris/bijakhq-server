@@ -39,4 +39,11 @@ defmodule BijakhqWeb.Api.QuizUserController do
       send_resp(conn, :no_content, "")
     end
   end
+
+
+
+  def add_extra_life(conn, %{"game_id" => game_id}) do
+    quiz_game_users = Quizzes.add_extra_life_to_players_by_game(game_id)
+    render(conn, "index.json", quiz_game_users: quiz_game_users)
+  end
 end

@@ -11,6 +11,7 @@ defmodule Bijakhq.Quizzes do
   alias Bijakhq.Quizzes.QuizGameQuestion
   alias Bijakhq.Quizzes.QuizScore
   alias Bijakhq.Accounts.User
+  alias Bijakhq.Accounts
 
   @doc """
   Returns the list of quiz_categories.
@@ -866,4 +867,34 @@ defmodule Bijakhq.Quizzes do
     end
 
   end
+
+  def get_players_by_game_id(game_id) do
+    
+      query =
+          from u in QuizUser,
+          where: u.game_id == ^game_id,
+          preload: [:user]
+  
+      Repo.all(query)
+  end
+
+  def add_extra_life_to_players_by_game(game_id) do
+    
+    # get user_ids from quiz_user
+    #  go through each user id and get user life
+    #  increment life by 1
+    #  update user table
+    players = get_players_by_game_id(game_id)
+    
+    Enum.each players, fn player ->       
+      # IO.inspect player
+      # Task.start(Bijakhq.Accounts, :update_user, [player.user, %{lives: player.user.lives + 1}])
+    end
+
+    # just return players
+    players
+  end
+
+
+
 end

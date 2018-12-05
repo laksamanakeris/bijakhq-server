@@ -2,6 +2,9 @@ defmodule Bijakhq.Quizzes.QuizUser do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Bijakhq.Quizzes.QuizSession
+  alias Bijakhq.Accounts.User
+
 
   schema "quiz_game_users" do
     field :is_player, :boolean, default: false

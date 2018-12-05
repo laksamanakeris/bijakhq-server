@@ -12,6 +12,8 @@ defmodule BijakhqWeb.Api.QuizUserView do
 
   def render("quiz_user.json", %{quiz_user: quiz_user}) do
     %{id: quiz_user.id,
+      game_id: quiz_user.game_id,
+      user_id: quiz_user.user_id,
       is_player: quiz_user.is_player,
       is_viewer: quiz_user.is_viewer}
   end
