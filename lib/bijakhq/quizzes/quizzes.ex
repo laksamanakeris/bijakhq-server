@@ -888,7 +888,7 @@ defmodule Bijakhq.Quizzes do
     
     Enum.each players, fn player ->       
       # IO.inspect player
-      # Task.start(Bijakhq.Accounts, :update_user, [player.user, %{lives: player.user.lives + 1}])
+      Task.start(Bijakhq.Accounts, :update_user, [player.user, %{lives: player.user.lives + 1}])
     end
 
     # just return players
