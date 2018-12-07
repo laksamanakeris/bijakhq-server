@@ -861,9 +861,13 @@ defmodule Bijakhq.Quizzes do
   end
 
   def insert_or_update_game_user(%{game_id: game_id, user_id: user_id} = quiz_user) do
-    case item = Repo.get_by(QuizUser, %{game_id: game_id, user_id: user_id}) do
-      nil -> Quizzes.create_quiz_user(quiz_user)
-      _ -> Quizzes.update_quiz_user(item, quiz_user)
+    case game_id do
+      nil -> nil #do nothing
+      game_id ->
+        case item = Repo.get_by(QuizUser, %{game_id: game_id, user_id: user_id}) do
+          nil -> Quizzes.create_quiz_user(quiz_user)
+          _ -> Quizzes.update_quiz_user(item, quiz_user)
+        end
     end
 
   end
