@@ -48,3 +48,5 @@ web.main:
   writable_dirs:          # Timex and TZData need to write into its priv/ folder
     - priv
     - app/_build/prod/lib
+  log_watch:
+    admin[error]: /app/logs/app_error.log
