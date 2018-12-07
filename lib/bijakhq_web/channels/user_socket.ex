@@ -10,7 +10,7 @@ defmodule BijakhqWeb.UserSocket do
   channel "load_test:lobby", BijakhqWeb.LoadTestChannel
 
   ## Transports
-  transport :websocket, Phoenix.Transports.WebSocket, check_origin: false
+  transport :websocket, Phoenix.Transports.WebSocket, check_origin: false, timeout: 120_000
 
   def connect(%{"token" => token}, socket) do
     #IO.puts "=============================================================================================================="
