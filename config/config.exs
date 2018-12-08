@@ -19,6 +19,7 @@ config :bijakhq, BijakhqWeb.Endpoint,
 
 # Phauxth authentication configuration
 config :phauxth,
+  log_level: :warn,
   token_salt: "CPTV+oxZ",
   endpoint: BijakhqWeb.Endpoint
 
