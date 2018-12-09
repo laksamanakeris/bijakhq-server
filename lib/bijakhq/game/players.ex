@@ -25,7 +25,13 @@ defmodule Bijakhq.Game.Players do
     game_started = Map.get(game_state, :game_started)
     Logger.warn "Connected user is #{user.role} - ID: #{user.id} | #{user.username}"
     if game_started == false and user.role != "admin" do
-      player = %Bijakhq.Game.Player{id: user.id, lives: user.lives, high_score: user.high_score, role: user.role, username: user.username, win_count: user.win_count, profile_picture: user.profile_picture}
+      player = 
+        %Bijakhq.Game.Player{
+          id: user.id, lives: user.lives, high_score: user.high_score, role: user.role, username: user.username, win_count: user.win_count, profile_picture: user.profile_picture,
+          is_playing: true,
+          eliminated: false,
+          extra_lives_remaining: extra_life(user.lives)
+        }
       #IO.inspect user
       #IO.inspect player
       :ets.insert(:players, {player.id, player})
@@ -78,6 +84,10 @@ defmodule Bijakhq.Game.Players do
     GenServer.call(@name, {:game_save_scores, game_id})
   end
 
+  def get_players_state do
+    GenServer.call(@name, :get_players_state)
+  end
+
   # GenServer implementation
 
   def init(args) do
@@ -87,10 +97,15 @@ defmodule Bijakhq.Game.Players do
     {:ok, args}
   end
 
+  def handle_call(:get_players_state, _from, player_state) do
+    #IO.inspect player_state
+    {:reply, player_state, player_state}
+  end
+
   def handle_call({:user_joined, user}, _from, players_state) do
 
     # %{ quest_now: quest_now, quest_next: _quest_next } = players_state
-    quest_now = Map.get(players_state, :quest_now)
+    quest_next = Map.get(players_state, :quest_next)
 
     # new_quest_now = case quest_now do
     #   nil ->
@@ -98,10 +113,10 @@ defmodule Bijakhq.Game.Players do
     #   users ->
     #     Map.put(quest_now, :quest_now, Enum.uniq([user | users]))
     # end
-    quest_now = quest_now ++ [user]
-    quest_now = Enum.uniq(quest_now)
+    quest_next = quest_next ++ [user]
+    quest_next = Enum.uniq(quest_next)
 
-    new_state = Map.put(players_state, :quest_now, quest_now)
+    new_state = Map.put(players_state, :quest_next, quest_next)
     {:reply, new_state, new_state}
   end
 
@@ -189,6 +204,13 @@ defmodule Bijakhq.Game.Players do
     new_state = Map.put(players_state, :quest_next, quest_next)
     # {:reply, new_state, new_state}
     {:noreply, new_state}
+  end
+
+  defp extra_life(lives) do
+    cond do
+      lives > 0 -> 1
+      true -> 0
+    end
   end
 
 end

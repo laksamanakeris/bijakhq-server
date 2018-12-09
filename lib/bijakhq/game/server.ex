@@ -90,12 +90,27 @@ defmodule Bijakhq.Game.Server do
     # get game state
     # increment answer based on user selection
     # if user's answer is correct - move player to next list
-    with Players.user_find(user) do
+    with player = Players.user_find(user) do
+      IO.puts "============================== Processing user"
       new_state = Questions.increment_question_answer(game_state, question_id, answer_id)
       question = get_question_by_id(new_state, question_id)
       selected_answer = Enum.find(question.answers, fn u -> u.id == answer_id end)
       if selected_answer.answer == true do
-        Players.user_go_to_next_question(user)
+        IO.puts "============================== User answer correct"
+        Players.user_go_to_next_question(player)
+      else
+        IO.puts "============================== User answer wrong"
+        if player.extra_lives_remaining > 0 do
+          IO.puts "============================== use extra live"
+          player = Map.merge(player, %{extra_lives_remaining: 0,saved_by_extra_life: true})
+          IO.inspect player
+          Players.user_go_to_next_question(player)
+          
+          Task.start(Bijakhq.Game.Player, :player_minus_life, [player])
+        else
+          IO.puts "============================== no extra live"
+          Map.merge(player, %{extra_lives_remaining: 0,eliminated: true})
+        end
       end
       game_state = new_state
       {:noreply, game_state}
