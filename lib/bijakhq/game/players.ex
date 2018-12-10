@@ -6,7 +6,9 @@ defmodule Bijakhq.Game.Players do
   alias Bijakhq.Quizzes
   alias Bijakhq.Quizzes.QuizScore
   alias Bijakhq.Game.Server
+  alias Bijakhq.Game.Players
   alias Bijakhq.Game.Player
+  alias Bijakhq.Game.Questions
 
   @name :game_players
   @players_state %{
@@ -211,6 +213,33 @@ defmodule Bijakhq.Game.Players do
       lives > 0 -> 1
       true -> 0
     end
+  end
+
+  def process_answer(game_state, question_id, player) do
+    
+    question = Questions.get_question_by_id(game_state, question_id)
+    selected_answer = Enum.find(question.answers, fn u -> u.id == answer_id end)
+
+    if selected_answer.answer == true do
+      Logger.warn "============================== User answer correct"
+      # Players.user_go_to_next_question(player)
+      Task.start(Players, :user_go_to_next_question, [player])
+    else
+      Logger.warn "============================== User answer wrong"
+      if player.extra_lives_remaining > 0 do
+        Logger.warn "============================== use extra live"
+        player = Map.merge(player, %{extra_lives_remaining: 0,saved_by_extra_life: true})
+        # IO.inspect player
+        # Players.user_go_to_next_question(player)
+        
+        Task.start(Players, :user_go_to_next_question, [player])
+        Task.start(Bijakhq.Game.Player, :player_minus_life, [player])
+      else
+        Logger.warn "============================== no extra live"
+        Map.merge(player, %{extra_lives_remaining: 0,eliminated: true})
+      end
+    end
+
   end
 
 end
