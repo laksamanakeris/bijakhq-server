@@ -90,7 +90,9 @@ defmodule Bijakhq.Game.Server do
     # get game state
     # increment answer based on user selection
     # if user's answer is correct - move player to next list
-    with player = Players.user_find(user) do
+    player = Players.user_find(user)
+    
+    if player != nil do
       Logger.warn "============================== Processing user answer #{player.id} ::  #{player.username}"
       new_state = Questions.increment_question_answer(game_state, question_id, answer_id)
 
@@ -118,7 +120,13 @@ defmodule Bijakhq.Game.Server do
 
       game_state = new_state
       {:noreply, game_state}
+    
+    else
+      Logger.warn "============================== User not in the player list #{user.id} ::  #{user.username}"
+      # nothing happening here. so get back to normal state
+      {:noreply, game_state}
     end
+    
   end
 
   def handle_cast(:game_save_scores, game_state) do
