@@ -91,10 +91,10 @@ defmodule Bijakhq.Game.Server do
     # increment answer based on user selection
     # if user's answer is correct - move player to next list
     with player = Players.user_find(user) do
-      Logger.warn "============================== Processing user answer #{user.id} ::  #{user.name}"
+      Logger.warn "============================== Processing user answer #{player.id} ::  #{player.username}"
       new_state = Questions.increment_question_answer(game_state, question_id, answer_id)
 
-      Task.start(Bijakhq.Game.Players, :process_answer, [new_state, question_id, player])
+      Task.start(Bijakhq.Game.Players, :process_answer, [new_state, question_id, answer_id, player])
 
       # question = get_question_by_id(new_state, question_id)
       # selected_answer = Enum.find(question.answers, fn u -> u.id == answer_id end)
