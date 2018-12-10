@@ -91,27 +91,31 @@ defmodule Bijakhq.Game.Server do
     # increment answer based on user selection
     # if user's answer is correct - move player to next list
     with player = Players.user_find(user) do
-      IO.puts "============================== Processing user"
+      Logger.warn "============================== Processing user answer #{user.id} ::  #{user.name}"
       new_state = Questions.increment_question_answer(game_state, question_id, answer_id)
-      question = get_question_by_id(new_state, question_id)
-      selected_answer = Enum.find(question.answers, fn u -> u.id == answer_id end)
-      if selected_answer.answer == true do
-        IO.puts "============================== User answer correct"
-        Players.user_go_to_next_question(player)
-      else
-        IO.puts "============================== User answer wrong"
-        if player.extra_lives_remaining > 0 do
-          IO.puts "============================== use extra live"
-          player = Map.merge(player, %{extra_lives_remaining: 0,saved_by_extra_life: true})
-          IO.inspect player
-          Players.user_go_to_next_question(player)
+
+      Task.start(Bijakhq.Game.Players, :process_answer, [new_state, question_id, player])
+
+      # question = get_question_by_id(new_state, question_id)
+      # selected_answer = Enum.find(question.answers, fn u -> u.id == answer_id end)
+      # if selected_answer.answer == true do
+      #   Logger.warn "============================== User answer correct"
+      #   Players.user_go_to_next_question(player)
+      # else
+      #   Logger.warn "============================== User answer wrong"
+      #   if player.extra_lives_remaining > 0 do
+      #     Logger.warn "============================== use extra live"
+      #     player = Map.merge(player, %{extra_lives_remaining: 0,saved_by_extra_life: true})
+      #     # IO.inspect player
+      #     Players.user_go_to_next_question(player)
           
-          Task.start(Bijakhq.Game.Player, :player_minus_life, [player])
-        else
-          IO.puts "============================== no extra live"
-          Map.merge(player, %{extra_lives_remaining: 0,eliminated: true})
-        end
-      end
+      #     Task.start(Bijakhq.Game.Player, :player_minus_life, [player])
+      #   else
+      #     Logger.warn "============================== no extra live"
+      #     Map.merge(player, %{extra_lives_remaining: 0,eliminated: true})
+      #   end
+      # end
+
       game_state = new_state
       {:noreply, game_state}
     end
