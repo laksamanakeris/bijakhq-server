@@ -215,7 +215,7 @@ defmodule Bijakhq.Game.Players do
     end
   end
 
-  def process_answer(game_state, question_id, player) do
+  def process_answer(game_state, question_id, answer_id, player) do
     
     question = Questions.get_question_by_id(game_state, question_id)
     selected_answer = Enum.find(question.answers, fn u -> u.id == answer_id end)
