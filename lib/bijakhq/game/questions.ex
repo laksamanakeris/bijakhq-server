@@ -45,4 +45,11 @@ defmodule Bijakhq.Game.Questions do
 
       %{game_state | questions: new_question_list}
   end
+
+  def get_question_by_id(game_state, question_id) do
+    # #IO.inspect game_state
+    questions = game_state.questions
+    question = Enum.at(questions,question_id)
+    question.answers_sequence
+  end
 end
