@@ -275,7 +275,8 @@ defmodule BijakhqWeb.GameSessionChannel do
   end
 
   def terminate(_reason, socket) do
-    Logger.warn "Player::leave"
+    user = socket.assigns.user
+    Logger.warn "Player::leave - #{user.id} - #{user.username}"
     {:noreply, socket}
   end
 
