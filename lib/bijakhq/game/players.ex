@@ -233,7 +233,10 @@ defmodule Bijakhq.Game.Players do
         # Players.user_go_to_next_question(player)
         
         Task.start(Players, :user_go_to_next_question, [player])
-        Task.start(Bijakhq.Game.Player, :player_minus_life, [player])
+        
+        if game_state.is_hidden == false do
+          Task.start(Bijakhq.Game.Player, :player_minus_life, [player])
+        end
       else
         Logger.warn "============================== no extra live"
         Map.merge(player, %{extra_lives_remaining: 0,eliminated: true})
