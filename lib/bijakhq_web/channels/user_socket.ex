@@ -1,6 +1,7 @@
 defmodule BijakhqWeb.UserSocket do
   use Phoenix.Socket
 
+  require Logger
   alias Bijakhq.Accounts
 
   @max_age 365 * 24 * 60 * 60
@@ -19,11 +20,14 @@ defmodule BijakhqWeb.UserSocket do
     case Phauxth.Token.verify(socket, token, @max_age) do
       {:ok, user_id} ->
         user = Accounts.get(user_id)
-        socket = assign(socket, :user, user)
-        #IO.puts "=============================================================================================================="
-        #IO.puts "User connected: ID  > #{user.id}"
-        #IO.puts "=============================================================================================================="
-        {:ok, socket}
+        case user do
+          nil ->
+            :error
+          _ ->
+            socket = assign(socket, :user, user)
+            Logger.warn "User socket connected :: #{user.id} - #{user.username}"
+            {:ok, socket}
+        end
       {:error, _something} ->
         #IO.inspect something
         :error
