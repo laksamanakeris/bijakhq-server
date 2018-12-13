@@ -1,6 +1,7 @@
 defmodule BijakhqWeb.UserSocket do
-  use Phoenix.Socket
+  use Phoenix.Socket, log: false
 
+  require Logger
   alias Bijakhq.Accounts
 
   @max_age 365 * 24 * 60 * 60
@@ -10,7 +11,7 @@ defmodule BijakhqWeb.UserSocket do
   channel "load_test:lobby", BijakhqWeb.LoadTestChannel
 
   ## Transports
-  transport :websocket, Phoenix.Transports.WebSocket, check_origin: false, timeout: 120_000
+  transport :websocket, Phoenix.Transports.WebSocket, check_origin: false, timeout: 500_000, transport_log: false
 
   def connect(%{"token" => token}, socket) do
     #IO.puts "=============================================================================================================="
@@ -19,11 +20,14 @@ defmodule BijakhqWeb.UserSocket do
     case Phauxth.Token.verify(socket, token, @max_age) do
       {:ok, user_id} ->
         user = Accounts.get(user_id)
-        socket = assign(socket, :user, user)
-        #IO.puts "=============================================================================================================="
-        #IO.puts "User connected: ID  > #{user.id}"
-        #IO.puts "=============================================================================================================="
-        {:ok, socket}
+        case user do
+          nil ->
+            :error
+          _ ->
+            socket = assign(socket, :user, user)
+            Logger.warn "SOCKET connected :: id:#{user.id} - username:#{user.username} - role:#{user.role} - system_time:#{:os.system_time(:milli_seconds)}"
+            {:ok, socket}
+        end
       {:error, _something} ->
         #IO.inspect something
         :error
