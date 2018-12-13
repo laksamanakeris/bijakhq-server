@@ -25,7 +25,8 @@ defmodule Bijakhq.Game.Players do
   def user_joined(user) do
     game_state = Server.get_game_state
     game_started = Map.get(game_state, :game_started)
-    Logger.warn "Connected user is #{user.role} - ID: #{user.id} | #{user.username}"
+    # Logger.warn "Connected user is #{user.role} - ID: #{user.id} | #{user.username}"
+    Logger.warn "CHANNEL joined :: id:#{user.id} - username:#{user.username} - role:#{user.role} - system_time:#{:os.system_time(:milli_seconds)}"
     if game_started == false and user.role != "admin" do
       player = 
         %Bijakhq.Game.Player{
@@ -233,7 +234,10 @@ defmodule Bijakhq.Game.Players do
         # Players.user_go_to_next_question(player)
         
         Task.start(Players, :user_go_to_next_question, [player])
-        Task.start(Bijakhq.Game.Player, :player_minus_life, [player])
+        
+        if game_state.is_hidden == false do
+          Task.start(Bijakhq.Game.Player, :player_minus_life, [player])
+        end
       else
         Logger.warn "============================== no extra live"
         Map.merge(player, %{extra_lives_remaining: 0,eliminated: true})
