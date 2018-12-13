@@ -1,5 +1,5 @@
 defmodule BijakhqWeb.UserSocket do
-  use Phoenix.Socket
+  use Phoenix.Socket, log: false
 
   require Logger
   alias Bijakhq.Accounts
@@ -11,7 +11,7 @@ defmodule BijakhqWeb.UserSocket do
   channel "load_test:lobby", BijakhqWeb.LoadTestChannel
 
   ## Transports
-  transport :websocket, Phoenix.Transports.WebSocket, check_origin: false, timeout: 120_000
+  transport :websocket, Phoenix.Transports.WebSocket, check_origin: false, timeout: 500_000, transport_log: false
 
   def connect(%{"token" => token}, socket) do
     #IO.puts "=============================================================================================================="
