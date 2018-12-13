@@ -84,5 +84,6 @@ defmodule BijakhqWeb.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
+    # get "/jksdhjfgsjadfhjgsadfhasdhfgkjhqegrweurgtkwegfhj73465623845234", PageController, :gen_token
   end
 end
