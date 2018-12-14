@@ -26,7 +26,7 @@ defmodule Bijakhq.Game.Players do
     game_state = Server.get_game_state
     game_started = Map.get(game_state, :game_started)
     # Logger.warn "Connected user is #{user.role} - ID: #{user.id} | #{user.username}"
-    Logger.warn "CHANNEL joined :: id:#{user.id} - username:#{user.username} - role:#{user.role} - system_time:#{:os.system_time(:milli_seconds)}"
+    Logger.warn "USER joined :: id:#{user.id} - username:#{user.username} - role:#{user.role} - time:#{DateTime.utc_now}"
     if game_started == false and user.role != "admin" do
       player = 
         %Bijakhq.Game.Player{

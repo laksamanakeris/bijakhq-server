@@ -262,15 +262,22 @@ defmodule BijakhqWeb.GameSessionChannel do
     push socket, "presence_state", Presence.list(socket)
 
     user = socket.assigns.user
+    Logger.warn "CHANNEL JOINED :: id:#{user.id} - username:#{user.username} - role:#{user.role} - time:#{DateTime.utc_now}"
     # Players.user_joined(user)
     Task.start(Bijakhq.Game.Players, :user_joined, [user])
     # #IO.inspect socket
 
-    {:ok, _} = Presence.track(socket, "user:#{user.id}", %{
+    # {:ok, _} = Presence.track(socket, "user:#{user.id}", %{
+    #   online_at: :os.system_time(:milli_seconds),
+    #   user_id: user.id,
+    #   username: user.username
+    # })
+    # moved to it's own process
+    Task.start(BijakhqWeb.Presence, :track, [socket, "user:#{user.id}", %{
       online_at: :os.system_time(:milli_seconds),
       user_id: user.id,
       username: user.username
-    })
+    }])
 
     {:noreply, socket}
   end
@@ -278,7 +285,7 @@ defmodule BijakhqWeb.GameSessionChannel do
   def terminate(_reason, socket) do
     user = socket.assigns.user
     # Logger.warn "Player::leave - #{user.id} - #{user.username} - #{user.role}"
-    Logger.warn "CHANNEL leave :: id:#{user.id} - username:#{user.username} - role:#{user.role} - system_time:#{:os.system_time(:milli_seconds)}"
+    Logger.warn "CHANNEL leave :: id:#{user.id} - username:#{user.username} - role:#{user.role} - time:#{DateTime.utc_now}"
     {:noreply, socket}
   end
 
