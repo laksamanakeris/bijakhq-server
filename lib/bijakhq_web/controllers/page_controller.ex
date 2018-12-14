@@ -1,6 +1,8 @@
 defmodule BijakhqWeb.PageController do
   use BijakhqWeb, :controller
 
+  alias Bijakhq.Accounts
+
   def index(conn, _params) do
     conn = put_layout conn, false
     render conn, "index.html"
@@ -11,7 +13,9 @@ defmodule BijakhqWeb.PageController do
     #   token = Phauxth.Token.sign(conn, i)
     #   IO.puts "#{token},"
     # end
-    tokens = Enum.map(210..5000, fn x -> Phauxth.Token.sign(conn, x) end)
+    users = Accounts.list_users
+
+    tokens = Enum.map(users, fn x -> Phauxth.Token.sign(conn, x.id) end)
     
     conn = put_layout conn, false
     render(conn, "tokens.html", tokens: tokens)
