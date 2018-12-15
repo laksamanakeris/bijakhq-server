@@ -8,6 +8,7 @@ defmodule Bijakhq.Game.Server do
   alias Bijakhq.Game.Questions
 
   @name :game_server
+  @ets_name :game_server
 
   @initial_state %{
     game_started: false,
@@ -20,30 +21,9 @@ defmodule Bijakhq.Game.Server do
     prize_text: "RM 0"
   }
   # Client API
-  def start_link, do: GenServer.start_link(__MODULE__, @initial_state, name: @name)
-
-  def game_start(game_id) do
-
-    # Game state format - @initial_state
-    game_data = Quizzes.get_initial_game_state(game_id)
-    #IO.inspect game_data
-
-    %{ game_details: game_details, game_questions: game_questions } = game_data
-
-    game_state = %{
-      game_started: false,
-      session_id: game_details.id,
-      total_questions: Enum.count(game_questions),
-      current_question: nil,
-      questions: game_questions,
-      prize: game_details.prize,
-      is_hidden: game_details.is_hidden,
-      prize_text: "RM #{game_details.prize}"
-    }
-
-    # activate game
-    Quizzes.activate_game_session(game_id)
-    GenServer.cast(@name, game_state)
+  def start_link() do
+    :ets.new(@ets_name, [:ordered_set, :public, :named_table, read_concurrency: true, write_concurrency: true])
+    GenServer.start_link(__MODULE__, @initial_state, name: @name)
   end
 
   def set_current_question(question_number) do
@@ -76,6 +56,10 @@ defmodule Bijakhq.Game.Server do
 
   def game_save_scores() do
     GenServer.cast(@name, :game_save_scores)
+  end
+
+  def process_question_result(question_id) do
+    GenServer.call(@name, {:process_question_result, question_id})
   end
 
   # Server
@@ -151,6 +135,14 @@ defmodule Bijakhq.Game.Server do
     # #IO.inspect game_state
     {:reply, game_state, game_state}
   end
+  
+  def handle_call({:process_question_result, question_id}, _from, game_state) do
+    
+    question_answers_count = Players.process_players_answers(game_state, question_id)
+    # update answers count
+    
+    {:reply, game_state, game_state}
+  end
 
   def handle_call({:update_game_state, new_game_state}, _from, game_state) do
     # #IO.inspect _from
@@ -203,6 +195,72 @@ defmodule Bijakhq.Game.Server do
     questions = game_state.questions
     question = Enum.at(questions,question_id)
     question.answers_sequence
+  end
+
+
+  # refactoring
+  
+  # create new players table
+  def reset_table do
+    :ets.delete(@ets_name)
+    :ets.new(@ets_name, [:ordered_set, :public, :named_table, read_concurrency: true, write_concurrency: true])
+  end
+
+  def game_start(game_id) do
+
+    reset_table()
+
+    # Game state format - @initial_state
+    game_data = Quizzes.get_initial_game_state(game_id)
+    #IO.inspect game_data
+
+    %{ game_details: game_details, game_questions: game_questions } = game_data
+
+    game_state = %{
+      game_started: false,
+      session_id: game_details.id,
+      total_questions: Enum.count(game_questions),
+      current_question: nil,
+      questions: game_questions,
+      prize: game_details.prize,
+      is_hidden: game_details.is_hidden,
+      prize_text: "RM #{game_details.prize}"
+    }
+    
+    :ets.insert(@ets_name, {:game_started, false})
+    :ets.insert(@ets_name, {:session_id, game_details.id})
+    :ets.insert(@ets_name, {:total_questions, Enum.count(game_questions)})
+    :ets.insert(@ets_name, {:current_question, nil})
+    :ets.insert(@ets_name, {:prize, game_details.prize})
+    :ets.insert(@ets_name, {:is_hidden, game_details.is_hidden})
+    :ets.insert(@ets_name, {:prize_text, "RM #{game_details.prize}"})
+
+    questions = game_questions
+    
+    questions = for {c, counter} <- Enum.with_index(questions), do: {counter, c}
+    
+    Enum.map(questions, fn item -> 
+      {key, soalan} = item
+      question_id = soalan.question_id
+      question =  soalan.answers_sequence
+      question = Map.put(question, :question_id, question_id)
+      :ets.insert(@ets_name, {"question:#{key}", question})
+    end)
+
+    # activate game
+    Quizzes.activate_game_session(game_id)
+  end
+  
+  def get_game_details do
+    :ets.tab2list @ets_name
+  end
+
+
+  def lookup(key) do
+    case :ets.lookup(@ets_name, key) do
+      [{^key, item}] -> item
+      [] -> nil
+    end
   end
 
 end
