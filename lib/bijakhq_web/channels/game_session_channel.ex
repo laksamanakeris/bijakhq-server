@@ -42,9 +42,9 @@ defmodule BijakhqWeb.GameSessionChannel do
     # start chat timer
     Chat.timer_start()
 
-    res = Server.game_start game_id
-    with response = Server.get_game_details do
-      #IO.inspect response
+    # res = Server.game_start(game_id)
+    with response = Server.game_start(game_id) do
+      IO.inspect response
       broadcast socket, "game:start", payload
       response = Phoenix.View.render_one(response, BijakhqWeb.Api.QuizSessionView, "game_start_details.json")
       # {:noreply, socket}
@@ -67,7 +67,7 @@ defmodule BijakhqWeb.GameSessionChannel do
 
     with question = Server.set_current_question(question_id) do
 
-      Server.set_current_question(question_id)
+      # Server.set_current_question(question_id)
       # #IO.inspect game
       # questions = game.questions
       # question = Enum.at( questions , question_id)
@@ -122,7 +122,7 @@ defmodule BijakhqWeb.GameSessionChannel do
   def handle_in("question:result:admin:show", payload, socket) do
     %{"question_id" => question_id} = payload
 
-    with question = Server.get_question(question_id) do
+    with question = Server.get_question_results(question_id) do
       # #IO.inspect game
       # questions = game.questions
       # question = Enum.at( questions , question_id)
@@ -177,7 +177,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     # broadcast socket, "game:result:show", payload
     with game_result = Server.game_process_result() do
       # #IO.inspect game
-      response = Phoenix.View.render_one(game_result.results, BijakhqWeb.Api.UserView, "game_result_index.json")
+      response = Phoenix.View.render_one(game_result, BijakhqWeb.Api.UserView, "game_result_index.json")
       broadcast socket, "game:result:process", response
       {:reply, {:ok, response}, socket}
     end
@@ -225,7 +225,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     %{"question_id" => question_id, "answer_id" => answer_id} = payload
     user = socket.assigns.user
     # process_user_answer(user, payload)
-    Server.process_user_answer(user, question_id, answer_id)
+    Players.player_answered(user, question_id, answer_id)
     {:reply, {:ok, payload}, socket}
   end
 

@@ -35,6 +35,9 @@ defmodule Bijakhq.Game.Player do
       profile_picture: user.profile_picture,
       is_playing: is_playing,
       eliminated: eliminated,
+      saved_by_extra_life: false,
+      is_winner: false,
+      amounts: 0,
       extra_lives_remaining: extra_life(user.lives)
     }
 

@@ -81,14 +81,14 @@ defmodule Bijakhq.Game.Players do
     GenServer.call(@name, {:set_game_result, users})
   end
 
-  def get_game_result() do
-    GenServer.call(@name, :get_game_result)
-  end
+  # def get_game_result() do
+  #   GenServer.call(@name, :get_game_result)
+  # end
 
-  def game_save_scores(game_id) do
-    #IO.puts "Players::game_save_scores -> #{game_id}"
-    GenServer.call(@name, {:game_save_scores, game_id})
-  end
+  # def game_save_scores(game_id) do
+  #   #IO.puts "Players::game_save_scores -> #{game_id}"
+  #   GenServer.call(@name, {:game_save_scores, game_id})
+  # end
 
   def get_players_state do
     GenServer.call(@name, :get_players_state)
@@ -366,6 +366,71 @@ defmodule Bijakhq.Game.Players do
 
   # process game result
   def process_game_result do
+    list = :ets.tab2list(@ets_name)
+    # get winner list
+    winners = get_last_standing_players |> update_winner_list
+  end
+
+  def get_last_standing_players do
+    list = :ets.tab2list(@ets_name)
+    players =
+      list
+      |> Enum.reduce([], fn obj, list ->
+        {_id, player} = obj
+        if player.eliminated == false do
+          Logger.warn "============================== get_last_standing_players #{player.username} :: #{player.eliminated}"
+          list = list ++ [player]
+        else
+          list
+        end
+      end)
+  end
+
+  def update_winner_list(players) do
+    # get prize amounts
+    # divide prizes amount with total winners
+    # update winner list -> is_winner, amounts,
+
+    prize_amount = Server.lookup(:prize)
+    total_players = Enum.count(players)
+    amount = (prize_amount / total_players)
+
+    result =
+      if total_players > 0 do
+        amount = :erlang.float_to_binary(amount, [decimals: 2])
+        list =
+          Enum.map(players, fn(player) ->
+            player = Map.merge(player, %{amounts: amount,is_winner: true})
+            :ets.insert(@ets_name, {player.id, player})
+            player
+          end)
+      else
+        []
+      end
+  end
+
+  def get_game_result do
+    list = :ets.tab2list(@ets_name)
+    players =
+      list
+      |> Enum.reduce([], fn obj, list ->
+        {_id, player} = obj
+        if player.is_winner == true do
+          list = list ++ [player]
+        else
+          list
+        end
+      end)
+  end
+
+  def game_save_scores(game_id) do
+    Logger.warn "============================== Game_save_scores :: #{game_id}"
+    results = get_game_result()
+    Enum.map(results, fn(subj) ->
+      score = %{amount: subj.amounts, user_id: subj.id, game_id: game_id, completed_at: DateTime.utc_now}
+      #  save to database
+      Task.start(Bijakhq.Quizzes, :create_quiz_score, [score])
+    end)
   end
 
 
