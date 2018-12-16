@@ -24,7 +24,7 @@ defmodule BijakhqWeb.UserSocket do
           nil ->
             :error
           _ ->
-            socket = assign(socket, :user, %{id: user.id, lives: user.lives, high_score: user.high_score, role: user.role, username: user.username, win_count: user.win_count, profile_picture: user.profile_picture})
+            socket = assign(socket, :user, %{id: user.id, role: user.role, username: user.username})
             Logger.warn "SOCKET connected :: id:#{user.id} - username:#{user.username} - role:#{user.role} - time:#{DateTime.utc_now}"
             {:ok, socket}
         end

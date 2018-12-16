@@ -9,6 +9,7 @@ defmodule Bijakhq.Game.Players do
   alias Bijakhq.Game.Players
   alias Bijakhq.Game.Player
   alias Bijakhq.Game.Questions
+  alias Bijakhq.Accounts
 
   @name :game_players
   @ets_name :game_players
@@ -62,6 +63,8 @@ defmodule Bijakhq.Game.Players do
           "admin" ->
             Logger.warn "============================== Player_add_to_list #{user.username} is admin. Not adding to the list"
           _ ->
+
+            user = Accounts.get(user.id)
             if game_started == false do
               is_playing = true;
               eliminated = false;
@@ -193,7 +196,6 @@ defmodule Bijakhq.Game.Players do
 
     prize_amount = Server.lookup(:prize)
     total_players = Enum.count(players)
-    
     result =
       if total_players > 0 do
         amount = (prize_amount / total_players)
@@ -245,6 +247,7 @@ defmodule Bijakhq.Game.Players do
     case :ets.lookup(@ets_name, user_id) do
       [{^user_id, user}] -> {:ok, user}
       [] -> nil
+      _ -> nil
     end
   end
 

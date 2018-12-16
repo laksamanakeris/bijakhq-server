@@ -51,6 +51,7 @@ defmodule Bijakhq.Game.Server do
   def game_start(game_id) do
 
     reset_table()
+    Players.reset_table();
 
     # Game state format - @initial_state
     game_data = Quizzes.get_initial_game_state(game_id)
@@ -185,6 +186,7 @@ defmodule Bijakhq.Game.Server do
     case :ets.lookup(@ets_name, key) do
       [{^key, item}] -> item
       [] -> nil
+      _ -> nil
     end
   end
 
