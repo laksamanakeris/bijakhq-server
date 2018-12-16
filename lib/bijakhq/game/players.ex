@@ -41,7 +41,6 @@ defmodule Bijakhq.Game.Players do
       _ ->
         :ets.delete(@ets_name)
         :ets.new(@ets_name, [:ordered_set, :public, :named_table, read_concurrency: true, write_concurrency: true])
-      
     end
   end
 
@@ -61,7 +60,7 @@ defmodule Bijakhq.Game.Players do
         case user.role do
           
           "admin" ->
-            Logger.warn "============================== Player_add_to_list #{user.username} is admin"
+            Logger.warn "============================== Player_add_to_list #{user.username} is admin. Not adding to the list"
           _ ->
             if game_started == false do
               is_playing = true;
@@ -169,7 +168,7 @@ defmodule Bijakhq.Game.Players do
   def process_game_result do
     list = :ets.tab2list(@ets_name)
     # get winner list
-    winners = get_last_standing_players |> update_winner_list
+    winners = get_last_standing_players() |> update_winner_list()
   end
 
   def get_last_standing_players do
@@ -194,10 +193,10 @@ defmodule Bijakhq.Game.Players do
 
     prize_amount = Server.lookup(:prize)
     total_players = Enum.count(players)
-    amount = (prize_amount / total_players)
-
+    
     result =
       if total_players > 0 do
+        amount = (prize_amount / total_players)
         amount = :erlang.float_to_binary(amount, [decimals: 2])
         list =
           Enum.map(players, fn(player) ->
