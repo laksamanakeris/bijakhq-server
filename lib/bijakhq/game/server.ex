@@ -38,9 +38,14 @@ defmodule Bijakhq.Game.Server do
   
   # create new players table
   def reset_table do
-    response = :ets.delete(@ets_name)
-    
-    :ets.new(@ets_name, [:ordered_set, :public, :named_table, read_concurrency: true, write_concurrency: true])
+    info = :ets.info(@ets_name)
+    case info do
+      :undefined -> :ets.new(@ets_name, [:ordered_set, :public, :named_table, read_concurrency: true, write_concurrency: true])
+      _ ->
+        :ets.delete(@ets_name)
+        :ets.new(@ets_name, [:ordered_set, :public, :named_table, read_concurrency: true, write_concurrency: true])
+      
+    end
   end
 
   def game_start(game_id) do
