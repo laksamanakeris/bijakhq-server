@@ -11,6 +11,9 @@ defmodule Bijakhq.Game.Players do
   alias Bijakhq.Game.Questions
 
   @name :game_players
+  
+  @ets_name :game_players
+
   @players_state %{
     quest_now: [],
     quest_next: [],
@@ -18,7 +21,7 @@ defmodule Bijakhq.Game.Players do
   }
 
   def start_link() do
-    :ets.new(:players, [:set, :public, :named_table])
+    :ets.new(@ets_name, [:ordered_set, :public, :named_table, read_concurrency: true, write_concurrency: true])
     GenServer.start_link(__MODULE__, @players_state, name: @name)
   end
 
@@ -26,7 +29,7 @@ defmodule Bijakhq.Game.Players do
     game_state = Server.get_game_state
     game_started = Map.get(game_state, :game_started)
     # Logger.warn "Connected user is #{user.role} - ID: #{user.id} | #{user.username}"
-    Logger.warn "USER joined :: id:#{user.id} - username:#{user.username} - role:#{user.role} - time:#{DateTime.utc_now}"
+    Logger.warn "ADDING USER :: id:#{user.id} - username:#{user.username} - role:#{user.role} - time:#{DateTime.utc_now}"
     if game_started == false and user.role != "admin" do
       player = 
         %Bijakhq.Game.Player{
@@ -37,7 +40,7 @@ defmodule Bijakhq.Game.Players do
         }
       #IO.inspect user
       #IO.inspect player
-      :ets.insert(:players, {player.id, player})
+      # :ets.insert(:players, {player.id, player})
 
       # Save user to for analytics
       Task.start(Bijakhq.Quizzes, :insert_or_update_game_user, [%{game_id: game_state.session_id, user_id: user.id, is_viewer: true, is_player: true}])
@@ -209,13 +212,6 @@ defmodule Bijakhq.Game.Players do
     {:noreply, new_state}
   end
 
-  defp extra_life(lives) do
-    cond do
-      lives > 0 -> 1
-      true -> 0
-    end
-  end
-
   def process_answer(game_state, question_id, answer_id, player) do
     
     question = Questions.get_question_by_id(game_state, question_id)
@@ -244,6 +240,147 @@ defmodule Bijakhq.Game.Players do
       end
     end
 
+  end
+
+  # refactoring
+  
+  # create new players table
+  def reset_table do
+    :ets.delete(@ets_name)
+    :ets.new(@ets_name, [:ordered_set, :public, :named_table, read_concurrency: true, write_concurrency: true])
+  end
+
+  # user join - add to list
+  def player_add_to_list(user) do
+    # check if user not exist in the list
+    case Players.lookup(user.id) do
+      {:ok, player} ->
+        Logger.warn "============================== #{player.username} already in the player list"
+      nil ->
+        # get game state
+        # game_started = true -> viewer
+        # game_started = false -> viewer
+        game_state = Server.get_game_state
+        game_started = Map.get(game_state, :game_started)
+
+        if game_started == false and user.role != "admin" do
+
+          is_playing = true;
+          eliminated = false;
+
+          player = Player.new(user, is_playing, eliminated)
+          :ets.insert(@ets_name, {player.id, player})
+    
+          # Save user to for analytics
+          Task.start(Bijakhq.Quizzes, :insert_or_update_game_user, [%{game_id: game_state.session_id, user_id: user.id, is_viewer: true, is_player: true}])
+        else
+          is_playing = false;
+          eliminated = true;
+          player = Player.new(user, is_playing, eliminated)
+          :ets.insert(@ets_name, {player.id, player})
+
+          # Save user to for analytics
+          Task.start(Bijakhq.Quizzes, :insert_or_update_game_user, [%{game_id: game_state.session_id, user_id: user.id, is_viewer: true}])
+        end
+        
+    end
+  end
+  
+  # user answered
+  def player_answered(user, question_id, answer_id) do
+    case Players.lookup(user.id) do
+      nil -> Logger.warn "============================== Player_answered #{user.username} not exist in the player list"
+      {:ok, player} -> 
+        Logger.warn "============================== Player_answered #{user.username}"
+        player = Player.update_answer(player, question_id, answer_id)
+        :ets.insert(@ets_name, {player.id, player})
+    end
+  end
+
+  # process users answers
+  def process_players_answers(question_id) do    
+    # current_question = Questions.get_question_by_id(game_state, question_id);
+    # is_test_game = game_state.is_hidden
+    current_question = Server.lookup("question:#{question_id}")
+    if current_question == nil do
+      nil
+    else
+      list = :ets.tab2list(@ets_name)
+      answers_sequence = current_question.answers_sequence
+      is_test_game = Server.lookup(:is_hidden)
+      is_last_question = check_last_question(question_id)
+
+      answers_count = 
+        list
+        |> Enum.reduce(%{1 => 0, 2 => 0, 3 => 0}, fn obj, map ->
+          {_id, player} = obj
+          user_answer = Player.get_answer(player, question_id)
+          Task.start(Bijakhq.Game.Player, :process_answer, [player, user_answer, answers_sequence, is_test_game, is_last_question])
+          Map.update(map, user_answer, 1, & &1 + 1)
+        end)
+
+      question_with_answers_count = update_answer_count(current_question, answers_count)
+      Server.update_question(question_id, question_with_answers_count)
+      
+      question_with_answers_count
+    end
+  end
+
+  def update_answer_count(question, answers_count) do
+
+    %{1 => count1, 2 => count2, 3 => count3} = answers_count
+
+    answers_sequence = question.answers_sequence
+    answers = answers_sequence.answers
+
+    #  pattern matching everything..
+    [
+      %{answer: answer1, id: 1, text: text1, total_answered: _},
+      %{answer: answer2, id: 2, text: text2, total_answered: _},
+      %{answer: answer3, id: 3, text: text3, total_answered: _}
+    ] = answers
+
+    answers = [
+      %{answer: answer1, id: 1, text: text1, total_answered: count1},
+      %{answer: answer2, id: 2, text: text2, total_answered: count2},
+      %{answer: answer3, id: 3, text: text3, total_answered: count3}
+    ]
+
+    #  put back to the question
+    answers_sequence = %{answers_sequence | answers: answers}
+    question = %{question | answers_sequence: answers_sequence}
+
+    question
+
+  end
+
+  def check_last_question(question_id) do
+    total_question = Server.lookup(:total_questions)
+    last_question_id = total_question - 1;
+    if question_id == last_question_id do
+      true
+    else
+      false
+    end
+  end
+
+  # process game result
+  def process_game_result do
+  end
+
+
+  defp extra_life(lives) do
+    cond do
+      lives > 0 -> 1
+      true -> 0
+    end
+  end
+
+  def lookup(user_id) do
+    case :ets.lookup(@ets_name, user_id) do
+      [{^user_id, user}] -> {:ok, user}
+      [] -> nil
+    end
   end
 
 end

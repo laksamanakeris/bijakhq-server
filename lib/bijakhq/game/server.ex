@@ -241,20 +241,76 @@ defmodule Bijakhq.Game.Server do
     
     Enum.map(questions, fn item -> 
       {key, soalan} = item
-      question_id = soalan.question_id
-      question =  soalan.answers_sequence
-      question = Map.put(question, :question_id, question_id)
+
+
+      description =  soalan.question.description
+      answers_sequence = soalan.answers_sequence
+      answers_sequence = Map.put(answers_sequence, :description, description)
+
+      question = 
+        %{
+          question_id: soalan.question_id,
+          total_correct: soalan.total_correct,
+          sequence: soalan.sequence,
+          is_completed: soalan.is_completed,
+          id: soalan.id,
+          answers_totals: soalan.answers_totals,
+          answers_sequence: answers_sequence
+        }
+
       :ets.insert(@ets_name, {"question:#{key}", question})
     end)
 
     # activate game
     Quizzes.activate_game_session(game_id)
   end
-  
+
   def get_game_details do
-    :ets.tab2list @ets_name
+    game_state = :ets.tab2list @ets_name
+    # reconstruct data
+    [
+      {:current_question, current_question},
+      {:game_started, game_started},
+      {:is_hidden, is_hidden},
+      {:prize, prize},
+      {:prize_text,prize_text},
+      {:session_id, session_id},
+      {:total_questions, total_questions} | tail ] = game_state
+
+      count = total_questions - 1
+
+    questions = 
+      Enum.map(0..count, fn num -> 
+        question = lookup("question:#{num}")
+      end)
+    
+
+    game_details = %{
+      game_started: game_started,
+      is_hidden: is_hidden,
+      session_id: session_id,
+      total_questions: total_questions,
+      current_question: current_question,
+      questions: questions,
+      prize: prize,
+      prize_text: prize_text
+    }
+
   end
 
+  def set_current_question(question_number) do
+    :ets.insert(@ets_name, {:current_question, question_number})
+    question = lookup("question:#{question_number}")
+  end
+
+  def update_question(question_id, question) do
+    :ets.insert(@ets_name, {"question:#{question_id}", question})
+  end
+
+
+  def get_question(question_number) do
+    question = lookup("question:#{question_number}")
+  end
 
   def lookup(key) do
     case :ets.lookup(@ets_name, key) do
