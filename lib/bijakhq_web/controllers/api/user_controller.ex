@@ -125,7 +125,9 @@ defmodule BijakhqWeb.Api.UserController do
     # #IO.inspect uploaded
 
     with {:ok, user} <- Accounts.upload_image(user, user_params) do
-      user = add_balance_to_user(user)
+      user = 
+        add_balance_to_user(user)
+        |> add_leaderboard
       render(conn, "show_me.json", user: user)
     end
     # render(conn, "show_me.json", user: user)
