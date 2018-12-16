@@ -263,7 +263,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     user = socket.assigns.user
     Logger.warn "CHANNEL joined :: id:#{user.id} - username:#{user.username} - role:#{user.role} - time:#{DateTime.utc_now}"
     # Players.user_joined(user)
-    Task.start(Bijakhq.Game.Players, :user_joined, [user])
+    Task.start(Bijakhq.Game.Players, :player_add_to_list, [user])
     # #IO.inspect socket
 
     # {:ok, _} = Presence.track(socket, "user:#{user.id}", %{
