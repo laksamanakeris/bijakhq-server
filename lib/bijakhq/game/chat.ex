@@ -5,6 +5,7 @@ defmodule Bijakhq.Game.Chat do
 
   alias Bijakhq.Quizzes
   alias BijakhqWeb.Presence
+  alias Bijakhq.Game.Server
 
   @name :game_chat
   @room_name "game_session:lobby"
@@ -53,6 +54,10 @@ defmodule Bijakhq.Game.Chat do
     chat_state = initial_data
     #IO.inspect chat_state
     # timer_start()
+    game_started = Server.lookup(:game_started)
+    if game_started != nil do
+      timer_start()
+    end
     {:ok, chat_state}
   end
 
