@@ -6,6 +6,7 @@ defmodule Bijakhq.Game.Server do
   alias Bijakhq.Quizzes
   alias Bijakhq.Game.Players
   alias Bijakhq.Game.Questions
+  alias Bijakhq.Game.Server
 
   @name :game_server
   @ets_name :game_server
@@ -26,21 +27,21 @@ defmodule Bijakhq.Game.Server do
     GenServer.start_link(__MODULE__, @initial_state, name: @name)
   end
 
-  def set_current_question(question_number) do
-    GenServer.call(@name, {:set_current_question, question_number})
-  end
+  # def set_current_question(question_number) do
+  #   GenServer.call(@name, {:set_current_question, question_number})
+  # end
 
   def question_result(question_number) do
 
   end
 
-  def game_process_result() do
-    GenServer.call(@name, :game_process_result)
-  end
+  # def game_process_result() do
+  #   GenServer.call(@name, :game_process_result)
+  # end
 
-  def game_end() do
-    Quizzes.stop_game_session()
-  end
+  # def game_end() do
+  #   Quizzes.stop_game_session()
+  # end
 
   def get_game_state do
     GenServer.call(@name, :game_state)
@@ -54,9 +55,9 @@ defmodule Bijakhq.Game.Server do
     GenServer.cast(@name, {:process_user_answer, user, question_id, answer_id})
   end
 
-  def game_save_scores() do
-    GenServer.cast(@name, :game_save_scores)
-  end
+  # def game_save_scores() do
+  #   GenServer.cast(@name, :game_save_scores)
+  # end
 
   def process_question_result(question_id) do
     GenServer.call(@name, {:process_question_result, question_id})
@@ -202,7 +203,8 @@ defmodule Bijakhq.Game.Server do
   
   # create new players table
   def reset_table do
-    :ets.delete(@ets_name)
+    response = :ets.delete(@ets_name)
+    
     :ets.new(@ets_name, [:ordered_set, :public, :named_table, read_concurrency: true, write_concurrency: true])
   end
 
@@ -249,7 +251,9 @@ defmodule Bijakhq.Game.Server do
 
       question = 
         %{
-          question_id: soalan.question_id,
+          session_id: game_details.id,
+          # question_id: soalan.question_id,
+          question_id: key,
           total_correct: soalan.total_correct,
           sequence: soalan.sequence,
           is_completed: soalan.is_completed,
@@ -263,6 +267,8 @@ defmodule Bijakhq.Game.Server do
 
     # activate game
     Quizzes.activate_game_session(game_id)
+
+    Server.get_game_details
   end
 
   def get_game_details do
@@ -307,11 +313,34 @@ defmodule Bijakhq.Game.Server do
     :ets.insert(@ets_name, {"question:#{question_id}", question})
   end
 
-
   def get_question(question_number) do
     question = lookup("question:#{question_number}")
   end
 
+  def get_question_results(question_id) do
+    result = Players.process_players_answers(question_id)
+  end
+
+  def game_process_result() do
+    winners = Players.process_game_result();
+  end
+
+  def game_save_scores() do
+    session_id = lookup(:session_id)
+    is_hidden = lookup(:is_hidden)
+    
+    if is_hidden == false do
+        Players.game_save_scores(session_id)
+    end
+  end
+
+  def game_end() do
+    Quizzes.stop_game_session()
+    reset_table();
+    Players.reset_table()
+  end
+
+  # UTILS
   def lookup(key) do
     case :ets.lookup(@ets_name, key) do
       [{^key, item}] -> item
