@@ -35,8 +35,14 @@ defmodule Bijakhq.Game.Players do
   
   # create new players table
   def reset_table do
-    :ets.delete(@ets_name)
-    :ets.new(@ets_name, [:ordered_set, :public, :named_table, read_concurrency: true, write_concurrency: true])
+    info = :ets.info(@ets_name)
+    case info do
+      :undefined -> :ets.new(@ets_name, [:ordered_set, :public, :named_table, read_concurrency: true, write_concurrency: true])
+      _ ->
+        :ets.delete(@ets_name)
+        :ets.new(@ets_name, [:ordered_set, :public, :named_table, read_concurrency: true, write_concurrency: true])
+      
+    end
   end
 
   # user join - add to list
@@ -52,24 +58,26 @@ defmodule Bijakhq.Game.Players do
         game_started = Server.lookup(:game_started)
         session_id = Server.lookup(:session_id)
 
-        if game_started == false and user.role != "admin" do
-
-          is_playing = true;
-          eliminated = false;
-
-          player = Player.new(user, is_playing, eliminated)
-          :ets.insert(@ets_name, {player.id, player})
-    
-          # Save user to for analytics
-          Task.start(Bijakhq.Quizzes, :insert_or_update_game_user, [%{game_id: session_id, user_id: user.id, is_viewer: true, is_player: true}])
-        else
-          is_playing = false;
-          eliminated = true;
-          player = Player.new(user, is_playing, eliminated)
-          :ets.insert(@ets_name, {player.id, player})
-
-          # Save user to for analytics
-          Task.start(Bijakhq.Quizzes, :insert_or_update_game_user, [%{game_id: session_id, user_id: user.id, is_viewer: true}])
+        case user.role do
+          
+          "admin" ->
+            Logger.warn "============================== Player_add_to_list #{user.username} is admin"
+          _ ->
+            if game_started == false do
+              is_playing = true;
+              eliminated = false;
+              player = Player.new(user, is_playing, eliminated)
+              :ets.insert(@ets_name, {player.id, player})
+              # Save user to for analytics
+              Task.start(Bijakhq.Quizzes, :insert_or_update_game_user, [%{game_id: session_id, user_id: user.id, is_viewer: true, is_player: true}])
+            else
+              is_playing = false;
+              eliminated = true;
+              player = Player.new(user, is_playing, eliminated)
+              :ets.insert(@ets_name, {player.id, player})
+              # Save user to for analytics
+              Task.start(Bijakhq.Quizzes, :insert_or_update_game_user, [%{game_id: session_id, user_id: user.id, is_viewer: true}])
+            end
         end
         
     end
@@ -103,9 +111,13 @@ defmodule Bijakhq.Game.Players do
         list
         |> Enum.reduce(%{1 => 0, 2 => 0, 3 => 0}, fn obj, map ->
           {_id, player} = obj
-          user_answer = Player.get_answer(player, question_id)
-          Task.start(Bijakhq.Game.Player, :process_answer, [player, user_answer, answers_sequence, is_test_game, is_last_question])
-          Map.update(map, user_answer, 1, & &1 + 1)
+          case player.eliminated do
+            true -> map
+            false ->
+              user_answer = Player.get_answer(player, question_id)
+              Task.start(Bijakhq.Game.Player, :process_answer, [player, user_answer, answers_sequence, is_test_game, is_last_question])
+              Map.update(map, user_answer, 1, & &1 + 1)
+          end
         end)
 
       question_with_answers_count = update_answer_count(current_question, answers_count)
