@@ -240,11 +240,16 @@ defmodule BijakhqWeb.GameSessionChannel do
 
   def handle_in("user:chat", payload, socket) do
     user = socket.assigns.user
-    user = Phoenix.View.render_one(user, BijakhqWeb.Api.UserView, "user.json")
-    message = Map.put(payload, :user, user)
-    # broadcast socket, "user:chat", response
-    Chat.add_message(message)
-    {:reply, {:ok, payload}, socket}
+    case Players.lookup(user.id) do
+      {:ok, player} ->
+        user = Phoenix.View.render_one(player, BijakhqWeb.Api.UserView, "user.json")
+        message = Map.put(payload, :user, user)
+        # broadcast socket, "user:chat", response
+        Chat.add_message(message)
+        {:reply, {:ok, payload}, socket}
+      nil ->
+        {:reply, {:ok, payload}, socket}
+    end
   end
 
   def handle_in("new_time", msg, socket) do
@@ -256,6 +261,9 @@ defmodule BijakhqWeb.GameSessionChannel do
     BijakhqWeb.Endpoint.broadcast("timer:start", "start_timer", %{})
     {:noreply, socket}
   end
+
+  intercept ["presence_diff"]
+  def handle_out("presence_diff", _, socket), do: {:noreply, socket}
 
   # From user
 
@@ -270,7 +278,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     push socket, "presence_state", Presence.list(socket)
 
     user = socket.assigns.user
-    Logger.warn "CHANNEL joined :: id:#{user.id} - username:#{user.username} - role:#{user.role} - time:#{DateTime.utc_now}"
+    Logger.warn "CHANNEL joined :: id:#{user.id} - time:#{DateTime.utc_now}"
     # Players.user_joined(user)
     Task.start(Bijakhq.Game.Players, :player_add_to_list, [user])
     # #IO.inspect socket
@@ -283,8 +291,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     # moved to it's own process
     Task.start(BijakhqWeb.Presence, :track, [socket, "user:#{user.id}", %{
       online_at: :os.system_time(:milli_seconds),
-      user_id: user.id,
-      username: user.username
+      user_id: user.id
     }])
 
     {:noreply, socket}
@@ -293,7 +300,7 @@ defmodule BijakhqWeb.GameSessionChannel do
   def terminate(_reason, socket) do
     user = socket.assigns.user
     # Logger.warn "Player::leave - #{user.id} - #{user.username} - #{user.role}"
-    Logger.warn "CHANNEL leave :: id:#{user.id} - username:#{user.username} - role:#{user.role} - time:#{DateTime.utc_now}"
+    Logger.warn "CHANNEL leave :: id:#{user.id} - time:#{DateTime.utc_now}"
     {:noreply, socket}
   end
 

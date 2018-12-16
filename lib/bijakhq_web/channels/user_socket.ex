@@ -19,15 +19,9 @@ defmodule BijakhqWeb.UserSocket do
     #IO.puts "=============================================================================================================="
     case Phauxth.Token.verify(socket, token, @max_age) do
       {:ok, user_id} ->
-        user = Accounts.get(user_id)
-        case user do
-          nil ->
-            :error
-          _ ->
-            socket = assign(socket, :user, %{id: user.id, role: user.role, username: user.username})
-            Logger.warn "SOCKET connected :: id:#{user.id} - username:#{user.username} - role:#{user.role} - time:#{DateTime.utc_now}"
-            {:ok, socket}
-        end
+        socket = assign(socket, :user, %{id: user_id})
+        Logger.warn "SOCKET connected :: id:#{user_id} - time:#{DateTime.utc_now}"
+        {:ok, socket}
       {:error, _something} ->
         #IO.inspect something
         :error
