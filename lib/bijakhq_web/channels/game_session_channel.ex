@@ -44,7 +44,7 @@ defmodule BijakhqWeb.GameSessionChannel do
 
     # res = Server.game_start(game_id)
     with response = Server.game_start(game_id) do
-      IO.inspect response
+      # IO.inspect response
       broadcast socket, "game:start", payload
       response = Phoenix.View.render_one(response, BijakhqWeb.Api.QuizSessionView, "game_start_details.json")
       # {:noreply, socket}

@@ -51,7 +51,7 @@ defmodule Bijakhq.Game.Player do
 
   def get_answer(player, question_id) do
     answer = player.answers[question_id]
-    IO.inspect answer
+    # IO.inspect answer
     Logger.warn "============================== get_answer #{player.username} :: #{answer}"
     case answer do
       nil ->
@@ -66,7 +66,7 @@ defmodule Bijakhq.Game.Player do
   def process_answer(player, user_answer, question, is_test_game, is_last_question) do
     Logger.warn "============================== Process_answer #{player.username} :: #{user_answer}"
     selected_answer = Enum.find(question.answers, fn u -> u.id == user_answer end)
-    IO.inspect selected_answer
+    # IO.inspect selected_answer
     case selected_answer do
       nil -> 
         # meaning user not answering the question
