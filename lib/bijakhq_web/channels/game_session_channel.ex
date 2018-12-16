@@ -53,12 +53,21 @@ defmodule BijakhqWeb.GameSessionChannel do
   end
 
   def handle_in("game:details:admin:show", _payload, socket) do
-    with response = Server.get_game_details do
-      response = Phoenix.View.render_one(response, BijakhqWeb.Api.QuizSessionView, "game_start_details.json")
-      # {:noreply, socket}
-      #IO.inspect response
-      broadcast socket, "game:details:admin:show", response
-      {:reply, {:ok, response}, socket}
+    
+    game_started = Server.lookup(:game_started)
+    case game_started do
+      nil ->
+        response = %{}
+        {:reply, {:ok, response}, socket}
+      _ -> 
+        with response = Server.get_game_details do
+          response = Phoenix.View.render_one(response, BijakhqWeb.Api.QuizSessionView, "game_start_details.json")
+          # {:noreply, socket}
+          #IO.inspect response
+          broadcast socket, "game:details:admin:show", response
+          {:reply, {:ok, response}, socket}
+        end
+        
     end
   end
 
