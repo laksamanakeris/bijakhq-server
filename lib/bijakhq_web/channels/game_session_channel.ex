@@ -290,7 +290,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     # })
     # moved to it's own process
     Task.start(BijakhqWeb.Presence, :track, [socket, "user:#{user.id}", %{
-      online_at: :os.system_time(:milli_seconds),
+      # online_at: :os.system_time(:milli_seconds),
       user_id: user.id
     }])
 
