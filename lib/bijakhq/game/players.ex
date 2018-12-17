@@ -38,10 +38,10 @@ defmodule Bijakhq.Game.Players do
   def reset_table do
     info = :ets.info(@ets_name)
     case info do
-      :undefined -> :ets.new(@ets_name, [:ordered_set, :public, :named_table, read_concurrency: true, write_concurrency: true])
+      :undefined -> :ets.new(@ets_name, [:set, :public, :named_table, read_concurrency: true, write_concurrency: true])
       _ ->
         :ets.delete(@ets_name)
-        :ets.new(@ets_name, [:ordered_set, :public, :named_table, read_concurrency: true, write_concurrency: true])
+        :ets.new(@ets_name, [:set, :public, :named_table, read_concurrency: true, write_concurrency: true])
     end
   end
 
@@ -96,7 +96,7 @@ defmodule Bijakhq.Game.Players do
     case Players.lookup(user.id) do
       nil -> Logger.warn "============================== Player_answered #{user.id} not exist in the player list"
       {:ok, player} -> 
-        Logger.warn "============================== Player_answered #{player.username}"
+        # Logger.warn "============================== Player_answered #{player.username}"
         player = Player.update_answer(player, question_id, answer_id)
         :ets.insert(@ets_name, {player.id, player})
     end
