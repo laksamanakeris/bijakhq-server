@@ -14,7 +14,8 @@ defmodule Bijakhq.Game.Chat do
   # This is chat state
   @chat_state %{
     timer_ref: nil,
-    messages: []
+    messages: [],
+    current_viewing: 0
   }
   # Client
   def start_link, do: GenServer.start_link(__MODULE__, @chat_state, name: @name)
@@ -63,14 +64,14 @@ defmodule Bijakhq.Game.Chat do
 
   def handle_call({:get_messages}, _from, chat_state) do
     # #IO.inspect chat_state
-    %{ timer_ref: _timer_ref, messages: messages} = chat_state
+    %{ timer_ref: _timer_ref, current_viewing: _current_viewing, messages: messages} = chat_state
     {:reply, %{messages: messages}, chat_state}
   end
 
   def handle_call({:add_message, message}, _from, chat_state) do
     # #IO.inspect message
     # #IO.inspect chat_state
-    %{ timer_ref: _timer_ref, messages: messages} = chat_state
+    %{ timer_ref: _timer_ref, current_viewing: _current_viewing, messages: messages} = chat_state
     messages = messages ++ [message]
     new_state = Map.put(chat_state, :messages, messages)
     {:reply, messages, new_state}
@@ -87,7 +88,7 @@ defmodule Bijakhq.Game.Chat do
 
   def handle_cast(:timer_stop, chat_state) do
     Logger.warn "Timer Stop"
-    %{ timer_ref: timer_ref, messages: _messages} = chat_state
+    %{ timer_ref: timer_ref, current_viewing: _current_viewing, messages: _messages} = chat_state
     cancel_timer(timer_ref)
     # new_state = Map.put(chat_state, :timer_ref, nil)
     # Reset timer
@@ -97,13 +98,21 @@ defmodule Bijakhq.Game.Chat do
 
   def handle_info(:update, chat_state) do
     # Logger.warn "update"
-    current_viewing = Presence.list(@room_name) |> Map.size
 
-    %{ timer_ref: _timer_ref, messages: messages} = chat_state
+    %{ timer_ref: _timer_ref, messages: messages, current_viewing: current_viewing} = chat_state
+
+    users_connected = Presence.list(@room_name) |> Map.size
+
+    current_viewing =
+      if is_integer(users_connected) do
+        users_connected
+      else
+        current_viewing
+      end
+    
     broadcast(%{messages: messages, current_viewing: current_viewing})
-
     timer_ref = schedule_timer @interval_time
-    new_state = %{ timer_ref: timer_ref, messages: []}
+    new_state = %{ timer_ref: timer_ref, current_viewing: current_viewing, messages: []}
     {:noreply, new_state}
   end
 
