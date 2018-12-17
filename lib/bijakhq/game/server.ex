@@ -40,10 +40,10 @@ defmodule Bijakhq.Game.Server do
   def reset_table do
     info = :ets.info(@ets_name)
     case info do
-      :undefined -> :ets.new(@ets_name, [:ordered_set, :public, :named_table, read_concurrency: true, write_concurrency: true])
+      :undefined -> :ets.new(@ets_name, [:set, :public, :named_table, read_concurrency: true, write_concurrency: true])
       _ ->
         :ets.delete(@ets_name)
-        :ets.new(@ets_name, [:ordered_set, :public, :named_table, read_concurrency: true, write_concurrency: true])
+        :ets.new(@ets_name, [:set, :public, :named_table, read_concurrency: true, write_concurrency: true])
       
     end
   end
