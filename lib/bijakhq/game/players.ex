@@ -21,12 +21,12 @@ defmodule Bijakhq.Game.Players do
   }
 
   def start_link() do
-    :ets.new(@ets_name, [:ordered_set, :public, :named_table, read_concurrency: true, write_concurrency: true])
+    reset_table()
     GenServer.start_link(__MODULE__, @players_state, name: @name)
   end
 
   def init(args) do
-    Logger.warn "Game Players initialized"
+    Logger.warn "============================== Game Players initialized"
     #IO.inspect args
     # timer_start()
     {:ok, args}

@@ -51,7 +51,7 @@ defmodule Bijakhq.Game.Chat do
 
   # Server and callbacks
   def init(initial_data) do
-    Logger.warn "Game chat initialized"
+    Logger.warn "============================== Game Chat initialized"
     chat_state = initial_data
     #IO.inspect chat_state
     # timer_start()

@@ -23,13 +23,13 @@ defmodule Bijakhq.Game.Server do
   }
   # Client API
   def start_link() do
-    :ets.new(@ets_name, [:ordered_set, :public, :named_table, read_concurrency: true, write_concurrency: true])
+    reset_table()
     GenServer.start_link(__MODULE__, @initial_state, name: @name)
   end
 
   # Server
   def init(game_state) do
-    Logger.warn "Game server initialized"
+    Logger.warn "============================== Game server initialized"
     #IO.inspect game_state
     {:ok, game_state}
   end
@@ -44,6 +44,14 @@ defmodule Bijakhq.Game.Server do
       _ ->
         :ets.delete(@ets_name)
         :ets.new(@ets_name, [:set, :public, :named_table, read_concurrency: true, write_concurrency: true])
+
+        :ets.insert(@ets_name, {:game_started, false})
+        :ets.insert(@ets_name, {:session_id, nil})
+        :ets.insert(@ets_name, {:total_questions, 0})
+        :ets.insert(@ets_name, {:current_question, nil})
+        :ets.insert(@ets_name, {:prize, 0})
+        :ets.insert(@ets_name, {:is_hidden, false})
+        :ets.insert(@ets_name, {:prize_text, "RM 0"})
       
     end
   end
@@ -58,17 +66,6 @@ defmodule Bijakhq.Game.Server do
     #IO.inspect game_data
 
     %{ game_details: game_details, game_questions: game_questions } = game_data
-
-    game_state = %{
-      game_started: false,
-      session_id: game_details.id,
-      total_questions: Enum.count(game_questions),
-      current_question: nil,
-      questions: game_questions,
-      prize: game_details.prize,
-      is_hidden: game_details.is_hidden,
-      prize_text: "RM #{game_details.prize}"
-    }
     
     :ets.insert(@ets_name, {:game_started, false})
     :ets.insert(@ets_name, {:session_id, game_details.id})
@@ -93,7 +90,6 @@ defmodule Bijakhq.Game.Server do
       question = 
         %{
           session_id: game_details.id,
-          # question_id: soalan.question_id,
           question_id: key,
           total_correct: soalan.total_correct,
           sequence: soalan.sequence,
