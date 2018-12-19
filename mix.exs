@@ -53,7 +53,7 @@ defmodule Bijakhq.Mixfile do
       {:cors_plug, "~> 1.5"},
       {:pay_pal, github: "laksamanakeris/PayPal"},
       {:immortal, "~> 0.2.2"},
-      {:libcluster, "~> 2.1", only: :prod}
+      {:libcluster, "~> 3.0", only: [:dev, :prod]}
     ]
   end
 

@@ -7,8 +7,8 @@ use Mix.Config
 # watchers to your application. For example, we use it
 # with brunch.io to recompile .js and .css sources.
 config :bijakhq, BijakhqWeb.Endpoint,
-  http: [port: 8080],
-  url: [host: "bijak.local", port: 8080],
+  http: [port: System.get_env("PORT") || 8080],
+  url: [host: "bijak.local", port: System.get_env("PORT") || 8080],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
@@ -61,3 +61,23 @@ config :pay_pal,
   client_id: System.get_env("PAYPAL_CLIENT_ID") || "AbdL0pqJgcqd5cKzzHJEsJ-qE6fUHq1IOYBrjnoWPzHlZUoivEZdnUP9ttie0Zzp1Fcv4Ic1VKD-qhrG",
   client_secret: System.get_env("PAYPAL_CLIENT_SECRET") || "EFqoDG-hQHswDzmjyWrNhTCBONRK3Ybdn_QWba5IddOG7WRMHkj72UU_dcTYYJ1HwVOCX8PLUmzGISaL",
   environment: :sandbox
+
+  config :libcluster,
+  topologies: [
+    exploring_elixir: [
+      strategy: Cluster.Strategy.Gossip,
+      #config: {},
+      # connect: {ExploringElixir.AutoCluster, :connect_node, []},
+      # disconnect: {ExploringElixir.AutoCluster, :disconnect_node, []},
+      #list_nodes: {:erlang, :nodes, [:connected]},
+      #child_spec: [restart: :transient]
+      
+      connect: {:net_kernel, :connect_node, []},
+      # The function to use for disconnecting nodes. The node
+      # name will be appended to the argument list. Optional
+      disconnect: {:erlang, :disconnect_node, []},
+      # The function to use for listing nodes.
+      # This function must return a list of node names. Optional
+      list_nodes: {:erlang, :nodes, [:connected]},
+    ]
+  ]
