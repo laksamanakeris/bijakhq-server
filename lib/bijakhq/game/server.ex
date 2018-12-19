@@ -109,18 +109,17 @@ defmodule Bijakhq.Game.Server do
   end
 
   def get_game_details do
-    game_state = :ets.tab2list @ets_name
-    # reconstruct data
-    [
-      {:current_question, current_question},
-      {:game_started, game_started},
-      {:is_hidden, is_hidden},
-      {:prize, prize},
-      {:prize_text,prize_text},
-      {:session_id, session_id},
-      {:total_questions, total_questions} | tail ] = game_state
 
-      count = total_questions - 1
+    # reconstruct data
+    game_started = lookup(:game_started)
+    session_id = lookup(:session_id)
+    total_questions = lookup(:total_questions)
+    current_question = lookup(:current_question)
+    prize = lookup(:prize)
+    is_hidden = lookup(:is_hidden)
+    prize_text = lookup(:prize_text)
+
+    count = total_questions - 1
 
     questions = 
       Enum.map(0..count, fn num -> 
