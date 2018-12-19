@@ -16,9 +16,9 @@ defmodule Bijakhq.Application do
       # worker(Bijakhq.Worker, [arg1, arg2, arg3]),
       supervisor(BijakhqWeb.Presence, []),
       
-      worker(Bijakhq.Game.Server, []),
-      worker(Bijakhq.Game.Chat, []),
-      worker(Bijakhq.Game.Players, []),
+      supervisor(Bijakhq.Game.Server, []),
+      supervisor(Bijakhq.Game.Chat, []),
+      supervisor(Bijakhq.Game.Players, []),
 
       # worker(Immortal.ETSTableManager, [Bijakhq.Game.Server, [:public]])
       # worker(Immortal.ETSTableManager, [Bijakhq.Game.Chat, [:public]])
