@@ -55,39 +55,64 @@ defmodule Bijakhq.Game.Players do
         # get game state
         # game_started = true -> viewer
         # game_started = false -> viewer
-        game_started = Server.lookup(:game_started)
-        session_id = Server.lookup(:session_id)
 
         # now get user from database
-        user = Accounts.get(user.id)
+        session_id = Server.lookup(:session_id)
+        game_started = Server.lookup(:game_started)
+        userdb = Accounts.get(user.id)
 
-        case user do
+        case userdb do
           nil -> 
-            Logger.warn "============================== Player_add_to_list #{user.id} not found in database"
-            :error
+            is_hidden = Server.lookup(:is_hidden)
+            case is_hidden do
+              false -> :error
+              true -> 
+                Logger.warn "============================== Player_add_to_list #{user.id} add dummy player"
+                dummyuser = Accounts.get(1)
+                dummyuser = Map.put(dummyuser, :id, user.id)
+                dummyuser = Map.put(dummyuser, :username, Faker.Internet.user_name)
+
+                is_dummy = true
+                add_player(dummyuser, session_id, game_started, is_dummy)
+            end
           _ -> 
-            case user.role do
+            case userdb.role do
               "admin" ->
-                Logger.warn "============================== Player_add_to_list #{user.username} is admin. Not adding to the list"
+                is_playing = false;
+                eliminated = true;
+                player = Player.new(userdb, is_playing, eliminated)
+                :ets.insert(@ets_name, {player.id, player})
+                # Save user to for analytics
+                Task.start(Bijakhq.Quizzes, :insert_or_update_game_user, [%{game_id: session_id, user_id: userdb.id, is_viewer: true, is_player: false}])
+                Logger.warn "============================== Player_add_to_list #{userdb.username} is admin. Not adding to the list"
               _ ->
-                if game_started == false do
-                  is_playing = true;
-                  eliminated = false;
-                  player = Player.new(user, is_playing, eliminated)
-                  :ets.insert(@ets_name, {player.id, player})
-                  # Save user to for analytics
-                  Task.start(Bijakhq.Quizzes, :insert_or_update_game_user, [%{game_id: session_id, user_id: user.id, is_viewer: true, is_player: true}])
-                else
-                  is_playing = false;
-                  eliminated = true;
-                  player = Player.new(user, is_playing, eliminated)
-                  :ets.insert(@ets_name, {player.id, player})
-                  # Save user to for analytics
-                  Task.start(Bijakhq.Quizzes, :insert_or_update_game_user, [%{game_id: session_id, user_id: user.id, is_viewer: true}])
-                end
+                add_player(userdb, session_id, game_started)
             end
         end
         
+    end
+  end
+
+  def add_player(user, session_id, game_started, is_dummy \\ false) do
+    
+    if game_started == false do
+      is_playing = true;
+      eliminated = false;
+      player = Player.new(user, is_playing, eliminated)
+      :ets.insert(@ets_name, {player.id, player})
+      # Save user to for analytics
+      if is_dummy == false do
+        Task.start(Bijakhq.Quizzes, :insert_or_update_game_user, [%{game_id: session_id, user_id: user.id, is_viewer: true, is_player: true}])  
+      end
+    else
+      is_playing = false;
+      eliminated = true;
+      player = Player.new(user, is_playing, eliminated)
+      :ets.insert(@ets_name, {player.id, player})
+      # Save user to for analytics
+      if is_dummy == false do
+        Task.start(Bijakhq.Quizzes, :insert_or_update_game_user, [%{game_id: session_id, user_id: user.id, is_viewer: true}])
+      end
     end
   end
   
