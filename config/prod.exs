@@ -61,16 +61,13 @@ config :logger, level: :warn
 
 config :libcluster,
   topologies: [
-    gossip: [
+    bijakhq: [
       strategy: Cluster.Strategy.Gossip,
-      config: [
-        port: 45892,
-        if_addr: {0,0,0,0},
-        multicast_addr: {230,1,1,251},
-        # a TTL of 1 remains on the local network,
-        # use this to change the number of jumps the
-        # multicast packets will make
-        multicast_ttl: 1]]]
+      connect: {:net_kernel, :connect_node, []},
+      disconnect: {:erlang, :disconnect_node, []},
+      list_nodes: {:erlang, :nodes, [:connected]},
+    ]
+  ]
 
 # Finally import the config/prod.secret.exs
 # which should be versioned separately.

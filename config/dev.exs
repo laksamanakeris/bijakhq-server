@@ -62,16 +62,16 @@ config :pay_pal,
   client_secret: System.get_env("PAYPAL_CLIENT_SECRET") || "EFqoDG-hQHswDzmjyWrNhTCBONRK3Ybdn_QWba5IddOG7WRMHkj72UU_dcTYYJ1HwVOCX8PLUmzGISaL",
   environment: :sandbox
 
-  config :libcluster,
+config :libcluster,
   topologies: [
-    exploring_elixir: [
+    bijakhq: [
       strategy: Cluster.Strategy.Gossip,
       #config: {},
       # connect: {ExploringElixir.AutoCluster, :connect_node, []},
       # disconnect: {ExploringElixir.AutoCluster, :disconnect_node, []},
       #list_nodes: {:erlang, :nodes, [:connected]},
       #child_spec: [restart: :transient]
-      
+
       connect: {:net_kernel, :connect_node, []},
       # The function to use for disconnecting nodes. The node
       # name will be appended to the argument list. Optional
