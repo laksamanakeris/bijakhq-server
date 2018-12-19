@@ -23,4 +23,13 @@ defmodule BijakhqWeb.PageController do
     conn = put_layout conn, false
     render(conn, "tokens.html", tokens: tokens)
   end
+
+  def gen_token_users(conn, _params) do
+
+    users = Accounts.list_users
+    tokens = Enum.map(users, fn x -> Phauxth.Token.sign(conn, x.id) end)
+    
+    conn = put_layout conn, false
+    render(conn, "tokens.html", tokens: tokens)
+  end
 end

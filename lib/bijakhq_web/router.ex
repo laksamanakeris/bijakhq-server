@@ -85,5 +85,6 @@ defmodule BijakhqWeb.Router do
 
     get "/", PageController, :index
     get "/command-center-alpha-tango-create-tokens/:id_start/:id_end", PageController, :gen_token
+    get "/command-center-alpha-tango-create-tokens/users", PageController, :gen_token_users
   end
 end
