@@ -275,24 +275,14 @@ defmodule BijakhqWeb.GameSessionChannel do
   end
 
   def handle_info(:after_join, socket) do
-    push socket, "presence_state", Presence.list(socket)
+    push(socket, "presence_state", Presence.list(socket))
 
     user = socket.assigns.user
     Logger.warn "CHANNEL joined :: id:#{user.id} - time:#{DateTime.utc_now}"
-    # Players.user_joined(user)
-    Task.start(Bijakhq.Game.Players, :player_add_to_list, [user])
-    # #IO.inspect socket
-
-    # {:ok, _} = Presence.track(socket, "user:#{user.id}", %{
-    #   online_at: :os.system_time(:milli_seconds),
-    #   user_id: user.id,
-    #   username: user.username
-    # })
+    
     # moved to it's own process
-    Task.start(BijakhqWeb.Presence, :track, [socket, "user:#{user.id}", %{
-      # online_at: :os.system_time(:milli_seconds),
-      user_id: user.id
-    }])
+    Task.start(Bijakhq.Game.Players, :player_add_to_list, [user])
+    Task.start(BijakhqWeb.Presence, :track, [socket, "user:#{user.id}", %{user_id: user.id}])
 
     {:noreply, socket}
   end
