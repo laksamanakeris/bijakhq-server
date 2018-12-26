@@ -63,6 +63,11 @@ config :libcluster,
   topologies: [
     bijakhq: [
       strategy: Cluster.Strategy.Gossip,
+      config: [
+        port: 45892,
+        if_addr: "0.0.0.0",
+        multicast_addr: "230.1.1.251",
+        multicast_ttl: 1],
       connect: {:net_kernel, :connect_node, []},
       disconnect: {:erlang, :disconnect_node, []},
       list_nodes: {:erlang, :nodes, [:connected]},
@@ -71,4 +76,32 @@ config :libcluster,
 
 # Finally import the config/prod.secret.exs
 # which should be versioned separately.
-import_config "prod.secret.exs"
+# import_config "prod.secret.exs"
+
+
+# In this file, we keep production configuration that
+# you'll likely want to automate and keep away from
+# your version control system.
+#
+# You should document the content of this
+# file or create a script for recreating it, since it's
+# kept out of version control and might be hard to recover
+# or recreate for your teammates (or yourself later on).
+config :bijakhq, BijakhqWeb.Endpoint,
+  secret_key_base: "${SECRET_KEY_BASE}"
+
+  # Configure your database
+config :bijakhq, Bijakhq.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  hostname: "${DB_HOSTNAME}",
+  username: "${DB_USERNAME}",
+  password: "${DB_PASSWORD}",
+  database: "${DB_NAME}",
+  timeout: 7200_000,
+  pool_size: 15
+
+
+config :pay_pal,
+  client_id: System.get_env("PAYPAL_CLIENT_ID") || "AbdL0pqJgcqd5cKzzHJEsJ-qE6fUHq1IOYBrjnoWPzHlZUoivEZdnUP9ttie0Zzp1Fcv4Ic1VKD-qhrG",
+  client_secret: System.get_env("PAYPAL_CLIENT_SECRET") || "EFqoDG-hQHswDzmjyWrNhTCBONRK3Ybdn_QWba5IddOG7WRMHkj72UU_dcTYYJ1HwVOCX8PLUmzGISaL",
+  environment: :sandbox
