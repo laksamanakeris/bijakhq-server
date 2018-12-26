@@ -54,7 +54,8 @@ defmodule Bijakhq.Mixfile do
       {:pay_pal, github: "laksamanakeris/PayPal"},
       {:immortal, "~> 0.2.2"},
       {:libcluster, "~> 3.0", only: [:dev, :prod]},
-      {:singleton, "~> 1.0.0"}
+      {:singleton, "~> 1.0.0"},
+      {:distillery, "~> 2.0"}
     ]
   end
 

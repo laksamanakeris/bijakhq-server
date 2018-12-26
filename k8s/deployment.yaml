@@ -1,0 +1,91 @@
+# apiVersion: v1
+# kind: Namespace
+# metadata:
+#   name: bijakhq
+# ---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: bijakhq
+  # namespace: bijakhq
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: bijakhq
+    spec:
+      # This section describes the containers that make up the deployment
+      containers:
+        - name: bijakhq
+          image: gcr.io/bijakhq-dev/bijakhq:v1
+          ports:
+            - containerPort: 8080
+          env:
+            - name: MY_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: HOST
+              value: "example.com"
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: secret_key_base
+            - name: DB_USERNAME
+              value: "postgres"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: db_password
+            - name: DB_NAME
+              value: "bijakhq_prod"
+            - name: DB_HOSTNAME
+              value: "127.0.0.1"
+        - name: cloudsql-proxy
+          image: gcr.io/cloudsql-docker/gce-proxy:1.11
+          command: ["/cloud_sql_proxy",
+                    "-instances=bijakhq-dev:asia-southeast1:bijaktrivia-postgres=tcp:5432",
+                    "-credential_file=/secrets/cloudsql/credentials.json"]
+          # securityContext:
+            # runAsUser: 2  # non-root user
+            # allowPrivilegeEscalation: false
+          volumeMounts:
+            - name: cloudsql-instance-credentials
+              mountPath: /secrets/cloudsql
+              readOnly: true
+      # [START volumes]
+      volumes:
+        - name: cloudsql-instance-credentials
+          secret:
+            secretName: cloudsql-instance-credentials
+      # [END volumes]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  # namespace: bijakhq
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  selector:
+    app: bijakhq
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: headless-service
+  # namespace: bijakhq
+spec:
+  ports:
+    - port: 7777
+  selector:
+    app: bijakhq
+  clusterIP: None
