@@ -10,8 +10,8 @@ https://github.com/jeanpsv/kubernetes-elixir-example
 
 # setup for secret
 
-echo -n "MjnsZX3ZOayH6ouA0p10BUyIkXQpF8C0NU4MBhsfx2q5wLdVdXtc43c4of0Z+ksy" | base64
-echo -n "7dxx0HsMjlk9EAsD" | base64
+echo -n "LeDwWTFLj9xqw2EmcjgIQx3LOWLp3qVOEeo9QQb8uNmDyfyM3OvRAd4WG+HFb3/a" | base64
+echo -n "E9obyl6Bm3OiuExw" | base64
 
 kubectl create -f ./k8s/secrets.yaml
 
@@ -22,9 +22,9 @@ MIX_ENV=prod \
 REPLACE_OS_VARS=true \
 PORT=4000 \
 HOST=example.com \
-SECRET_KEY_BASE=MjnsZX3ZOayH6ouA0p10BUyIkXQpF8C0NU4MBhsfx2q5wLdVdXtc43c4of0Z+ksy \
+SECRET_KEY_BASE=LeDwWTFLj9xqw2EmcjgIQx3LOWLp3qVOEeo9QQb8uNmDyfyM3OvRAd4WG+HFb3/a \
 DB_USERNAME=postgres \
-DB_PASSWORD=7dxx0HsMjlk9EAsD \
+DB_PASSWORD=E9obyl6Bm3OiuExw \
 DB_NAME=bijakhq_prod \
 DB_HOSTNAME=35.240.164.92 \
 _build/prod/rel/bijakhq/bin/bijakhq foreground
@@ -38,9 +38,9 @@ docker run -it --rm -p 8080:8080 bijakhq
 
 docker run -it -p 8080:8080 \
 -e "HOST=example.com" \
--e "SECRET_KEY_BASE=MjnsZX3ZOayH6ouA0p10BUyIkXQpF8C0NU4MBhsfx2q5wLdVdXtc43c4of0Z+ksy" \
+-e "SECRET_KEY_BASE=LeDwWTFLj9xqw2EmcjgIQx3LOWLp3qVOEeo9QQb8uNmDyfyM3OvRAd4WG+HFb3/a" \
 -e "DB_USERNAME=postgres" \
--e "DB_PASSWORD=7dxx0HsMjlk9EAsD" \
+-e "DB_PASSWORD=E9obyl6Bm3OiuExw" \
 -e "DB_NAME=bijakhq_prod" \
 -e "DB_HOSTNAME=35.240.164.92" \
 --rm bijakhq
