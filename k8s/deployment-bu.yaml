@@ -13,7 +13,7 @@ spec:
       # This section describes the containers that make up the deployment
       containers:
         - name: bijakhq
-          image: gcr.io/bijakhq-dev/bijakhq:v2
+          image: gcr.io/bijakhq-dev/bijakhq:v1
           ports:
             - containerPort: 8080
           env:
@@ -61,3 +61,30 @@ spec:
           secret:
             secretName: cloudsql-instance-credentials
       # [END volumes]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  namespace: bijakhq
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  selector:
+    app: bijakhq
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: headless-service
+  namespace: bijakhq
+spec:
+  ports:
+    - port: 7777
+  selector:
+    app: bijakhq
+  clusterIP: None

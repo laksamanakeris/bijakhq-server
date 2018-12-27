@@ -174,8 +174,33 @@ $ kubectl apply -f ./k8s/deployment.yaml
 $ kubectl get secrets --namespace=bijakhq
 $ kubectl get pods --namespace=bijakhq
 $ kubectl expose deployment bijakhq --type=LoadBalancer --port 80 --target-port 8080 --namespace=bijakhq
+$ kubectl describe services web --namespace=bijakhq  
 
 
 # Domain & SSL setup
 https://github.com/ahmetb/gke-letsencrypt/blob/master/10-install-helm.md
 
+
+# ===================================================================================================================
+
+
+# Setup GCP Ingress
+https://cloud.google.com/kubernetes-engine/docs/tutorials/configuring-domain-name-static-ip
+
+gcloud compute addresses create bijakhq-ip --global
+gcloud compute addresses describe bijakhq-ip --global
+# ===
+address: 35.244.247.18
+creationTimestamp: '2018-12-26T17:57:41.066-08:00'
+description: ''
+id: '4617697858140344186'
+ipVersion: IPV4
+kind: compute#address
+name: bijakhq-ip
+networkTier: PREMIUM
+selfLink: https://www.googleapis.com/compute/v1/projects/bijakhq-dev/global/addresses/bijakhq-ip
+status: RESERVED
+# ===
+
+# apply deployment.yaml
+kubectl get ingress --namespace=bijakhq

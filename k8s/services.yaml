@@ -1,0 +1,38 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: bijakhq-web
+  namespace: bijakhq
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: bijakhq-ip
+  labels:
+    app: bijakhq
+spec:
+  backend:
+    serviceName: bijakhq-backend
+    servicePort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bijakhq-backend
+  namespace: bijakhq
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: bijakhq
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: headless-service
+  namespace: bijakhq
+spec:
+  ports:
+    - port: 7777
+  selector:
+    app: bijakhq
+  clusterIP: None
