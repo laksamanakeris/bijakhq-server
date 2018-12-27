@@ -31,7 +31,10 @@ gcloud sql instances describe bijaktrivia-postgres | grep connectionName
 
 killall cloud_sql_proxy
 
+
+# https://medium.com/platformer-blog/using-kubernetes-secrets-5e7530e0378a
+
 kubectl create secret generic cloudsql-instance-credentials \
---from-file=credentials.json=./keys/proxy-user.json
+--namespace=bijakhq --from-file=credentials.json=./keys/proxy-user.json
 
 #================================================================================================================================
