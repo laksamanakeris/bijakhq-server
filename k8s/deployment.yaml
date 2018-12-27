@@ -1,13 +1,8 @@
-# apiVersion: v1
-# kind: Namespace
-# metadata:
-#   name: bijakhq
-# ---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: bijakhq
-  # namespace: bijakhq
+  namespace: bijakhq
 spec:
   replicas: 1
   template:
@@ -44,6 +39,10 @@ spec:
               value: "bijakhq_prod"
             - name: DB_HOSTNAME
               value: "127.0.0.1"
+            - name: PAYPAL_CLIENT_ID
+              value: "AbdL0pqJgcqd5cKzzHJEsJ-qE6fUHq1IOYBrjnoWPzHlZUoivEZdnUP9ttie0Zzp1Fcv4Ic1VKD-qhrG"
+            - name: PAYPAL_CLIENT_SECRET
+              value: "EFqoDG-hQHswDzmjyWrNhTCBONRK3Ybdn_QWba5IddOG7WRMHkj72UU_dcTYYJ1HwVOCX8PLUmzGISaL"
         - name: cloudsql-proxy
           image: gcr.io/cloudsql-docker/gce-proxy:1.11
           command: ["/cloud_sql_proxy",
@@ -67,7 +66,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: web
-  # namespace: bijakhq
+  namespace: bijakhq
 spec:
   ports:
     - port: 80
@@ -82,7 +81,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: headless-service
-  # namespace: bijakhq
+  namespace: bijakhq
 spec:
   ports:
     - port: 7777
