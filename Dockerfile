@@ -30,7 +30,12 @@
 # release. This stage uses the official Alpine Linux - Elixir base image, and
 # installs a few additional build tools such as Node.js.
 
-FROM elixir:alpine
+# The version of Alpine to use for the final image
+# This should match the version of Alpine that the `elixir:1.7.2-alpine` image uses
+ARG ALPINE_VERSION=3.8
+
+
+FROM elixir:1.7.2-alpine AS builder
 
 
 ##############################################################################
@@ -62,7 +67,9 @@ WORKDIR /opt/app
 # NodeJS is used for Brunch builds of Phoenix assets.
 # Hex and Rebar are needed to get and build dependencies.
 RUN apk update \
-    && apk --no-cache --update add nodejs nodejs-npm \
+    apk upgrade --no-cache && \
+    apk add --no-cache \
+    nodejs nodejs-npm yarn git build-base \
     && mix local.rebar --force \
     && mix local.hex --force
 
@@ -96,7 +103,7 @@ RUN mix release --env=prod --verbose \
 # Creates the actual runtime image. This is based on a the Alpine Linux base
 # image, with only the minimum dependencies for running ERTS.
 
-FROM alpine:latest
+FROM alpine:${ALPINE_VERSION}
 
 # Install dependencies for ERTS.
 RUN apk update \
@@ -112,7 +119,7 @@ ENV PORT=8080 \
 WORKDIR /opt/app
 
 # Obtain the built application release from the build stage.
-COPY --from=0 /opt/release .
+COPY --from=builder /opt/release .
 
 # Start the server.
 EXPOSE ${PORT}
