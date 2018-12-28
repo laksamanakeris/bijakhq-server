@@ -20,7 +20,7 @@ defmodule Bijakhq.Mixfile do
   def application do
     [
       mod: {Bijakhq.Application, []},
-      extra_applications: [:logger, :runtime_tools, :httpoison, :timex, :faker, :arc_ecto, :pay_pal, :singleton]
+      extra_applications: [:logger, :runtime_tools, :httpoison, :timex, :faker, :arc_ecto, :pay_pal, :singleton, :peerage]
     ]
   end
 
@@ -53,7 +53,7 @@ defmodule Bijakhq.Mixfile do
       {:cors_plug, "~> 1.5"},
       {:pay_pal, github: "laksamanakeris/PayPal"},
       {:immortal, "~> 0.2.2"},
-      {:libcluster, "~> 3.0", only: [:dev, :prod]},
+      {:peerage, "~> 1.0.2"},
       {:singleton, "~> 1.0.0"},
       {:distillery, "~> 2.0"}
     ]

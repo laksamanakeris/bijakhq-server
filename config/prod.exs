@@ -62,20 +62,11 @@ config :logger, level: :warn
 #     config :bijakhq, BijakhqWeb.Endpoint, server: true
 #
 
-config :libcluster,
-  topologies: [
-    bijakhq: [
-      strategy: Cluster.Strategy.Gossip,
-      config: [
-        port: 45892,
-        if_addr: "0.0.0.0",
-        multicast_addr: "230.1.1.251",
-        multicast_ttl: 1],
-      connect: {:net_kernel, :connect_node, []},
-      disconnect: {:erlang, :disconnect_node, []},
-      list_nodes: {:erlang, :nodes, [:connected]},
-    ]
-  ]
+config :peerage, via: Peerage.Via.Dns,
+  # This format my-svc.my-namespace.svc.cluster.local
+  dns_name: "headless-service.bijakhq.svc.cluster.local",
+  app_name: "bijakhq",
+  interval: 1
 
 # Finally import the config/prod.secret.exs
 # which should be versioned separately.
