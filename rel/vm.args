@@ -3,7 +3,7 @@
 ## http://erlang.org/doc/man/erl.html
 
 ## Name of the node
--name bijakhq@{MY_POD_IP}
+-name bijakhq@${MY_POD_IP}
 
 ## Cookie for distributed erlang
 ## -setcookie <%= release.profile.cookie %>
@@ -14,7 +14,10 @@
 ##-heart
 
 ## Enable kernel poll and a few async threads
-##+K true
++K true
+## https://www.smartspate.com/how-to-develop-a-highly-loaded-websocket-service/
++Q 500000
++P 4194304
 ##+A 5
 ## For OTP21+, the +A flag is not used anymore,
 ## +SDio replace it to use dirty schedulers
@@ -24,8 +27,11 @@
 ##-env ERL_MAX_PORTS 4096
 
 ## Tweak GC to run more often
-##-env ERL_FULLSWEEP_AFTER 10
+-env ERL_FULLSWEEP_AFTER 10
 
 # Enable SMP automatically based on availability
 # On OTP21+, this is not needed anymore.
 -smp auto
+
+--erl "+P 10000000"
+
