@@ -32,7 +32,7 @@ defmodule BijakhqWeb.GameSessionChannel do
   # broadcast to everyone in the current topic (game_session:lobby).
   def handle_in("shout", payload, socket) do
     broadcast socket, "shout", payload
-    {:noreply, socket}
+    {:noreply, socket, :hibernate}
   end
 
   # GAME SESSION
@@ -86,7 +86,7 @@ defmodule BijakhqWeb.GameSessionChannel do
 
       response = Phoenix.View.render_one(question, BijakhqWeb.Api.QuizQuestionView, "soalan.json")
       broadcast socket, "question:show", response
-      {:noreply, socket}
+      {:noreply, socket, :hibernate}
     end
   end
 
@@ -173,13 +173,13 @@ defmodule BijakhqWeb.GameSessionChannel do
 
       response = Phoenix.View.render_one(question, BijakhqWeb.Api.QuizQuestionView, "soalan_jawapan.json")
       broadcast socket, "question:result:show", response
-      {:noreply, socket}
+      {:noreply, socket, :hibernate}
     end
   end
 
   def handle_in("question:result:end", payload, socket) do
     broadcast socket, "question:result:end", payload
-    {:noreply, socket}
+    {:noreply, socket, :hibernate}
   end
 
   def handle_in("game:result:process", _payload, socket) do
@@ -198,7 +198,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     winners = Players.get_game_result()
     response = Phoenix.View.render_one(winners, BijakhqWeb.Api.UserView, "game_result_index.json")
     broadcast socket, "game:result:show", response
-    {:noreply, socket}
+    {:noreply, socket, :hibernate}
   end
 
   def handle_in("game:result:admin:show", _payload, socket) do
@@ -214,7 +214,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     Server.game_save_scores()
 
     broadcast socket, "game:result:end", %{}
-    {:noreply, socket}
+    {:noreply, socket, :hibernate}
   end
 
   # GAME SESSION
@@ -225,7 +225,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     Chat.timer_end()
 
     broadcast socket, "game:end", %{}
-    {:noreply, socket}
+    {:noreply, socket, :hibernate}
   end
 
   # Users
@@ -254,12 +254,12 @@ defmodule BijakhqWeb.GameSessionChannel do
 
   def handle_in("new_time", msg, socket) do
     push socket, "new_time", msg
-    {:noreply, socket}
+    {:noreply, socket, :hibernate}
   end
 
   def handle_in("start_timer", _, socket) do
     BijakhqWeb.Endpoint.broadcast("timer:start", "start_timer", %{})
-    {:noreply, socket}
+    {:noreply, socket, :hibernate}
   end
 
   intercept ["presence_diff"]
@@ -284,14 +284,14 @@ defmodule BijakhqWeb.GameSessionChannel do
     Task.start(Bijakhq.Game.Players, :player_add_to_list, [user])
     Task.start(BijakhqWeb.Presence, :track, [socket, "user:#{user.id}", %{user_id: user.id}])
 
-    {:noreply, socket}
+    {:noreply, socket, :hibernate}
   end
 
   def terminate(_reason, socket) do
     user = socket.assigns.user
     # Logger.warn "Player::leave - #{user.id} - #{user.username} - #{user.role}"
     Logger.warn "CHANNEL leave :: id:#{user.id} - time:#{DateTime.utc_now}"
-    {:noreply, socket}
+    {:noreply, socket, :hibernate}
   end
 
 end
