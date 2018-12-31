@@ -20,7 +20,7 @@ defmodule Bijakhq.Mixfile do
   def application do
     [
       mod: {Bijakhq.Application, []},
-      extra_applications: [:logger, :runtime_tools, :observer, :httpoison, :timex, :faker, :arc_ecto, :pay_pal, :singleton, :peerage]
+      extra_applications: [:logger, :runtime_tools, :httpoison, :timex, :faker, :arc_ecto, :pay_pal, :singleton, :peerage]
     ]
   end
 
@@ -55,7 +55,7 @@ defmodule Bijakhq.Mixfile do
       {:immortal, "~> 0.2.2"},
       {:peerage, "~> 1.0.2"},
       {:singleton, "~> 1.0.0"},
-      {:distillery, "~> 2.0"}
+      {:distillery, "~> 2.0"},
     ]
   end
 
