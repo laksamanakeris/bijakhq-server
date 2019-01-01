@@ -39,6 +39,7 @@ environment :prod do
   set include_src: false
   set cookie: :"jgsqpgi>C[*c[&8HtFvv2VW<dS];~r(q@;Gb9ixO@adY@Xr[f&^sfgxsOEgt2[a8"
   set vm_args: "rel/vm.args"
+  set erl_opts: "-kernel inet_dist_listen_min 9001 inet_dist_listen_max 9100"
 end
 
 # You may define one or more releases in this file.
