@@ -1,12 +1,16 @@
 # Clean up docker containers
 https://linuxize.com/post/how-to-remove-docker-images-containers-volumes-and-networks/
 
-
+# http://bijaktrivia.xyz/command-center-alpha-tango-create-tokens/users
 
 # Follow this
 https://github.com/liamgriffiths/distributed-elixir-demo
 https://github.com/jeanpsv/kubernetes-elixir-example
 
+https://github.com/kubernetes/ingress-gce/tree/master/examples/websocket
+
+# to consider create separate service for database
+https://github.com/GoogleCloudPlatform/cloudsql-proxy/blob/master/Kubernetes.md
 
 # setup for secret
 
@@ -130,14 +134,52 @@ kubectl set image deployment/bijakhq-web bijakhq-web=gcr.io/bijakhq-dev/bijakhq:
 
 
 kubectl get pods
+kubectl get pods -o=wide -n=bijakhq
 kubectl attach bijakhq-web-7d99bd65c6-hgk2z -c bijakhq-web
+
+kubectl logs <podname> -c cloudsql-proxy
 
 
 # https://cloud.google.com/compute/pricing
 
+gcloud config set compute/zone asia-southeast1-a
+
 gcloud container clusters create bijakhq-cluster --zone asia-southeast1-a \
---machine-type=n1-standard-2  --enable-autorepair \
+--machine-type=n1-standard-4  --enable-autorepair \
+--enable-autoscaling --max-nodes=1000 --min-nodes=1
+
+gcloud container clusters update bijakhq-cluster --zone asia-southeast1-a \
+--machine-type=n1-standard-4 \
 --enable-autoscaling --max-nodes=100 --min-nodes=1
+
+gcloud container clusters create bijakhq-cluster --num-nodes=5
+
+# high CPU
+gcloud container node-pools create larger-pool --cluster=bijakhq-cluster \
+  --machine-type=n1-standard-4  --enable-autorepair \
+--enable-autoscaling --max-nodes=50 --min-nodes=1
+
+# high memory
+gcloud container node-pools create high-memory --cluster=bijakhq-cluster \
+  --machine-type=n1-highmem-2  --enable-autorepair \
+--enable-autoscaling --max-nodes=9 --min-nodes=1
+
+gcloud container node-pools list --cluster bijakhq-cluster
+
+# delete pool
+gcloud container node-pools delete default-pool --cluster bijakhq-cluster
+gcloud container node-pools delete large-pool --cluster bijakhq-cluster
+gcloud container node-pools delete high-memory --cluster bijakhq-cluster
+
+kubectl autoscale deployment bijakhq --max 500 --min 1 --cpu-percent 50 --namespace=bijakhq
+kubectl autoscale deployment bijakhq --cpu-percent=50 --min=1 --max=10
+kubectl autoscale deployment bijakhq --max 1000 --min 1 --cpu-percent 50 --namespace=bijakhq
+
+kubectl delete hpa
+
+#  autoscale
+https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/
+https://github.com/kubernetes/ingress-gce/tree/e72479ba461fedae5fc5bf64999f28ba3125004d/examples/websocket
 
 
 
@@ -169,17 +211,44 @@ kubectl apply -f ./k8s/deployment.yaml
 # Deploy
 # reminder - if we use namespace, dont forget to put namespace when call kubectl
 
-$ gcloud builds submit --tag=gcr.io/bijakhq-dev/bijakhq:v1 .
+# build container
+$ gcloud builds submit --tag=gcr.io/bijakhq-dev/bijakhq:v10 .
+
+
 $ kubectl apply -f ./k8s/deployment.yaml
 $ kubectl get secrets --namespace=bijakhq
 $ kubectl get pods --namespace=bijakhq
 $ kubectl expose deployment bijakhq --type=LoadBalancer --port 80 --target-port 8080 --namespace=bijakhq
 $ kubectl describe services web --namespace=bijakhq  
 
+kubectl get hpa --namespace=bijakhq
+kubectl get pods --namespace=bijakhq
+
+kubectl get pods -o=wide -n=bijakhq
+
+kubectl logs <podname> -c cloudsql-proxy
+
 
 # Domain & SSL setup
 https://github.com/ahmetb/gke-letsencrypt/blob/master/10-install-helm.md
+https://cloud.google.com/kubernetes-engine/docs/tutorials/configuring-domain-name-static-ip
+https://akomljen.com/get-automatic-https-with-lets-encrypt-and-kubernetes-ingress/
+https://kubernetes.io/docs/reference/kubectl/cheatsheet/
 
+
+
+Install the Helm client on your development machine:
+- https://docs.helm.sh/using_helm/#installing-helm-client
+
+kubectl create serviceaccount -n {namespace} tiller
+kubectl create serviceaccount -n bijakhq tiller
+
+kubectl create clusterrolebinding tiller-binding \
+    --clusterrole=cluster-admin \
+    --serviceaccount bijakhq:tiller
+
+helm install --name cert-manager --version v0.5.2 \
+    --namespace bijakhq stable/cert-manager
 
 # ===================================================================================================================
 
@@ -189,6 +258,7 @@ https://cloud.google.com/kubernetes-engine/docs/tutorials/configuring-domain-nam
 
 gcloud compute addresses create bijakhq-ip --global
 gcloud compute addresses describe bijakhq-ip --global
+
 # ===
 address: 35.244.247.18
 creationTimestamp: '2018-12-26T17:57:41.066-08:00'
@@ -204,3 +274,56 @@ status: RESERVED
 
 # apply deployment.yaml
 kubectl get ingress --namespace=bijakhq
+
+
+# connect to pod
+
+kubectl get pods -n=bijakhq
+kubectl -n=bijakhq exec -it bijakhq-749c5bc8d4-7zj8l -c bijakhq sh
+
+$ vi releases/0.0.1/vm.args
+or
+$ sed -i.bak "s/bijakhq/console/g" releases/0.0.1/vm.args
+
+PORT=5555 ./bin/start_server console --name debugging@127.0.0.1 --remsh console@127.0.0.1 --cookie bijakhqcookie
+
+kubectl -n bijakhq port-forward bijakhq-746db8c55d-k2nlf 4369 9001 9002 9003 9004
+
+kubectl -n bijakhq exec -t bijakhq-746db8c55d-k2nlf -c bijakhq -- env | grep MY_POD_IP
+
+sudo iptables -t nat -A OUTPUT -d 10.40.22.15 -j DNAT --to-destination 127.0.0.1
+sudo iptables -t nat -A OUTPUT -d 10.40.22.15 -j DNAT --to-destination 127.0.0.1
+
+# https://www.mendrugory.com/post/remote-elixir-node-kubernetes/
+# https://stackoverflow.com/questions/41998083/running-observer-for-a-remote-erlang-node-making-it-simpler
+
+
+kubectl exec -n=bijakhq bijakhq-9d87d966-2krss -i -t -- iex --name debugging@127.0.0.1 --remsh console@127.0.0.1 --cookie bijakhqcookie 
+kubectl exec -n=bijakhq bijakhq-9d87d966-2krss -i -t -- env PORT=5555 && iex --name debugging@127.0.0.1 --remsh console@10.40.22.15 --cookie bijakhqcookie
+kubectl exec -n=bijakhq bijakhq-9d87d966-2krss -i -t -- env PORT=5555 && iex --name debugging@127.0.0.1 --remsh console@10.40.22.15 --cookie bijakhqcookie
+
+kubectl exec -n=bijakhq bijakhq-9d87d966-2krss -- bash -c "cd /opt/app; env PORT=5555 && ./bin/start_server console --name debugging@127.0.0.1 --remsh console@127.0.0.1 --cookie bijakhqcookie"
+kubectl exec -n=bijakhq bijakhq-9d87d966-2krss -- bash -c "cd /opt/app; "
+
+# https://www.mendrugory.com/post/remote-elixir-node-kubernetes/
+kubectl port-forward --namespace=bijakhq bijakhq-9d87d966-2krss 4369 &
+
+iex --cookie bijakhqcookie --name bijakhq@127.0.0.1 \
+    -e "Node.connect(:'bijakhq@10.40.22.16')" \
+    -S mix run --no-start
+
+
+# This is working
+echo "rdr on en0 inet proto tcp from any to 10.40.22.18 -> 127.0.0.1" | sudo pfctl -ef -
+sudo sysctl -w net.inet.ip.forwarding=1
+sudo pfctl -s nat
+
+
+kubectl port-forward myapp-2431125679-cwqvt 35609 4369
+
+iex --name console@10.40.22.16 --cookie bijakhqcookie
+
+Node.connect(:"bijakhq@10.40.22.16")
+
+iex --name console@10.40.22.18 --cookie bijakhqcookie --remsh "bijakhq@10.40.22.18"
+epmd -names

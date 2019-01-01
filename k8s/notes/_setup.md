@@ -37,4 +37,7 @@ killall cloud_sql_proxy
 kubectl create secret generic cloudsql-instance-credentials \
 --namespace=bijakhq --from-file=credentials.json=./keys/proxy-user.json
 
+# https://medium.com/@nithinmallya4/using-the-cloudsql-proxy-to-talk-to-mysql-from-your-gke-rails-application-aa53f2611b78
+# https://ihaveabackup.net/article/kubernetes-on-gke-with-cloudsql-proxy
+
 #================================================================================================================================
