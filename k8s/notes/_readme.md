@@ -212,7 +212,7 @@ kubectl apply -f ./k8s/deployment.yaml
 # reminder - if we use namespace, dont forget to put namespace when call kubectl
 
 # build container
-$ gcloud builds submit --tag=gcr.io/bijakhq-dev/bijakhq:v10 .
+$ gcloud builds submit --tag=gcr.io/bijakhq-dev/bijakhq:v11 .
 
 
 $ kubectl apply -f ./k8s/deployment.yaml
