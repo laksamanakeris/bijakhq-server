@@ -90,7 +90,7 @@ config :bijakhq, Bijakhq.Repo,
   password: "${DB_PASSWORD}",
   database: "${DB_NAME}",
   timeout: 7200_000,
-  pool_size: 15
+  pool_size: 10
 
 
 config :pay_pal,
