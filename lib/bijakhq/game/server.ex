@@ -30,7 +30,7 @@ defmodule Bijakhq.Game.Server do
   # Server
   def init(game_state) do
     Logger.warn "============================== Game server initialized"
-    #IO.inspect game_state
+    preload_data();
     {:ok, game_state}
   end
 
@@ -44,16 +44,18 @@ defmodule Bijakhq.Game.Server do
       _ ->
         :ets.delete(@ets_name)
         :ets.new(@ets_name, [:set, :public, :named_table, read_concurrency: true, write_concurrency: true])
-
-        :ets.insert(@ets_name, {:game_started, false})
-        :ets.insert(@ets_name, {:session_id, nil})
-        :ets.insert(@ets_name, {:total_questions, 0})
-        :ets.insert(@ets_name, {:current_question, nil})
-        :ets.insert(@ets_name, {:prize, 0})
-        :ets.insert(@ets_name, {:is_hidden, false})
-        :ets.insert(@ets_name, {:prize_text, "RM 0"})
-      
+        preload_data()
     end
+  end
+
+  def preload_data do
+    :ets.insert(@ets_name, {:game_started, false})
+    :ets.insert(@ets_name, {:session_id, nil})
+    :ets.insert(@ets_name, {:total_questions, 0})
+    :ets.insert(@ets_name, {:current_question, nil})
+    :ets.insert(@ets_name, {:prize, 0})
+    :ets.insert(@ets_name, {:is_hidden, false})
+    :ets.insert(@ets_name, {:prize_text, "RM 0"})
   end
 
   def game_start(game_id) do
