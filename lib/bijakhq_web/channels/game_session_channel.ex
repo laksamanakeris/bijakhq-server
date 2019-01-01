@@ -291,7 +291,7 @@ defmodule BijakhqWeb.GameSessionChannel do
   end
 
   def handle_info(:after_join, socket) do
-    push(socket, "presence_state", Presence.list(socket))
+    # push(socket, "presence_state", Presence.list(socket))
 
     user = socket.assigns.user
     Logger.warn "CHANNEL joined :: id:#{user.id} - time:#{DateTime.utc_now}"
