@@ -5,12 +5,24 @@ metadata:
   namespace: bijakhq
   annotations:
     kubernetes.io/ingress.global-static-ip-name: bijakhq-ip
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    certmanager.k8s.io/acme-http01-edit-in-place: "true"
   labels:
     app: bijakhq
 spec:
   backend:
     serviceName: bijakhq-backend
     servicePort: 8080
+  tls:
+  - hosts:
+    - bijaktrivia.xyz
+    secretName: bijaktrivia-xyz-tls
+  - hosts:
+    - www.bijaktrivia.xyz
+    secretName: www-bijaktrivia-xyz-tls
+  - hosts:
+    - api.bijaktrivia.xyz
+    secretName: api.bijaktrivia-xyz-tls
 ---
 apiVersion: v1
 kind: Service
@@ -33,6 +45,26 @@ metadata:
 spec:
   ports:
     - port: 7777
+      targetPort: 7777
+      name: headless
+    - port: 4369
+      targetPort: 4369
+      name: epmd
   selector:
     app: bijakhq
   clusterIP: None
+---
+# https://www.quora.com/What-is-the-best-deployment-method-for-a-websocket-application-using-Kubernetes  
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bijakhq-ingress-lb-cfg
+  labels:
+    app: bijakhq-web
+    group: lb
+data:
+  enable-sticky-sessions: 'true'
+  enable-vts-status: 'true'
+  proxy-read-timeout: '360000'
+  proxy-send-timeout: '360000'
+  #error-log-level: 'debug'  

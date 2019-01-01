@@ -5,24 +5,77 @@ metadata:
   namespace: bijakhq
 spec:
   replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: bijakhq
+  strategy:
+    rollingUpdate:
+      maxSurge: 10%
+      maxUnavailable: 0
+    type: RollingUpdate
   template:
     metadata:
       labels:
         app: bijakhq
     spec:
+      # [START volumes]
+      volumes:
+        - name: cloudsql-instance-credentials
+          secret:
+            secretName: cloudsql-instance-credentials
+      # [END volumes]
       # This section describes the containers that make up the deployment
       containers:
         - name: bijakhq
-          image: gcr.io/bijakhq-dev/bijakhq:v2
+          image: gcr.io/bijakhq-dev/bijakhq:v10
           ports:
             - containerPort: 8080
+              name: bijakhq-server
+            - containerPort: 4369
+              name: epmd
+            - containerPort: 9001
+              name: epmd1
+            - containerPort: 9002
+              name: epmd2
+            - containerPort: 9003
+              name: epmd3
+            - containerPort: 9004
+              name: epmd4
+            - containerPort: 9005
+              name: epmd5
+            - containerPort: 9006
+              name: epmd6
+            - containerPort: 9007
+              name: epmd7
+            - containerPort: 9008
+              name: epmd8
+          resources:
+            limits:
+              cpu: 0.9
+              memory: 6Gi
+            requests:
+              cpu: 0.5
+              memory: 4Gi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 30
+            timeoutSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
           env:
             - name: MY_POD_IP
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
             - name: HOST
-              value: "example.com"
+              value: "bijaktrivia.xyz"
             - name: SECRET_KEY_BASE
               valueFrom:
                 secretKeyRef:
@@ -51,13 +104,17 @@ spec:
           # securityContext:
             # runAsUser: 2  # non-root user
             # allowPrivilegeEscalation: false
+          ports:
+            - name: postgres
+              containerPort: 5432
           volumeMounts:
             - name: cloudsql-instance-credentials
               mountPath: /secrets/cloudsql
               readOnly: true
-      # [START volumes]
-      volumes:
-        - name: cloudsql-instance-credentials
-          secret:
-            secretName: cloudsql-instance-credentials
-      # [END volumes]
+          resources:
+            limits:
+              cpu: 150m
+              memory: 150Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
