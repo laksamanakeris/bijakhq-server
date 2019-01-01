@@ -18,35 +18,45 @@ defmodule Bijakhq.Game.Chat do
     current_viewing: 0
   }
   # Client
-  def start_link, do: GenServer.start_link(__MODULE__, @chat_state, name: @name)
+  def start_link() do
+    # GenServer.start_link(__MODULE__, @chat_state, name: @name)
+    Singleton.start_child(__MODULE__, @chat_state, {Bijakhq.Game.Chat, 1})
+  end
 
 
   def get_messages do
-    GenServer.call(@name, {:get_messages})
+    pid = :global.whereis_name({Bijakhq.Game.Chat, 1})
+    GenServer.call(pid, {:get_messages})
   end
 
   def add_message(message) do
-    GenServer.call(@name, {:add_message, message})
+    pid = :global.whereis_name({Bijakhq.Game.Chat, 1})
+    GenServer.call(pid, {:add_message, message})
   end
 
   def viewer_add() do
-    GenServer.cast(@name, :viewer_add)
+    pid = :global.whereis_name({Bijakhq.Game.Chat, 1})
+    GenServer.cast(pid, :viewer_add)
   end
 
   def viewer_remove() do
-    GenServer.cast(@name, :viewer_remove)
+    pid = :global.whereis_name({Bijakhq.Game.Chat, 1})
+    GenServer.cast(pid, :viewer_remove)
   end
 
   def viewer_update(count) do
-    GenServer.cast(@name, {:viewer_update, count})
+    pid = :global.whereis_name({Bijakhq.Game.Chat, 1})
+    GenServer.cast(pid, {:viewer_update, count})
   end
 
   def timer_start do
-    GenServer.cast(@name, :timer_start)
+    pid = :global.whereis_name({Bijakhq.Game.Chat, 1})
+    GenServer.cast(pid, :timer_start)
   end
 
   def timer_end do
-    GenServer.cast(@name, :timer_stop)
+    pid = :global.whereis_name({Bijakhq.Game.Chat, 1})
+    GenServer.cast(pid, :timer_stop)
   end
 
   # Server and callbacks
