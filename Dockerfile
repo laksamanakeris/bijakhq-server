@@ -69,7 +69,7 @@ WORKDIR /opt/app
 RUN apk update \
     apk upgrade --no-cache && \
     apk add --no-cache \
-    nodejs nodejs-npm yarn git build-base \
+    nodejs nodejs-npm yarn git build-base imagemagick \
     && mix local.rebar --force \
     && mix local.hex --force
 
@@ -107,7 +107,7 @@ FROM alpine:${ALPINE_VERSION}
 
 # Install dependencies for ERTS.
 RUN apk update \
-    && apk --no-cache --update add bash openssl-dev
+    && apk --no-cache --update add bash openssl-dev imagemagick
 
 # This is the runtime environment for a Phoenix app.
 # It listens on port 8080, and runs in the prod environment.
