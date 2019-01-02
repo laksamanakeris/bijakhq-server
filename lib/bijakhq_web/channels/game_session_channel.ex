@@ -156,31 +156,6 @@ defmodule BijakhqWeb.GameSessionChannel do
 
     # with question = Server.get_question(question_id) do
     with question = GameManager.server_get_question(question_id) do
-      # #IO.inspect game
-      # questions = game.questions
-      # question = Enum.at( questions , question_id)
-      # question = Map.put(question, :question_id, question_id)
-
-      # #IO.inspect question
-      #IO.puts "========================================================================"
-
-      # # soalan = Bijakhq.MapHelpers.atomize_keys(question.answers_sequence)
-      # soalan = question.answers_sequence
-      # # #IO.inspect soalan
-      # answers = soalan.answers
-
-      # [answer1, answer2, answer3] = answers
-      # answer1 = Map.put(answer1, :total_answered, Enum.random(1..200) )
-      # answer2 = Map.put(answer2, :total_answered, Enum.random(1..200))
-      # answer3 = Map.put(answer3, :total_answered, Enum.random(1..200))
-
-      # answers = [answer1, answer2, answer3]
-      # soalan = Map.put(soalan, :answers, answers)
-      # # update the sequence again
-      # question = Map.put(question, :answers_sequence, soalan)
-
-      # #IO.inspect question
-
       response = Phoenix.View.render_one(question, BijakhqWeb.Api.QuizQuestionView, "soalan_jawapan.json")
       broadcast socket, "question:result:show", response
       {:noreply, socket, :hibernate}
