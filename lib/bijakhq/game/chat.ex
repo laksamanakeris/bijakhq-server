@@ -6,6 +6,7 @@ defmodule Bijakhq.Game.Chat do
   alias Bijakhq.Quizzes
   alias BijakhqWeb.Presence
   alias Bijakhq.Game.Server
+  alias Bijakhq.Game.GameManager
 
   @name :game_chat
   @room_name "game_session:lobby"
@@ -29,9 +30,18 @@ defmodule Bijakhq.Game.Chat do
     GenServer.call(pid, {:get_messages})
   end
 
-  def add_message(message) do
-    pid = :global.whereis_name({Bijakhq.Game.Chat, 1})
-    GenServer.call(pid, {:add_message, message})
+  def add_message(user, payload) do
+    case GameManager.players_lookup(user.id) do
+      {:ok, player} ->
+        user = Phoenix.View.render_one(player, BijakhqWeb.Api.UserView, "user.json")
+        message = Map.put(payload, :user, user)
+        # broadcast socket, "user:chat", response
+        pid = :global.whereis_name({Bijakhq.Game.Chat, 1})
+        GenServer.cast(pid, {:add_message, message})
+        :ok
+      nil ->
+        :error
+    end
   end
 
   def viewer_add() do
@@ -78,13 +88,13 @@ defmodule Bijakhq.Game.Chat do
     {:reply, %{messages: messages}, chat_state}
   end
 
-  def handle_call({:add_message, message}, _from, chat_state) do
+  def handle_cast({:add_message, message}, chat_state) do
     # #IO.inspect message
     # #IO.inspect chat_state
     %{ timer_ref: _timer_ref, current_viewing: _current_viewing, messages: messages} = chat_state
     messages = messages ++ [message]
     new_state = Map.put(chat_state, :messages, messages)
-    {:reply, messages, new_state}
+    {:noreply, new_state}
   end
 
   # Timer stuff
@@ -130,8 +140,6 @@ defmodule Bijakhq.Game.Chat do
   defp cancel_timer(nil), do: :ok
   defp cancel_timer(ref), do: Process.cancel_timer(ref)
   defp broadcast(messages) do
-    # Logger.warn "broadcast"
-    # #IO.inspect messages
     BijakhqWeb.Endpoint.broadcast("game_session:lobby", "user:chat", messages)
   end
 
