@@ -247,28 +247,14 @@ defmodule BijakhqWeb.GameSessionChannel do
   def handle_in("user:answer", payload, socket) do
     %{"question_id" => question_id, "answer_id" => answer_id} = payload
     user = socket.assigns.user
-    # process_user_answer(user, payload)
-    # Players.player_answered(user, question_id, answer_id)
     GameManager.players_player_answered(user, question_id, answer_id)
     {:reply, {:ok, payload}, socket}
   end
 
   def handle_in("user:chat", %{"message" => message} = payload, socket) do
     user = socket.assigns.user
-    # case Players.lookup(user.id) do
-    # Chat.add_message(user, message)
     Task.start(Bijakhq.Game.Chat, :add_message, [user, payload])
     {:reply, {:ok, payload}, socket}
-    # case GameManager.players_lookup(user.id) do
-    #   {:ok, player} ->
-    #     user = Phoenix.View.render_one(player, BijakhqWeb.Api.UserView, "user.json")
-    #     message = Map.put(payload, :user, user)
-    #     # broadcast socket, "user:chat", response
-    #     Chat.add_message(message)
-    #     {:reply, {:ok, payload}, socket}
-    #   nil ->
-    #     {:reply, {:ok, payload}, socket}
-    # end
   end
 
   def handle_in("new_time", msg, socket) do
