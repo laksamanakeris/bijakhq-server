@@ -42,7 +42,8 @@ defmodule BijakhqWeb.GameSessionChannel do
     %{"game_id" => game_id} = payload
 
     # start chat timer
-    Chat.timer_start()
+    # Chat.timer_start()
+    Task.start(Bijakhq.Game.Chat, :timer_start, [])
 
     # res = Server.game_start(game_id)
     # with response = Server.game_start(game_id) do
@@ -83,7 +84,8 @@ defmodule BijakhqWeb.GameSessionChannel do
     with question = GameManager.server_set_current_question(question_id) do
 
       # pause chat timer
-      Chat.timer_pause()
+      # Chat.timer_pause()
+      Task.start(Bijakhq.Game.Chat, :timer_pause, [])
       # Server.set_current_question(question_id)
       # #IO.inspect game
       # questions = game.questions
@@ -122,7 +124,8 @@ defmodule BijakhqWeb.GameSessionChannel do
     #IO.inspect payload
 
     # start chat timer
-    Chat.timer_start()
+    # Chat.timer_start()
+    Task.start(Bijakhq.Game.Chat, :timer_start, [])
 
     broadcast socket, "question:end", payload
     {:reply, {:ok, payload}, socket}
@@ -164,7 +167,8 @@ defmodule BijakhqWeb.GameSessionChannel do
     with question = GameManager.server_get_question(question_id) do
 
       # pause chat timer
-      Chat.timer_pause()
+      # Chat.timer_pause()
+      Task.start(Bijakhq.Game.Chat, :timer_pause, [])
 
       response = Phoenix.View.render_one(question, BijakhqWeb.Api.QuizQuestionView, "soalan_jawapan.json")
       broadcast socket, "question:result:show", response
@@ -175,7 +179,8 @@ defmodule BijakhqWeb.GameSessionChannel do
   def handle_in("question:result:end", payload, socket) do
 
     # start chat timer
-    Chat.timer_start()
+    # Chat.timer_start()
+    Task.start(Bijakhq.Game.Chat, :timer_start, [])
 
     broadcast socket, "question:result:end", payload
     {:noreply, socket, :hibernate}
@@ -203,7 +208,8 @@ defmodule BijakhqWeb.GameSessionChannel do
   def handle_in("game:result:show", _payload, socket) do
 
     # pause chat timer
-    Chat.timer_pause()
+    # Chat.timer_pause()
+    Task.start(Bijakhq.Game.Chat, :timer_pause, [])
 
     # winners = Players.get_game_result()
     winners = GameManager.players_get_game_result()
@@ -214,8 +220,9 @@ defmodule BijakhqWeb.GameSessionChannel do
 
   def handle_in("game:result:end", _payload, socket) do
 
-    # pause chat timer
-    Chat.timer_start()
+    # restart chat timer
+    # Chat.timer_start()
+    Task.start(Bijakhq.Game.Chat, :timer_start, [])
 
     # Server.game_save_scores()
     GameManager.server_game_save_scores()
