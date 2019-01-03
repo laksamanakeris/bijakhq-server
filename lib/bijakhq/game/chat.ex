@@ -154,15 +154,16 @@ defmodule Bijakhq.Game.Chat do
 
     # %{messages: msg_broadcast, current_viewing: current_viewing}
     list =
-      Enum.map(messages, fn(message) ->
+      messages
+      |> Enum.reduce([], fn message, messages ->
         user = message.user
         case GameManager.players_lookup(user.id) do
           {:ok, player} ->
             user = Phoenix.View.render_one(player, BijakhqWeb.Api.UserView, "user.json")
             message = Map.put(message, :user, user)
-            message
+            messages = messages ++ [message]
           _ ->
-            nil
+            messages
         end
       end)
     
