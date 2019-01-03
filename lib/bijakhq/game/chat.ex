@@ -3,12 +3,11 @@ defmodule Bijakhq.Game.Chat do
   use GenServer
   require Logger
 
-  alias Bijakhq.Quizzes
   alias BijakhqWeb.Presence
   alias Bijakhq.Game.Server
   alias Bijakhq.Game.GameManager
 
-  @name :game_chat
+  # @name :game_chat
   @room_name "game_session:lobby"
   @interval_time 2_500 * 1
 
@@ -130,9 +129,13 @@ defmodule Bijakhq.Game.Chat do
         current_viewing
       end
     
-    broadcast(%{messages: messages, current_viewing: current_viewing})
+    # get limited messages from the list
+    total_to_broadcast = 500
+    [msg_broadcast, msg_next] = get_messagess_to_broadcast(messages, total_to_broadcast)
+    
+    broadcast(%{messages: msg_broadcast, current_viewing: current_viewing})
     timer_ref = schedule_timer @interval_time
-    new_state = %{ timer_ref: timer_ref, current_viewing: current_viewing, messages: []}
+    new_state = %{ timer_ref: timer_ref, current_viewing: current_viewing, messages: msg_next }
     {:noreply, new_state}
   end
 
@@ -141,6 +144,21 @@ defmodule Bijakhq.Game.Chat do
   defp cancel_timer(ref), do: Process.cancel_timer(ref)
   defp broadcast(messages) do
     BijakhqWeb.Endpoint.broadcast("game_session:lobby", "user:chat", messages)
+  end
+
+  defp get_messagess_to_broadcast(messages, total_to_broadcast) do
+    
+    total_count = Enum.count(messages)
+    cond do
+      total_count == 0 -> 
+        [[], []]
+      total_count > total_to_broadcast ->
+        msg_broadcast = Enum.take(messages, total_to_broadcast)
+        msg_next = Enum.drop(messages, total_to_broadcast)
+        [msg_broadcast, msg_next]
+      true ->
+        [messages, []]
+    end
   end
 
 end
