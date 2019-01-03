@@ -30,17 +30,10 @@ defmodule Bijakhq.Game.Chat do
   end
 
   def add_message(user, payload) do
-    case GameManager.players_lookup(user.id) do
-      {:ok, player} ->
-        user = Phoenix.View.render_one(player, BijakhqWeb.Api.UserView, "user.json")
-        message = Map.put(payload, :user, user)
-        # broadcast socket, "user:chat", response
-        pid = :global.whereis_name({Bijakhq.Game.Chat, 1})
-        GenServer.cast(pid, {:add_message, message})
-        :ok
-      nil ->
-        :error
-    end
+
+    message = Map.put(payload, :user, user)
+    pid = :global.whereis_name({Bijakhq.Game.Chat, 1})
+    GenServer.cast(pid, {:add_message, message})
   end
 
   def viewer_add() do
@@ -63,9 +56,14 @@ defmodule Bijakhq.Game.Chat do
     GenServer.cast(pid, :timer_start)
   end
 
+  def timer_pause do
+    pid = :global.whereis_name({Bijakhq.Game.Chat, 1})
+    GenServer.cast(pid, :timer_pause)
+  end
+
   def timer_end do
     pid = :global.whereis_name({Bijakhq.Game.Chat, 1})
-    GenServer.cast(pid, :timer_stop)
+    GenServer.cast(pid, :timer_end)
   end
 
   # Server and callbacks
@@ -105,13 +103,22 @@ defmodule Bijakhq.Game.Chat do
     {:noreply, new_state}
   end
 
-  def handle_cast(:timer_stop, chat_state) do
+  def handle_cast(:timer_end, chat_state) do
     Logger.warn "Timer Stop"
     %{ timer_ref: timer_ref, current_viewing: _current_viewing, messages: _messages} = chat_state
     cancel_timer(timer_ref)
-    # new_state = Map.put(chat_state, :timer_ref, nil)
+    new_state = Map.put(chat_state, :timer_ref, nil)
     # Reset timer
     {:noreply, @chat_state}
+  end
+
+  def handle_cast(:timer_pause, chat_state) do
+    Logger.warn "Timer pause"
+    %{ timer_ref: timer_ref, current_viewing: _current_viewing, messages: _messages} = chat_state
+    cancel_timer(timer_ref)
+    new_state = Map.put(chat_state, :timer_ref, nil)
+    # Reset timer
+    {:noreply, new_state}
   end
 
 
@@ -130,21 +137,42 @@ defmodule Bijakhq.Game.Chat do
       end
     
     # get limited messages from the list
-    total_to_broadcast = 500
+    total_to_broadcast = 250
     [msg_broadcast, msg_next] = get_messagess_to_broadcast(messages, total_to_broadcast)
     
-    broadcast(%{messages: msg_broadcast, current_viewing: current_viewing})
+    # broadcast(%{messages: msg_broadcast, current_viewing: current_viewing})
+    broadcast(msg_broadcast,current_viewing);
+
     timer_ref = schedule_timer @interval_time
     new_state = %{ timer_ref: timer_ref, current_viewing: current_viewing, messages: msg_next }
     {:noreply, new_state}
   end
 
+
+  # public
+  def broadcast(messages, users_count) do
+
+    # %{messages: msg_broadcast, current_viewing: current_viewing}
+    list =
+      Enum.map(messages, fn(message) ->
+        user = message.user
+        case GameManager.players_lookup(user.id) do
+          {:ok, player} ->
+            user = Phoenix.View.render_one(player, BijakhqWeb.Api.UserView, "user.json")
+            message = Map.put(message, :user, user)
+            message
+          _ ->
+            nil
+        end
+      end)
+    
+    params = %{messages: list, current_viewing: users_count}
+    BijakhqWeb.Endpoint.broadcast("game_session:lobby", "user:chat", params)
+  end
+
   defp schedule_timer(interval), do: Process.send_after self(), :update, interval
   defp cancel_timer(nil), do: :ok
   defp cancel_timer(ref), do: Process.cancel_timer(ref)
-  defp broadcast(messages) do
-    BijakhqWeb.Endpoint.broadcast("game_session:lobby", "user:chat", messages)
-  end
 
   defp get_messagess_to_broadcast(messages, total_to_broadcast) do
     
