@@ -56,6 +56,7 @@ defmodule Bijakhq.Mixfile do
       {:peerage, "~> 1.0.2"},
       {:singleton, "~> 1.0.0"},
       {:distillery, "~> 2.0"},
+      {:observer_cli, "~> 1.4"},
     ]
   end
 
