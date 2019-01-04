@@ -143,6 +143,8 @@ defmodule Bijakhq.Game.Server do
   end
 
   def set_current_question(question_number) do
+    # game started true
+    :ets.insert(@ets_name, {:game_started, true})
     :ets.insert(@ets_name, {:current_question, question_number})
     question = lookup("question:#{question_number}")
   end
