@@ -13,6 +13,7 @@ defmodule Bijakhq.Game.Players do
 
   @name :game_players
   @ets_name :game_players
+  @ets_winners :game_winners
 
   @players_state %{
     quest_now: [],
@@ -22,7 +23,7 @@ defmodule Bijakhq.Game.Players do
 
   def start_link() do
     reset_table()
-    GenServer.start_link(__MODULE__, @players_state, name: @name)
+    GenServer.start_link(__MODULE__, [], name: @name)
   end
 
   def init(args) do
@@ -33,15 +34,20 @@ defmodule Bijakhq.Game.Players do
   end
 
   # refactoring
+
+  def reset_table() do
+    reset_ets(@ets_name)
+    reset_ets(@ets_winners)
+  end
   
-  # create new players table
-  def reset_table do
-    info = :ets.info(@ets_name)
+  # create new & reset ETS table
+  def reset_ets(ets_table_name) do
+    info = :ets.info(ets_table_name)
     case info do
-      :undefined -> :ets.new(@ets_name, [:set, :public, :named_table, read_concurrency: true, write_concurrency: true])
+      :undefined -> :ets.new(ets_table_name, [:set, :public, :named_table, read_concurrency: true, write_concurrency: true])
       _ ->
-        :ets.delete(@ets_name)
-        :ets.new(@ets_name, [:set, :public, :named_table, read_concurrency: true, write_concurrency: true])
+        :ets.delete(ets_table_name)
+        :ets.new(ets_table_name, [:set, :public, :named_table, read_concurrency: true, write_concurrency: true])
     end
   end
 
@@ -235,6 +241,7 @@ defmodule Bijakhq.Game.Players do
           Enum.map(players, fn(player) ->
             player = Map.merge(player, %{amounts: amount,is_winner: true})
             :ets.insert(@ets_name, {player.id, player})
+            :ets.insert(@ets_winners, {player.id, player})
             player
           end)
       else
@@ -243,16 +250,12 @@ defmodule Bijakhq.Game.Players do
   end
 
   def get_game_result do
-    list = :ets.tab2list(@ets_name)
+    list = :ets.tab2list(@ets_winners)
     players =
       list
       |> Enum.reduce([], fn obj, list ->
         {_id, player} = obj
-        if player.is_winner == true do
-          list = list ++ [player]
-        else
-          list
-        end
+        list = list ++ [player]
       end)
   end
 
