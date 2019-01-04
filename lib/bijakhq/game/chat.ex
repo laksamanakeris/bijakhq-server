@@ -9,7 +9,7 @@ defmodule Bijakhq.Game.Chat do
 
   # @name :game_chat
   @room_name "game_session:lobby"
-  @interval_time 2_500 * 1
+  @interval_time 1_000 * 1
 
   # This is chat state
   @chat_state %{
@@ -137,7 +137,7 @@ defmodule Bijakhq.Game.Chat do
       end
     
     # get limited messages from the list
-    total_to_broadcast = 250
+    total_to_broadcast = 5
     [msg_broadcast, msg_next] = get_messagess_to_broadcast(messages, total_to_broadcast)
     
     # broadcast(%{messages: msg_broadcast, current_viewing: current_viewing})
