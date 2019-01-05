@@ -11,7 +11,7 @@ defmodule BijakhqWeb.UserSocket do
   channel "load_test:lobby", BijakhqWeb.LoadTestChannel
 
   ## Transports
-  transport :websocket, Phoenix.Transports.WebSocket, check_origin: false, timeout: infinity, transport_log: false
+  transport :websocket, Phoenix.Transports.WebSocket, check_origin: false, timeout: :infinity, transport_log: false
 
   def connect(%{"token" => token}, socket) do
     #IO.puts "=============================================================================================================="
