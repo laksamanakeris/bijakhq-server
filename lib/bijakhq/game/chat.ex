@@ -10,6 +10,7 @@ defmodule Bijakhq.Game.Chat do
   # @name :game_chat
   @room_name "game_session:lobby"
   @interval_time 1_000 * 1
+  @max_messages_in_memory 1000
 
   # This is chat state
   @chat_state %{
@@ -89,7 +90,15 @@ defmodule Bijakhq.Game.Chat do
     # #IO.inspect message
     # #IO.inspect chat_state
     %{ timer_ref: _timer_ref, current_viewing: _current_viewing, messages: messages} = chat_state
-    messages = messages ++ [message]
+
+    total_count = Enum.count(messages)
+    new_messages = 
+      if total_count > @max_messages_in_memory do
+        messages = Enum.drop(messages, @max_messages_in_memory)
+      else
+        messages
+      end
+    messages = new_messages ++ [message]
     new_state = Map.put(chat_state, :messages, messages)
     {:noreply, new_state}
   end
