@@ -96,6 +96,8 @@ defmodule BijakhqWeb.GameSessionChannel do
 
       response = Phoenix.View.render_one(question, BijakhqWeb.Api.QuizQuestionView, "soalan.json")
       broadcast socket, "question:show", response
+      send(socket.transport_pid, :garbage_collect)
+      
       {:noreply, socket, :hibernate}
     end
   end
@@ -172,6 +174,7 @@ defmodule BijakhqWeb.GameSessionChannel do
 
       response = Phoenix.View.render_one(question, BijakhqWeb.Api.QuizQuestionView, "soalan_jawapan.json")
       broadcast socket, "question:result:show", response
+      send(socket.transport_pid, :garbage_collect)
       {:noreply, socket, :hibernate}
     end
   end
@@ -200,7 +203,10 @@ defmodule BijakhqWeb.GameSessionChannel do
 
     winners = GameManager.players_get_game_result()
     response = Phoenix.View.render_one(winners, BijakhqWeb.Api.GameView, "game_result_index.json")
+    
     broadcast socket, "game:result:admin:show", response
+    send(socket.transport_pid, :garbage_collect)
+
     {:reply, {:ok, response}, socket}
   end
 
@@ -214,7 +220,10 @@ defmodule BijakhqWeb.GameSessionChannel do
     # winners = Players.get_game_result()
     winners = GameManager.players_get_game_result()
     response = Phoenix.View.render_one(winners, BijakhqWeb.Api.GameView, "game_result_index.json")
+    
     broadcast socket, "game:result:show", response
+    send(socket.transport_pid, :garbage_collect)
+
     {:noreply, socket, :hibernate}
   end
 
