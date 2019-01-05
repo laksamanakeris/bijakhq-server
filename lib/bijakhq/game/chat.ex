@@ -73,10 +73,10 @@ defmodule Bijakhq.Game.Chat do
     chat_state = initial_data
     #IO.inspect chat_state
     # timer_start()
-    game_started = Server.lookup(:game_started)
-    if game_started != nil do
-      timer_start()
-    end
+    # game_started = Server.lookup(:game_started)
+    # if game_started != nil do
+    #   timer_start()
+    # end
     {:ok, chat_state}
   end
 
