@@ -28,7 +28,7 @@ spec:
       # This section describes the containers that make up the deployment
       containers:
         - name: bijakhq
-          image: gcr.io/bijakhq-dev/bijakhq:v13
+          image: gcr.io/bijakhq-dev/bijakhq:v23
           ports:
             - containerPort: 8080
               name: bijakhq-server
@@ -52,23 +52,23 @@ spec:
               name: epmd8
           resources:
             limits:
-              cpu: 1.7
-              memory: 10Gi
+              cpu: 8000m
+              memory: 50000Mi
             requests:
-              cpu: 1.4
-              memory: 8Gi
+              cpu: 5000m
+              memory: 35000Mi
           livenessProbe:
             httpGet:
               path: /health
               port: 8080
             initialDelaySeconds: 5
             periodSeconds: 30
-            timeoutSeconds: 30
+            timeoutSeconds: 60
           readinessProbe:
             httpGet:
               path: /health
               port: 8080
-            initialDelaySeconds: 5
+            initialDelaySeconds: 10
           env:
             - name: MY_POD_IP
               valueFrom:
@@ -113,8 +113,8 @@ spec:
               readOnly: true
           resources:
             limits:
-              cpu: 150m
+              cpu: 250m
               memory: 150Mi
             requests:
-              cpu: 100m
+              cpu: 200m
               memory: 100Mi
