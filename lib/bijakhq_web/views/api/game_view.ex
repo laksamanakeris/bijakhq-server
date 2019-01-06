@@ -3,11 +3,11 @@ defmodule BijakhqWeb.Api.GameView do
   alias BijakhqWeb.Api.GameView
 
   # Game result
-  def render("game_result_index.json", %{user: user}) do
+  def render("game_result_index.json", %{game: user}) do
     %{data: render_many(user, GameView,"game_result_user.json")}
   end
 
-  def render("game_result_user.json", %{user: user}) do
+  def render("game_result_user.json", %{game: user}) do
     %{
       user_id: user.id,
       username: user.username,
