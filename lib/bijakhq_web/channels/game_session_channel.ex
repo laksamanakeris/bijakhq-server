@@ -294,7 +294,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     # push(socket, "presence_state", Presence.list(socket))
 
     user = socket.assigns.user
-    Logger.warn "CHANNEL joined :: id:#{user.id} - time:#{DateTime.utc_now}"
+    # Logger.warn "CHANNEL joined :: id:#{user.id} - time:#{DateTime.utc_now}"
     
     # moved to it's own process
     # Task.start(Bijakhq.Game.Players, :player_add_to_list, [user])
@@ -307,7 +307,7 @@ defmodule BijakhqWeb.GameSessionChannel do
   def terminate(_reason, socket) do
     user = socket.assigns.user
     # Logger.warn "Player::leave - #{user.id} - #{user.username} - #{user.role}"
-    Logger.warn "CHANNEL leave :: id:#{user.id} - time:#{DateTime.utc_now}"
+    # Logger.warn "CHANNEL leave :: id:#{user.id} - time:#{DateTime.utc_now}"
     {:noreply, socket, :hibernate}
   end
 

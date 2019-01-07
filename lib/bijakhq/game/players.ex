@@ -73,7 +73,7 @@ defmodule Bijakhq.Game.Players do
             case is_hidden do
               false -> :error
               true -> 
-                Logger.warn "============================== Player_add_to_list #{user.id} add dummy player"
+                # Logger.warn "============================== Player_add_to_list #{user.id} add dummy player"
                 dummyuser = Accounts.get(1)
                 dummyuser = Map.put(dummyuser, :id, user.id)
                 dummyuser = Map.put(dummyuser, :username, Faker.Internet.user_name)
