@@ -20,7 +20,7 @@ defmodule BijakhqWeb.UserSocket do
     case Phauxth.Token.verify(socket, token, @max_age) do
       {:ok, user_id} ->
         socket = assign(socket, :user, %{id: user_id})
-        Logger.warn "SOCKET connected :: id:#{user_id} - time:#{DateTime.utc_now}"
+        # Logger.warn "SOCKET connected :: id:#{user_id} - time:#{DateTime.utc_now}"
         {:ok, socket}
       {:error, _something} ->
         #IO.inspect something
