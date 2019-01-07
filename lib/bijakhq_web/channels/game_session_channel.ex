@@ -42,7 +42,8 @@ defmodule BijakhqWeb.GameSessionChannel do
     %{"game_id" => game_id} = payload
 
     # start chat timer
-    # Chat.timer_start()
+    # Stop any chat process available
+    Bijakhq.Game.Chat.timer_end()
     Task.start(Bijakhq.Game.Chat, :timer_start, [])
 
     # res = Server.game_start(game_id)
