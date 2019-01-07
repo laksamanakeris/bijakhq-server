@@ -68,7 +68,7 @@ defmodule Bijakhq.Game.Player do
   end
 
   def process_answer(player, user_answer, question, is_test_game, is_last_question) do
-    Logger.warn "============================== Process_answer #{player.username} :: #{user_answer}"
+    # Logger.warn "============================== Process_answer #{player.username} :: #{user_answer}"
     selected_answer = Enum.find(question.answers, fn u -> u.id == user_answer end)
     # IO.inspect selected_answer
     case selected_answer do
