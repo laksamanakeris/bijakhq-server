@@ -10,7 +10,6 @@ defmodule Bijakhq.Game.UserCounter do
   # @name :game_chat
   @room_name "game_session:lobby"
   @interval_time 1_000 * 1
-  @max_messages_in_memory 1000
 
   # This is chat state
   @counter_state %{
@@ -55,7 +54,7 @@ defmodule Bijakhq.Game.UserCounter do
 
   def handle_cast(:timer_end, counter_state) do
     Logger.warn "Game Viewers :: Timer Stop"
-    %{ timer_ref: timer_ref, current_viewing: _current_viewing, messages: _messages} = counter_state
+    %{ timer_ref: timer_ref, current_viewing: _current_viewing} = counter_state
     cancel_timer(timer_ref)
     new_state = Map.put(counter_state, :timer_ref, nil)
     # Reset timer
@@ -64,7 +63,7 @@ defmodule Bijakhq.Game.UserCounter do
 
   def handle_cast(:timer_pause, counter_state) do
     Logger.warn "Game Viewers :: Timer pause"
-    %{ timer_ref: timer_ref, current_viewing: _current_viewing, messages: _messages} = counter_state
+    %{ timer_ref: timer_ref, current_viewing: _current_viewing} = counter_state
     cancel_timer(timer_ref)
     new_state = Map.put(counter_state, :timer_ref, nil)
     # Reset timer
