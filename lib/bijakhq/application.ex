@@ -20,7 +20,7 @@ defmodule Bijakhq.Application do
       supervisor(Bijakhq.Game.Players, []),
       supervisor(Bijakhq.Game.GameManager, []),
       supervisor(Bijakhq.Game.Chat, []),
-      # supervisor(Bijakhq.Game.UserCounter, []),
+      supervisor(Bijakhq.Game.UserCounter, []),
 
       # worker(Immortal.ETSTableManager, [Bijakhq.Game.Server, [:public]])
       # worker(Immortal.ETSTableManager, [Bijakhq.Game.Chat, [:public]])
