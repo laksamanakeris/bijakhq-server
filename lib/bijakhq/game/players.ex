@@ -212,13 +212,13 @@ defmodule Bijakhq.Game.Players do
   end
 
   def get_last_standing_players do
+    Logger.warn "============================== Players :: get_last_standing_players"
     list = :ets.tab2list(@ets_name)
     players =
       list
       |> Enum.reduce([], fn obj, list ->
         {_id, player} = obj
         if player.eliminated == false do
-          Logger.warn "============================== get_last_standing_players #{player.username} :: #{player.eliminated}"
           list = list ++ [player]
         else
           list
@@ -227,6 +227,7 @@ defmodule Bijakhq.Game.Players do
   end
 
   def update_winner_list(players) do
+    Logger.warn "============================== Players :: update_winner_list"
     # get prize amounts
     # divide prizes amount with total winners
     # update winner list -> is_winner, amounts,
@@ -240,8 +241,9 @@ defmodule Bijakhq.Game.Players do
         list =
           Enum.map(players, fn(player) ->
             player = Map.merge(player, %{amounts: amount,is_winner: true})
-            :ets.insert(@ets_name, {player.id, player})
-            :ets.insert(@ets_winners, {player.id, player})
+            # :ets.insert(@ets_name, {player.id, player})
+            # :ets.insert(@ets_winners, {player.id, player})
+            Task.start(Bijakhq.Game.Players, :save_to_cache_winner_list, [player])
             player
           end)
       else
@@ -249,7 +251,13 @@ defmodule Bijakhq.Game.Players do
       end
   end
 
+  def save_to_cache_winner_list(player) do
+    :ets.insert(@ets_name, {player.id, player})
+    :ets.insert(@ets_winners, {player.id, player})
+  end
+
   def get_game_result do
+    Logger.warn "============================== Players :: get_game_result"
     list = :ets.tab2list(@ets_winners)
     players =
       list
