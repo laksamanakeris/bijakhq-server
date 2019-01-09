@@ -265,6 +265,9 @@ defmodule BijakhqWeb.GameSessionChannel do
   def handle_in("user:chat", %{"message" => message} = payload, socket) do
     user = socket.assigns.user
     Task.start(Bijakhq.Game.Chat, :add_message, [user, payload])
+    
+    send(socket.transport_pid, :garbage_collect)
+    
     {:reply, {:ok, payload}, socket}
   end
 
