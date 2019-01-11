@@ -56,7 +56,7 @@ defmodule Bijakhq.Game.Player do
   def get_answer(player, question_id) do
     answer = player.answers[question_id]
     # IO.inspect answer
-    Logger.warn "============================== get_answer #{player.username} :: #{answer}"
+    # Logger.warn "============================== get_answer #{player.username} :: #{answer}"
     case answer do
       nil ->
         player = Player.update_answer(player, question_id, 4)
@@ -85,7 +85,7 @@ defmodule Bijakhq.Game.Player do
   end
 
   def player_have_wrong_answer(player, is_test_game, is_last_question) do
-    Logger.warn "============================== Player_have_wrong_answer #{player.username} - is_last_question = #{is_last_question}"
+    # Logger.warn "============================== Player_have_wrong_answer #{player.username} - is_last_question = #{is_last_question}"
     player = 
       if player.extra_lives_remaining > 0 && is_last_question == false do
         player = Map.merge(player, %{extra_lives_remaining: 0,saved_by_extra_life: true})
