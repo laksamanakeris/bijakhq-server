@@ -29,7 +29,7 @@ defmodule Bijakhq.Game.Server do
 
   # Server
   def init(game_state) do
-    Logger.warn "============================== Game server initialized"
+    Logger.warn "============================== Game Server initialized"
     preload_data();
     {:ok, game_state}
   end
