@@ -168,7 +168,7 @@ defmodule Bijakhq.Game.Chat do
         user = message.user
         case GameManager.players_lookup(user.id) do
           {:ok, player} ->
-            user = Phoenix.View.render_one(player, BijakhqWeb.Api.UserView, "user.json")
+            user = Phoenix.View.render_one(player, BijakhqWeb.Api.GameView, "user.json")
             message = Map.put(message, :user, user)
             messages = messages ++ [message]
           _ ->
