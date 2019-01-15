@@ -221,7 +221,10 @@ defmodule BijakhqWeb.GameSessionChannel do
     # winners = Players.get_game_result()
     winners = GameManager.players_get_game_result()
     response = Phoenix.View.render_one(winners, BijakhqWeb.Api.GameView, "game_result_index.json")
-    
+
+    total_winners = GameManager.players_get_game_total_winners()
+    response = Map.merge(response, %{total_winners: total_winners})
+
     broadcast socket, "game:result:show", response
     send(socket.transport_pid, :garbage_collect)
 
@@ -281,10 +284,21 @@ defmodule BijakhqWeb.GameSessionChannel do
     {:noreply, socket, :hibernate}
   end
 
-  intercept ["presence_diff"]
+  intercept ["presence_diff", "game:result:show"]
   def handle_out("presence_diff", _, socket), do: {:noreply, socket}
 
-  # From user
+  # customize payload based on user
+  # add in game details and user result
+  def handle_out("game:result:show", msg, socket) do
+
+    user = socket.assigns.user
+    player = GameManager.players_get_player_game_result(user)
+    player = Phoenix.View.render_one(player, BijakhqWeb.Api.GameView, "game_result_user.json")
+    msg = Map.merge(msg, %{user: player})
+    
+    push(socket, "game:result:show", msg)
+    {:noreply, socket}
+  end
 
 
 
