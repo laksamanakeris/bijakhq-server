@@ -16,6 +16,16 @@ defmodule BijakhqWeb.Api.GameView do
     }
   end
 
+  def render("user.json", %{game: user}) do
+    %{id: user.id,
+      email: user.email,
+      username: user.username,
+      # is_tester: user.is_tester,
+      # role: user.role,
+      profile_picture: GameView.check_profile_picture(user.profile_picture)
+    }
+  end
+
   def check_profile_picture(nil) do
     "https://storage.googleapis.com/bijakhq_avatars/uploads/user/avatars/avatar_circle_blue_512dp.png"
   end
