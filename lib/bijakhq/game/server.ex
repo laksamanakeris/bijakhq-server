@@ -163,6 +163,7 @@ defmodule Bijakhq.Game.Server do
 
   def game_process_result() do
     winners = Players.process_game_result();
+    winners = Enum.take_random(winners, 100)
   end
 
   def game_save_scores() do

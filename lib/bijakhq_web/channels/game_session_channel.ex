@@ -194,6 +194,10 @@ defmodule BijakhqWeb.GameSessionChannel do
     with game_result = GameManager.server_game_process_result() do
       # IO.inspect game_result
       response = Phoenix.View.render_one(game_result, BijakhqWeb.Api.GameView, "game_result_index.json")
+
+      total_winners = GameManager.players_get_game_total_winners()
+      response = Map.merge(response, %{total_winners: total_winners})
+      
       broadcast socket, "game:result:process", response
       {:reply, {:ok, response}, socket}
     end
@@ -204,6 +208,9 @@ defmodule BijakhqWeb.GameSessionChannel do
 
     winners = GameManager.players_get_game_result()
     response = Phoenix.View.render_one(winners, BijakhqWeb.Api.GameView, "game_result_index.json")
+
+    total_winners = GameManager.players_get_game_total_winners()
+    response = Map.merge(response, %{total_winners: total_winners})
     
     broadcast socket, "game:result:admin:show", response
     send(socket.transport_pid, :garbage_collect)
