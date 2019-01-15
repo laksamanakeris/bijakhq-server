@@ -257,13 +257,11 @@ defmodule Bijakhq.Game.Players do
   end
 
   def get_player_game_result(user) do
-    case Players.lookup(user.id) do
+    case Players.lookup_winners(user.id) do
       nil -> nil
       {:ok, player} -> 
         %{
           id: player.id,
-          eliminated: player.eliminated,
-          is_winner: player.is_winner,
           amounts: player.amounts,
           username: player.username,
           profile_picture: player.profile_picture,
@@ -309,6 +307,14 @@ defmodule Bijakhq.Game.Players do
 
   def lookup(user_id) do
     case :ets.lookup(@ets_name, user_id) do
+      [{^user_id, user}] -> {:ok, user}
+      [] -> nil
+      _ -> nil
+    end
+  end
+
+  def lookup_winners(user_id) do
+    case :ets.lookup(@ets_winners, user_id) do
       [{^user_id, user}] -> {:ok, user}
       [] -> nil
       _ -> nil
