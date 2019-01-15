@@ -71,6 +71,16 @@ defmodule Bijakhq.Game.GameManager do
     GenServer.call(pid, {:players_get_game_result})
   end
 
+  def players_get_game_total_winners() do
+    pid = :global.whereis_name({Bijakhq.Game.GameManager, 1})
+    GenServer.call(pid, {:players_get_game_total_winners})
+  end
+
+  def players_get_player_game_result(user) do
+    pid = :global.whereis_name({Bijakhq.Game.GameManager, 1})
+    GenServer.call(pid, {:players_get_player_game_result, user})
+  end
+
   def players_lookup(param) do
     pid = :global.whereis_name({Bijakhq.Game.GameManager, 1})
     GenServer.call(pid, {:players_lookup, param})
@@ -150,6 +160,16 @@ defmodule Bijakhq.Game.GameManager do
 
   def handle_call({:players_get_game_result}, _from, state) do
     response = Players.get_game_result()
+    {:reply, response, state}
+  end
+
+  def handle_call({:players_get_game_total_winners}, _from, state) do
+    response = Players.get_game_total_winners()
+    {:reply, response, state}
+  end
+
+  def handle_call({:players_get_player_game_result, user}, _from, state) do
+    response = Players.get_player_game_result(user)
     {:reply, response, state}
   end
 

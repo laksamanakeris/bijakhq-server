@@ -256,6 +256,21 @@ defmodule Bijakhq.Game.Players do
     :ets.insert(@ets_winners, {player.id, player})
   end
 
+  def get_player_game_result(user) do
+    case Players.lookup(user.id) do
+      nil -> nil
+      {:ok, player} -> 
+        %{
+          id: player.id,
+          eliminated: player.eliminated,
+          is_winner: player.is_winner,
+          amounts: player.amounts,
+          username: player.username,
+          profile_picture: player.profile_picture,
+        }
+    end
+  end
+
   def get_game_result do
     Logger.warn "============================== Players :: get_game_result"
     list = :ets.tab2list(@ets_winners)
@@ -265,6 +280,13 @@ defmodule Bijakhq.Game.Players do
         {_id, player} = obj
         list = list ++ [player]
       end)
+    players = Enum.take_random(players, 100)
+  end
+
+  def get_game_total_winners do
+    Logger.warn "============================== Players :: get_game_total_winners"
+    list = :ets.tab2list(@ets_winners)
+    total = Enum.count(list)
   end
 
   def game_save_scores(game_id) do
