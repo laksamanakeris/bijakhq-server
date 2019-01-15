@@ -14,6 +14,7 @@ defmodule BijakhqWeb.Api.UserView do
     %{id: user.id,
       email: user.email,
       username: user.username,
+      phone: user.phone,
       is_tester: user.is_tester,
       role: user.role,
       profile_picture: UserView.check_profile_picture(user.profile_picture)
@@ -25,6 +26,7 @@ defmodule BijakhqWeb.Api.UserView do
       id: user.id,
       # email: user.email,
       username: user.username,
+      phone: user.phone,
       paypal_email: user.paypal_email,
       profile_picture: UserView.check_profile_picture(user.profile_picture),
       balance: user.balance,
