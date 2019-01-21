@@ -20,7 +20,7 @@ defmodule Bijakhq.Mixfile do
   def application do
     [
       mod: {Bijakhq.Application, []},
-      extra_applications: [:logger, :runtime_tools, :httpoison, :timex, :faker, :arc_ecto, :pay_pal]
+      extra_applications: [:logger, :runtime_tools, :httpoison, :timex, :faker, :arc_ecto, :pay_pal, :singleton, :peerage]
     ]
   end
 
@@ -41,7 +41,7 @@ defmodule Bijakhq.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
       {:phauxth, "~> 1.2"},
-      {:bcrypt_elixir, "~> 1.0"},
+      {:bcrypt_elixir, "~> 1.1"},
       {:bamboo, "~> 0.8"},
       {:plug_cowboy, "~> 1.0"},
       {:httpoison, "~> 1.1.1", override: true},
@@ -52,7 +52,11 @@ defmodule Bijakhq.Mixfile do
       {:arc_gcs, "~> 0.0.8"},
       {:cors_plug, "~> 1.5"},
       {:pay_pal, github: "laksamanakeris/PayPal"},
-      {:libcluster, "~> 2.1", only: :prod}
+      {:immortal, "~> 0.2.2"},
+      {:peerage, "~> 1.0.2"},
+      {:singleton, "~> 1.0.0"},
+      {:distillery, "~> 2.0"},
+      {:observer_cli, "~> 1.4"},
     ]
   end
 

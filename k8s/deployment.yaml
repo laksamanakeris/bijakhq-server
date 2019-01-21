@@ -1,0 +1,121 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: bijakhq
+  namespace: bijakhq
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: bijakhq
+  strategy:
+    rollingUpdate:
+      maxSurge: 10%
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: bijakhq
+    spec:
+      # [START volumes]
+      volumes:
+        - name: cloudsql-instance-credentials
+          secret:
+            secretName: cloudsql-instance-credentials
+      # [END volumes]
+      # This section describes the containers that make up the deployment
+      # restartPolicy: Never
+      containers:
+        - name: bijakhq
+          image: gcr.io/bijakhq-dev/bijakhq:v31
+          ports:
+            - containerPort: 8080
+              name: bijakhq-server
+            - containerPort: 4369
+              name: epmd
+            - containerPort: 9001
+              name: epmd1
+            - containerPort: 9002
+              name: epmd2
+            - containerPort: 9003
+              name: epmd3
+            - containerPort: 9004
+              name: epmd4
+            - containerPort: 9005
+              name: epmd5
+            - containerPort: 9006
+              name: epmd6
+            - containerPort: 9007
+              name: epmd7
+            - containerPort: 9008
+              name: epmd8
+          resources:
+            limits:
+              cpu: 7500m
+              memory: 50000Mi
+            requests:
+              cpu: 6000m
+              memory: 45000Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 150
+            timeoutSeconds: 300
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+          env:
+            - name: MY_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: HOST
+              value: "bijaktrivia.xyz"
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: secret_key_base
+            - name: DB_USERNAME
+              value: "postgres"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: db_password
+            - name: DB_NAME
+              value: "bijakhq_prod"
+            - name: DB_HOSTNAME
+              value: "127.0.0.1"
+            - name: PAYPAL_CLIENT_ID
+              value: "AbdL0pqJgcqd5cKzzHJEsJ-qE6fUHq1IOYBrjnoWPzHlZUoivEZdnUP9ttie0Zzp1Fcv4Ic1VKD-qhrG"
+            - name: PAYPAL_CLIENT_SECRET
+              value: "EFqoDG-hQHswDzmjyWrNhTCBONRK3Ybdn_QWba5IddOG7WRMHkj72UU_dcTYYJ1HwVOCX8PLUmzGISaL"
+        - name: cloudsql-proxy
+          image: gcr.io/cloudsql-docker/gce-proxy:1.11
+          command: ["/cloud_sql_proxy",
+                    "-instances=bijakhq-dev:asia-southeast1:bijaktrivia-postgres=tcp:5432",
+                    "-credential_file=/secrets/cloudsql/credentials.json"]
+          # securityContext:
+            # runAsUser: 2  # non-root user
+            # allowPrivilegeEscalation: false
+          ports:
+            - name: postgres
+              containerPort: 5432
+          volumeMounts:
+            - name: cloudsql-instance-credentials
+              mountPath: /secrets/cloudsql
+              readOnly: true
+          resources:
+            limits:
+              cpu: 250m
+              memory: 150Mi
+            requests:
+              cpu: 200m
+              memory: 100Mi
