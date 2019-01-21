@@ -279,7 +279,7 @@ kubectl get ingress --namespace=bijakhq
 # connect to pod
 
 kubectl get pods -n=bijakhq
-kubectl -n=bijakhq exec -it bijakhq-749c5bc8d4-7zj8l -c bijakhq sh
+kubectl -n=bijakhq exec -it bijakhq-cbf4f9d66-pwb94 -c bijakhq sh
 
 $ vi releases/0.0.1/vm.args
 or

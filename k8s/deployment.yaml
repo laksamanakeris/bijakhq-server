@@ -26,9 +26,10 @@ spec:
             secretName: cloudsql-instance-credentials
       # [END volumes]
       # This section describes the containers that make up the deployment
+      # restartPolicy: Never
       containers:
         - name: bijakhq
-          image: gcr.io/bijakhq-dev/bijakhq:v23
+          image: gcr.io/bijakhq-dev/bijakhq:v31
           ports:
             - containerPort: 8080
               name: bijakhq-server
@@ -52,18 +53,18 @@ spec:
               name: epmd8
           resources:
             limits:
-              cpu: 8000m
+              cpu: 7500m
               memory: 50000Mi
             requests:
-              cpu: 5000m
-              memory: 35000Mi
+              cpu: 6000m
+              memory: 45000Mi
           livenessProbe:
             httpGet:
               path: /health
               port: 8080
             initialDelaySeconds: 5
-            periodSeconds: 30
-            timeoutSeconds: 60
+            periodSeconds: 150
+            timeoutSeconds: 300
           readinessProbe:
             httpGet:
               path: /health
