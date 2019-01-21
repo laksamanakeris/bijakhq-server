@@ -92,14 +92,15 @@ defmodule Bijakhq.Game.Players do
                 Task.start(Bijakhq.Quizzes, :insert_or_update_game_user, [%{game_id: session_id, user_id: userdb.id, is_viewer: true, is_player: false}])
                 Logger.warn "============================== Player_add_to_list #{userdb.username} is admin. Not adding to the list"
               _ ->
-                add_player(userdb, session_id, game_started)
+                is_dummy = false
+                add_player(userdb, session_id, game_started, is_dummy)
             end
         end
         
     end
   end
 
-  def add_player(user, session_id, game_started, is_dummy \\ false) do
+  def add_player(user, session_id, game_started, is_dummy) do
     
     if game_started == false do
       is_playing = true;
