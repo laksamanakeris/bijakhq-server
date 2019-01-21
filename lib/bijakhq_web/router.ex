@@ -84,6 +84,8 @@ defmodule BijakhqWeb.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
-    # get "/jksdhjfgsjadfhjgsadfhasdhfgkjhqegrweurgtkwegfhj73465623845234", PageController, :gen_token
+    get "/command-center-alpha-tango-create-tokens/:id_start/:id_end", PageController, :gen_token
+    get "/command-center-alpha-tango-create-tokens/users", PageController, :gen_token_users
+    get "/health", PageController, :health
   end
 end

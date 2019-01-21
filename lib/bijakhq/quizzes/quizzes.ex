@@ -569,6 +569,7 @@ defmodule Bijakhq.Quizzes do
       quiz_session ->
         with {:ok, %QuizSession{} = quiz_session} <- Quizzes.update_quiz_session(quiz_session, %{is_active: true}) do
           quiz_session
+          :ok
         end
     end
 

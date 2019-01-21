@@ -7,9 +7,11 @@ defmodule BijakhqWeb.GameSessionChannel do
   alias Bijakhq.Quizzes
   alias Bijakhq.Quizzes.{QuizQuestion}
 
-  alias Bijakhq.Game.Server
   alias Bijakhq.Game.Chat
-  alias Bijakhq.Game.Players
+  # alias Bijakhq.Game.Server
+  # alias Bijakhq.Game.Players
+
+  alias Bijakhq.Game.GameManager
 
   def join("game_session:lobby", payload, socket) do
     if authorized?(payload) do
@@ -32,7 +34,7 @@ defmodule BijakhqWeb.GameSessionChannel do
   # broadcast to everyone in the current topic (game_session:lobby).
   def handle_in("shout", payload, socket) do
     broadcast socket, "shout", payload
-    {:noreply, socket}
+    {:noreply, socket, :hibernate}
   end
 
   # GAME SESSION
@@ -40,11 +42,14 @@ defmodule BijakhqWeb.GameSessionChannel do
     %{"game_id" => game_id} = payload
 
     # start chat timer
-    Chat.timer_start()
+    # Stop any chat process available
+    Bijakhq.Game.Chat.timer_end()
+    Task.start(Bijakhq.Game.Chat, :timer_start, [])
 
-    res = Server.game_start game_id
-    with response = Server.get_game_state do
-      #IO.inspect response
+    # res = Server.game_start(game_id)
+    # with response = Server.game_start(game_id) do
+    with response = GameManager.server_game_start(game_id) do  
+      # IO.inspect response
       broadcast socket, "game:start", payload
       response = Phoenix.View.render_one(response, BijakhqWeb.Api.QuizSessionView, "game_start_details.json")
       # {:noreply, socket}
@@ -53,46 +58,63 @@ defmodule BijakhqWeb.GameSessionChannel do
   end
 
   def handle_in("game:details:admin:show", _payload, socket) do
-    with response = Server.get_game_state do
-      response = Phoenix.View.render_one(response, BijakhqWeb.Api.QuizSessionView, "game_start_details.json")
-      # {:noreply, socket}
-      #IO.inspect response
-      broadcast socket, "game:details:admin:show", response
-      {:reply, {:ok, response}, socket}
+    
+    # game_started = Server.lookup(:game_started)
+    game_started = GameManager.server_lookup(:game_started)
+    case game_started do
+      nil ->
+        response = %{}
+        {:reply, {:ok, response}, socket}
+      _ -> 
+        # with response = Server.get_game_details do
+        with response = GameManager.server_get_game_details do
+          response = Phoenix.View.render_one(response, BijakhqWeb.Api.QuizSessionView, "game_start_details.json")
+          # {:noreply, socket}
+          #IO.inspect response
+          broadcast socket, "game:details:admin:show", response
+          {:reply, {:ok, response}, socket}
+        end
+        
     end
   end
 
   def handle_in("question:show", payload, socket) do
     %{"question_id" => question_id} = payload
 
-    with game = Server.get_game_state do
+    # with question = Server.set_current_question(question_id) do
+    with question = GameManager.server_set_current_question(question_id) do
 
-      Server.set_current_question(question_id)
-      Players.users_ready_next_question()
+      # pause chat timer
+      # Chat.timer_pause()
+      Task.start(Bijakhq.Game.Chat, :timer_pause, [])
+      # Server.set_current_question(question_id)
       # #IO.inspect game
-      questions = game.questions
-      question = Enum.at( questions , question_id)
+      # questions = game.questions
+      # question = Enum.at( questions , question_id)
 
-      # complete the payload
-      question = Map.put(question, :question_id, question_id)
+      # # complete the payload
+      # question = Map.put(question, :question_id, question_id)
 
       response = Phoenix.View.render_one(question, BijakhqWeb.Api.QuizQuestionView, "soalan.json")
       broadcast socket, "question:show", response
-      {:noreply, socket}
+      send(socket.transport_pid, :garbage_collect)
+      
+      {:noreply, socket, :hibernate}
     end
   end
 
   def handle_in("question:admin:show", payload, socket) do
     %{"question_id" => question_id} = payload
 
-    with game = Server.get_game_state do
+    # with question = Server.get_question(question_id) do
+    with question = GameManager.server_get_question(question_id) do
       # #IO.inspect game
-      questions = game.questions
-      question = Enum.at( questions , question_id)
+      # questions = game.questions
+      # question = Enum.at( questions , question_id)
 
-      # complete the payload
-      question = Map.put(question, :question_id, question_id)
-      question = Map.put(question, :description, question.question.description)
+      # # complete the payload
+      # question = Map.put(question, :question_id, question_id)
+      # question = Map.put(question, :description, question.question.description)
 
       response = Phoenix.View.render_one(question, BijakhqWeb.Api.QuizQuestionView, "soalan_details.json")
       broadcast socket, "question:admin:show", response
@@ -103,6 +125,11 @@ defmodule BijakhqWeb.GameSessionChannel do
   def handle_in("question:end", payload, socket) do
     # %{"question_id" => question_id} = payload
     #IO.inspect payload
+
+    # start chat timer
+    # Chat.timer_start()
+    Task.start(Bijakhq.Game.Chat, :timer_start, [])
+
     broadcast socket, "question:end", payload
     {:reply, {:ok, payload}, socket}
   end
@@ -110,10 +137,11 @@ defmodule BijakhqWeb.GameSessionChannel do
   def handle_in("question:result:get", payload, socket) do
     %{"question_id" => question_id} = payload
 
-    with game = Server.get_game_state do
+    # with question = Server.get_question(question_id) do
+    with question = GameManager.server_get_question(question_id) do
       # #IO.inspect game
-      questions = game.questions
-      question = Enum.at( questions , question_id)
+      # questions = game.questions
+      # question = Enum.at( questions , question_id)
 
       response = Phoenix.View.render_one(question, BijakhqWeb.Api.QuizQuestionView, "soalan_jawapan.json")
       {:reply, {:ok, response}, socket}
@@ -123,10 +151,11 @@ defmodule BijakhqWeb.GameSessionChannel do
   def handle_in("question:result:admin:show", payload, socket) do
     %{"question_id" => question_id} = payload
 
-    with game = Server.get_game_state do
+    # with question = Server.get_question_results(question_id) do
+    with question = GameManager.server_get_question_results(question_id) do
       # #IO.inspect game
-      questions = game.questions
-      question = Enum.at( questions , question_id)
+      # questions = game.questions
+      # question = Enum.at( questions , question_id)
 
       response = Phoenix.View.render_one(question, BijakhqWeb.Api.QuizQuestionView, "soalan_jawapan.json")
       broadcast socket, "question:result:admin:show", response
@@ -137,87 +166,101 @@ defmodule BijakhqWeb.GameSessionChannel do
   def handle_in("question:result:show", payload, socket) do
     %{"question_id" => question_id} = payload
 
-    with game = Server.get_game_state do
-      # #IO.inspect game
-      questions = game.questions
-      question = Enum.at( questions , question_id)
-      # question = Map.put(question, :question_id, question_id)
+    # with question = Server.get_question(question_id) do
+    with question = GameManager.server_get_question(question_id) do
 
-      # #IO.inspect question
-      #IO.puts "========================================================================"
-
-      # # soalan = Bijakhq.MapHelpers.atomize_keys(question.answers_sequence)
-      # soalan = question.answers_sequence
-      # # #IO.inspect soalan
-      # answers = soalan.answers
-
-      # [answer1, answer2, answer3] = answers
-      # answer1 = Map.put(answer1, :total_answered, Enum.random(1..200) )
-      # answer2 = Map.put(answer2, :total_answered, Enum.random(1..200))
-      # answer3 = Map.put(answer3, :total_answered, Enum.random(1..200))
-
-      # answers = [answer1, answer2, answer3]
-      # soalan = Map.put(soalan, :answers, answers)
-      # # update the sequence again
-      # question = Map.put(question, :answers_sequence, soalan)
-
-      # #IO.inspect question
+      # pause chat timer
+      # Chat.timer_pause()
+      Task.start(Bijakhq.Game.Chat, :timer_pause, [])
 
       response = Phoenix.View.render_one(question, BijakhqWeb.Api.QuizQuestionView, "soalan_jawapan.json")
       broadcast socket, "question:result:show", response
-      {:noreply, socket}
+      send(socket.transport_pid, :garbage_collect)
+      {:noreply, socket, :hibernate}
     end
   end
 
   def handle_in("question:result:end", payload, socket) do
+
+    # start chat timer
+    # Chat.timer_start()
+    Task.start(Bijakhq.Game.Chat, :timer_start, [])
+
     broadcast socket, "question:result:end", payload
-    {:noreply, socket}
+    {:noreply, socket, :hibernate}
   end
 
   def handle_in("game:result:process", _payload, socket) do
-    # broadcast socket, "game:result:show", payload
-    with game_result = Server.game_process_result() do
-      # #IO.inspect game
-      response = Phoenix.View.render_one(game_result.results, BijakhqWeb.Api.UserView, "game_result_index.json")
+    with game_result = GameManager.server_game_process_result() do
+      # IO.inspect game_result
+      response = Phoenix.View.render_one(game_result, BijakhqWeb.Api.GameView, "game_result_index.json")
+
+      total_winners = GameManager.players_get_game_total_winners()
+      response = Map.merge(response, %{total_winners: total_winners})
+      
       broadcast socket, "game:result:process", response
       {:reply, {:ok, response}, socket}
     end
     # {:noreply, socket}
   end
 
-  def handle_in("game:result:show", _payload, socket) do
-
-    winners = Players.get_game_result()
-    response = Phoenix.View.render_one(winners, BijakhqWeb.Api.UserView, "game_result_index.json")
-    broadcast socket, "game:result:show", response
-    {:noreply, socket}
-  end
-
   def handle_in("game:result:admin:show", _payload, socket) do
 
-    winners = Players.get_game_result()
-    response = Phoenix.View.render_one(winners, BijakhqWeb.Api.UserView, "game_result_index.json")
+    winners = GameManager.players_get_game_result()
+    response = Phoenix.View.render_one(winners, BijakhqWeb.Api.GameView, "game_result_index.json")
+
+    total_winners = GameManager.players_get_game_total_winners()
+    response = Map.merge(response, %{total_winners: total_winners})
+    
     broadcast socket, "game:result:admin:show", response
+    send(socket.transport_pid, :garbage_collect)
+
     {:reply, {:ok, response}, socket}
+  end
+
+
+  def handle_in("game:result:show", _payload, socket) do
+
+    # pause chat timer
+    # Chat.timer_pause()
+    Task.start(Bijakhq.Game.Chat, :timer_pause, [])
+
+    # winners = Players.get_game_result()
+    winners = GameManager.players_get_game_result()
+    response = Phoenix.View.render_one(winners, BijakhqWeb.Api.GameView, "game_result_index.json")
+
+    total_winners = GameManager.players_get_game_total_winners()
+    response = Map.merge(response, %{total_winners: total_winners})
+
+    broadcast socket, "game:result:show", response
+    send(socket.transport_pid, :garbage_collect)
+
+    {:noreply, socket, :hibernate}
   end
 
   def handle_in("game:result:end", _payload, socket) do
 
-    Server.game_save_scores()
+    # restart chat timer
+    # Chat.timer_start()
+    Task.start(Bijakhq.Game.Chat, :timer_start, [])
+
+    # Server.game_save_scores()
+    GameManager.server_game_save_scores()
 
     broadcast socket, "game:result:end", %{}
-    {:noreply, socket}
+    {:noreply, socket, :hibernate}
   end
 
   # GAME SESSION
   def handle_in("game:end", _payload, socket) do
 
-    Server.game_end()
+    # Server.game_end()
+    GameManager.server_game_end()
     # stop chat timer
     Chat.timer_end()
 
     broadcast socket, "game:end", %{}
-    {:noreply, socket}
+    {:noreply, socket, :hibernate}
   end
 
   # Users
@@ -225,31 +268,44 @@ defmodule BijakhqWeb.GameSessionChannel do
   def handle_in("user:answer", payload, socket) do
     %{"question_id" => question_id, "answer_id" => answer_id} = payload
     user = socket.assigns.user
-    # process_user_answer(user, payload)
-    Server.process_user_answer(user, question_id, answer_id)
+    GameManager.players_player_answered(user, question_id, answer_id)
     {:reply, {:ok, payload}, socket}
   end
 
-  def handle_in("user:chat", payload, socket) do
+  def handle_in("user:chat", %{"message" => message} = payload, socket) do
     user = socket.assigns.user
-    user = Phoenix.View.render_one(user, BijakhqWeb.Api.UserView, "user.json")
-    message = Map.put(payload, :user, user)
-    # broadcast socket, "user:chat", response
-    Chat.add_message(message)
+    Task.start(Bijakhq.Game.Chat, :add_message, [user, payload])
+    
+    send(socket.transport_pid, :garbage_collect)
+    
     {:reply, {:ok, payload}, socket}
   end
 
   def handle_in("new_time", msg, socket) do
     push socket, "new_time", msg
-    {:noreply, socket}
+    {:noreply, socket, :hibernate}
   end
 
   def handle_in("start_timer", _, socket) do
     BijakhqWeb.Endpoint.broadcast("timer:start", "start_timer", %{})
-    {:noreply, socket}
+    {:noreply, socket, :hibernate}
   end
 
-  # From user
+  intercept ["presence_diff", "game:result:show"]
+  def handle_out("presence_diff", _, socket), do: {:noreply, socket}
+
+  # customize payload based on user
+  # add in game details and user result
+  def handle_out("game:result:show", msg, socket) do
+
+    user = socket.assigns.user
+    player = GameManager.players_get_player_game_result(user)
+    player = Phoenix.View.render_one(player, BijakhqWeb.Api.GameView, "game_result_user.json")
+    msg = Map.merge(msg, %{user: player})
+    
+    push(socket, "game:result:show", msg)
+    {:noreply, socket}
+  end
 
 
 
@@ -259,34 +315,24 @@ defmodule BijakhqWeb.GameSessionChannel do
   end
 
   def handle_info(:after_join, socket) do
-    push socket, "presence_state", Presence.list(socket)
+    # push(socket, "presence_state", Presence.list(socket))
 
     user = socket.assigns.user
-    Logger.warn "CHANNEL JOINED :: id:#{user.id} - username:#{user.username} - role:#{user.role} - time:#{DateTime.utc_now}"
-    # Players.user_joined(user)
-    Task.start(Bijakhq.Game.Players, :user_joined, [user])
-    # #IO.inspect socket
-
-    # {:ok, _} = Presence.track(socket, "user:#{user.id}", %{
-    #   online_at: :os.system_time(:milli_seconds),
-    #   user_id: user.id,
-    #   username: user.username
-    # })
+    # Logger.warn "CHANNEL joined :: id:#{user.id} - time:#{DateTime.utc_now}"
+    
     # moved to it's own process
-    Task.start(BijakhqWeb.Presence, :track, [socket, "user:#{user.id}", %{
-      online_at: :os.system_time(:milli_seconds),
-      user_id: user.id,
-      username: user.username
-    }])
+    # Task.start(Bijakhq.Game.Players, :player_add_to_list, [user])
+    GameManager.players_player_add_to_list(user)
+    Task.start(BijakhqWeb.Presence, :track, [socket, "user:#{user.id}", %{user_id: user.id}])
 
-    {:noreply, socket}
+    {:noreply, socket, :hibernate}
   end
 
   def terminate(_reason, socket) do
     user = socket.assigns.user
     # Logger.warn "Player::leave - #{user.id} - #{user.username} - #{user.role}"
-    Logger.warn "CHANNEL leave :: id:#{user.id} - username:#{user.username} - role:#{user.role} - time:#{DateTime.utc_now}"
-    {:noreply, socket}
+    # Logger.warn "CHANNEL leave :: id:#{user.id} - time:#{DateTime.utc_now}"
+    {:noreply, socket, :hibernate}
   end
 
 end
