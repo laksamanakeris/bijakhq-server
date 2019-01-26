@@ -13,14 +13,22 @@ defmodule BijakhqWeb.GameSessionChannel do
 
   alias Bijakhq.Game.GameManager
 
+  @semaphore_name :semaphore_channel
+  @semaphore_max 1000
+
   def join("game_session:lobby", payload, socket) do
-    if authorized?(payload) do
-
-      send(self(), :after_join)
-
-      {:ok, socket}
+    if Semaphore.acquire(@semaphore_name, @semaphore_max) do
+      if authorized?(socket) do
+        send(self(), :after_join)
+        {:ok, socket}
+      else
+        Semaphore.release(@semaphore_name)
+        Logger.warn "GameSessionChannel join :: unauthorized - time:#{DateTime.utc_now} - #{Semaphore.count(@semaphore_name)}"
+        {:error, %{reason: "unauthorized"}}
+      end
     else
-      {:error, %{reason: "unauthorized"}}
+      Logger.warn "GameSessionChannel join :: error - too many callers - time:#{DateTime.utc_now} - #{Semaphore.count(@semaphore_name)}"
+      {:error, %{reason: "Too many callers"}}
     end
   end
 
@@ -310,8 +318,9 @@ defmodule BijakhqWeb.GameSessionChannel do
 
 
   # Add authorization logic here as required.
-  defp authorized?(_payload) do
-    true
+  defp authorized?(socket) do
+    # enable user with token only
+    user_exist = Map.has_key?(socket.assigns, :user)
   end
 
   def handle_info(:after_join, socket) do
@@ -322,8 +331,17 @@ defmodule BijakhqWeb.GameSessionChannel do
     
     # moved to it's own process
     # Task.start(Bijakhq.Game.Players, :player_add_to_list, [user])
+    # Task.start(BijakhqWeb.Presence, :track, [socket, "user:#{user.id}", %{user_id: user.id}])
+    Task.start(BijakhqWeb.Presence, :track, [socket, user.id, %{}])
     GameManager.players_player_add_to_list(user)
-    Task.start(BijakhqWeb.Presence, :track, [socket, "user:#{user.id}", %{user_id: user.id}])
+    # Presence.track(socket, user.id, %{user_id: user.id})
+    # {:ok, _} = Presence.track(socket, user.id, %{
+    #   online_at: inspect(System.system_time(:second))
+    # })
+
+    # release semaphore to allow next process
+    Semaphore.release(@semaphore_name)
+    Logger.warn "GameSessionChannel after_join :: release semaphore - time:#{DateTime.utc_now} - #{Semaphore.count(@semaphore_name)}"
 
     {:noreply, socket, :hibernate}
   end
