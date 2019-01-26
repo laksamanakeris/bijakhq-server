@@ -332,9 +332,11 @@ defmodule BijakhqWeb.GameSessionChannel do
     # moved to it's own process
     # Task.start(Bijakhq.Game.Players, :player_add_to_list, [user])
     # Task.start(BijakhqWeb.Presence, :track, [socket, "user:#{user.id}", %{user_id: user.id}])
-    Task.start(BijakhqWeb.Presence, :track, [socket, user.id, %{}])
+    # Task.start(BijakhqWeb.Presence, :track, [socket, user.id, %{}])
     GameManager.players_player_add_to_list(user)
-    # Presence.track(socket, user.id, %{user_id: user.id})
+    # {:ok, _} = Presence.track(socket, :players, %{user_id: user.id})
+    Task.start(BijakhqWeb.Presence, :track, [socket, :players, %{user_id: user.id}])
+    # push_presence_state(socket)
     # {:ok, _} = Presence.track(socket, user.id, %{
     #   online_at: inspect(System.system_time(:second))
     # })
@@ -344,6 +346,10 @@ defmodule BijakhqWeb.GameSessionChannel do
     Logger.warn "GameSessionChannel after_join :: release semaphore - time:#{DateTime.utc_now} - #{Semaphore.count(@semaphore_name)}"
 
     {:noreply, socket, :hibernate}
+  end
+
+  defp push_presence_state(socket) do
+    push(socket, "presence_state", Presence.list(socket))
   end
 
   def terminate(_reason, socket) do
