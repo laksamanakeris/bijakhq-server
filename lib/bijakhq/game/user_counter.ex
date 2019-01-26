@@ -81,7 +81,9 @@ defmodule Bijakhq.Game.UserCounter do
 
     users_connected = 
       if Semaphore.acquire(@semaphore_name, @semaphore_max) do
-        users_connected = Presence.list(@room_name) |> Map.size
+        # users_connected = Presence.list(@room_name) |> Map.size
+        counter = Presence.list(@room_name)
+        %{"count" => users_connected} = counter
         Semaphore.release(@semaphore_name)
         users_connected
       else
