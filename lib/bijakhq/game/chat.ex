@@ -12,6 +12,9 @@ defmodule Bijakhq.Game.Chat do
   @interval_time 1_000 * 1
   @max_messages_in_memory 1000
 
+  @semaphore_name :semaphore_chat
+  @semaphore_max 100
+
   # This is chat state
   @chat_state %{
     timer_ref: nil,
@@ -136,7 +139,14 @@ defmodule Bijakhq.Game.Chat do
 
     %{ timer_ref: _timer_ref, messages: messages, current_viewing: current_viewing} = chat_state
 
-    users_connected = Presence.list(@room_name) |> Map.size
+    users_connected = 
+      if Semaphore.acquire(@semaphore_name, @semaphore_max) do
+        users_connected = Presence.list(@room_name) |> Map.size
+        Semaphore.release(@semaphore_name)
+        users_connected
+      else
+        current_viewing
+      end
 
     current_viewing =
       if is_integer(users_connected) do
