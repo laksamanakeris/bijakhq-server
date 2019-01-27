@@ -350,18 +350,22 @@ defmodule BijakhqWeb.GameSessionChannel do
   end
 
   def handle_out("question:result:show", msg, socket) do
+    question_id = msg.question_id
 
     user = socket.assigns.user
     case GameManager.players_lookup(user.id) do
       {:ok, player} ->
+        user_answer = player.answers[question_id]
         data = %{
           id: player.id,
           username: player.username,
           extra_lives_remaining: player.extra_lives_remaining, 
           eliminated: player.eliminated,
           saved_by_extra_life: player.saved_by_extra_life,
-          is_playing: player.is_playing
+          is_playing: player.is_playing,
+          answer: user_answer
         }
+        
         msg = Map.merge(msg, %{user: data})
         msg = Map.merge(msg, %{ts: DateTime.utc_now})
         
