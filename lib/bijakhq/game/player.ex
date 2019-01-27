@@ -49,7 +49,7 @@ defmodule Bijakhq.Game.Player do
 
   def update_answer(player, question_id, answer_id) do
     answers = player.answers
-    answers = Map.put(answers, question_id, answer_id)
+    answers = Map.put(answers, question_id, %{answer_id: answer_id, ts: DateTime.utc_now})
     %{player | answers: answers}
   end
 
@@ -62,7 +62,8 @@ defmodule Bijakhq.Game.Player do
         player = Player.update_answer(player, question_id, 4)
         :ets.insert(@ets_name, {player.id, player})
       _ ->
-        answer
+        %{answer_id: answer_id, ts: _} = answer
+        answer_id
     end
 
   end
