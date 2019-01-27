@@ -102,8 +102,10 @@ defmodule BijakhqWeb.GameSessionChannel do
 
       # # complete the payload
       # question = Map.put(question, :question_id, question_id)
+      is_last_question = GameManager.players_check_last_question(question_id)
 
       response = Phoenix.View.render_one(question, BijakhqWeb.Api.QuizQuestionView, "soalan.json")
+      response = Map.merge(response, %{last_question: is_last_question})
       broadcast socket, "question:show", response
       send(socket.transport_pid, :garbage_collect)
       
@@ -181,9 +183,13 @@ defmodule BijakhqWeb.GameSessionChannel do
       # Chat.timer_pause()
       Task.start(Bijakhq.Game.Chat, :timer_pause, [])
 
+      is_last_question = GameManager.players_check_last_question(question_id)
+
       response = Phoenix.View.render_one(question, BijakhqWeb.Api.QuizQuestionView, "soalan_jawapan.json")
+      response = Map.merge(response, %{last_question: is_last_question})
       broadcast socket, "question:result:show", response
       send(socket.transport_pid, :garbage_collect)
+      
       {:noreply, socket, :hibernate}
     end
   end
