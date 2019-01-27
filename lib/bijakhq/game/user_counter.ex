@@ -11,6 +11,9 @@ defmodule Bijakhq.Game.UserCounter do
   @room_name "game_session:lobby"
   @interval_time 1_000 * 1
 
+  @semaphore_name :semaphore_counter
+  @semaphore_max 100
+
   # This is chat state
   @counter_state %{
     timer_ref: nil,
@@ -76,7 +79,16 @@ defmodule Bijakhq.Game.UserCounter do
 
     %{ timer_ref: _timer_ref, current_viewing: current_viewing} = counter_state
 
-    users_connected = Presence.list(@room_name) |> Map.size
+    users_connected = 
+      if Semaphore.acquire(@semaphore_name, @semaphore_max) do
+        # users_connected = Presence.list(@room_name) |> Map.size
+        counter = Presence.list(@room_name)
+        %{"count" => users_connected} = counter
+        Semaphore.release(@semaphore_name)
+        users_connected
+      else
+        current_viewing
+      end
 
     current_viewing =
       if is_integer(users_connected) do

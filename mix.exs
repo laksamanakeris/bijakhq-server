@@ -57,6 +57,7 @@ defmodule Bijakhq.Mixfile do
       {:singleton, "~> 1.0.0"},
       {:distillery, "~> 2.0"},
       {:observer_cli, "~> 1.4"},
+      {:semaphore, "~> 1.0"},
     ]
   end
 
