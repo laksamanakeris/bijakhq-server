@@ -42,7 +42,7 @@ defmodule Bijakhq.Game.Player do
       saved_by_extra_life: false,
       is_winner: false,
       amounts: 0,
-      extra_lives_remaining: extra_life(user.lives)
+      extra_lives_remaining: extra_life(user.lives, is_playing)
     }
 
   end
@@ -106,11 +106,21 @@ defmodule Bijakhq.Game.Player do
   end
 
   # utils
-  defp extra_life(lives) do
-    cond do
-      lives > 0 -> 1
-      true -> 0
-    end
+  defp extra_life(lives, is_playing) do
+    count =
+      cond do
+        lives > 0 -> 1
+        true -> 0
+      end
+    
+    life =
+      if is_playing == true do
+        count
+      else
+        0
+      end
+    
+    life
   end
 
 end
