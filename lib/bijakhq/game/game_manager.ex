@@ -86,6 +86,11 @@ defmodule Bijakhq.Game.GameManager do
     GenServer.call(pid, {:players_lookup, param})
   end
 
+  def players_check_last_question(question_id) do
+    pid = :global.whereis_name({Bijakhq.Game.GameManager, 1})
+    GenServer.call(pid, {:players_check_last_question, question_id})
+  end
+
 
   # CAST
 
@@ -175,6 +180,11 @@ defmodule Bijakhq.Game.GameManager do
 
   def handle_call({:players_lookup, param}, _from, state) do
     response = Players.lookup(param)
+    {:reply, response, state}
+  end
+
+  def handle_call({:players_check_last_question, question_id}, _from, state) do
+    response = Players.check_last_question(question_id)
     {:reply, response, state}
   end
 

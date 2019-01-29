@@ -42,14 +42,14 @@ defmodule Bijakhq.Game.Player do
       saved_by_extra_life: false,
       is_winner: false,
       amounts: 0,
-      extra_lives_remaining: extra_life(user.lives)
+      extra_lives_remaining: extra_life(user.lives, is_playing)
     }
 
   end
 
   def update_answer(player, question_id, answer_id) do
     answers = player.answers
-    answers = Map.put(answers, question_id, answer_id)
+    answers = Map.put(answers, question_id, %{answer_id: answer_id, ts: DateTime.utc_now})
     %{player | answers: answers}
   end
 
@@ -62,7 +62,8 @@ defmodule Bijakhq.Game.Player do
         player = Player.update_answer(player, question_id, 4)
         :ets.insert(@ets_name, {player.id, player})
       _ ->
-        answer
+        %{answer_id: answer_id, ts: _} = answer
+        answer_id
     end
 
   end
@@ -106,11 +107,21 @@ defmodule Bijakhq.Game.Player do
   end
 
   # utils
-  defp extra_life(lives) do
-    cond do
-      lives > 0 -> 1
-      true -> 0
-    end
+  defp extra_life(lives, is_playing) do
+    count =
+      cond do
+        lives > 0 -> 1
+        true -> 0
+      end
+    
+    life =
+      if is_playing == true do
+        count
+      else
+        0
+      end
+    
+    life
   end
 
 end

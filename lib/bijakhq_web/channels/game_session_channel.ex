@@ -102,8 +102,10 @@ defmodule BijakhqWeb.GameSessionChannel do
 
       # # complete the payload
       # question = Map.put(question, :question_id, question_id)
+      is_last_question = GameManager.players_check_last_question(question_id)
 
       response = Phoenix.View.render_one(question, BijakhqWeb.Api.QuizQuestionView, "soalan.json")
+      response = Map.merge(response, %{last_question: is_last_question})
       broadcast socket, "question:show", response
       send(socket.transport_pid, :garbage_collect)
       
@@ -181,9 +183,13 @@ defmodule BijakhqWeb.GameSessionChannel do
       # Chat.timer_pause()
       Task.start(Bijakhq.Game.Chat, :timer_pause, [])
 
+      is_last_question = GameManager.players_check_last_question(question_id)
+
       response = Phoenix.View.render_one(question, BijakhqWeb.Api.QuizQuestionView, "soalan_jawapan.json")
+      response = Map.merge(response, %{last_question: is_last_question})
       broadcast socket, "question:result:show", response
       send(socket.transport_pid, :garbage_collect)
+      
       {:noreply, socket, :hibernate}
     end
   end
@@ -299,7 +305,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     {:noreply, socket, :hibernate}
   end
 
-  intercept ["presence_diff", "game:result:show"]
+  intercept ["presence_diff", "game:result:show", "question:show", "question:result:show"]
   def handle_out("presence_diff", _, socket), do: {:noreply, socket}
 
   # customize payload based on user
@@ -310,9 +316,66 @@ defmodule BijakhqWeb.GameSessionChannel do
     player = GameManager.players_get_player_game_result(user)
     player = Phoenix.View.render_one(player, BijakhqWeb.Api.GameView, "game_result_user.json")
     msg = Map.merge(msg, %{user: player})
-    
+    msg = Map.merge(msg, %{ts: DateTime.utc_now})
+
     push(socket, "game:result:show", msg)
     {:noreply, socket}
+  end
+
+  # customize payload based on user
+  # add in user game progress
+  def handle_out("question:show", msg, socket) do
+
+    user = socket.assigns.user
+    case GameManager.players_lookup(user.id) do
+      {:ok, player} ->
+        data = %{
+          id: player.id,
+          username: player.username,
+          extra_lives_remaining: player.extra_lives_remaining, 
+          eliminated: player.eliminated,
+          saved_by_extra_life: player.saved_by_extra_life,
+          is_playing: player.is_playing
+        }
+        msg = Map.merge(msg, %{user: data})
+        msg = Map.merge(msg, %{ts: DateTime.utc_now})
+        
+        push(socket, "question:show", msg)
+        {:noreply, socket}
+      _ ->
+        msg = Map.merge(msg, %{ts: DateTime.utc_now})
+        push(socket, "question:show", msg)
+        {:noreply, socket}
+    end
+  end
+
+  def handle_out("question:result:show", msg, socket) do
+    question_id = msg.question_id
+
+    user = socket.assigns.user
+    case GameManager.players_lookup(user.id) do
+      {:ok, player} ->
+        user_answer = player.answers[question_id]
+        data = %{
+          id: player.id,
+          username: player.username,
+          extra_lives_remaining: player.extra_lives_remaining, 
+          eliminated: player.eliminated,
+          saved_by_extra_life: player.saved_by_extra_life,
+          is_playing: player.is_playing,
+          answer: user_answer
+        }
+        
+        msg = Map.merge(msg, %{user: data})
+        msg = Map.merge(msg, %{ts: DateTime.utc_now})
+        
+        push(socket, "question:result:show", msg)
+        {:noreply, socket}
+      _ ->
+        msg = Map.merge(msg, %{ts: DateTime.utc_now})
+        push(socket, "question:result:show", msg)
+        {:noreply, socket}
+    end
   end
 
 
