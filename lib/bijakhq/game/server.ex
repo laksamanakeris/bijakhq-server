@@ -176,6 +176,11 @@ defmodule Bijakhq.Game.Server do
   end
 
   def game_end() do
+    session_id = lookup(:session_id)
+    if session_id do
+      IO.inspect session_id
+      Quizzes.complete_game_session(session_id)
+    end
     Quizzes.stop_game_session()
     reset_table();
     Players.reset_table()
