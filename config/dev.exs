@@ -7,8 +7,8 @@ use Mix.Config
 # watchers to your application. For example, we use it
 # with brunch.io to recompile .js and .css sources.
 config :bijakhq, BijakhqWeb.Endpoint,
-  http: [port: 8080],
-  url: [host: "bijak.local", port: 8080],
+  http: [port: System.get_env("PORT") || 80],
+  # url: [host: "bijak.local", port: System.get_env("PORT") || 8080],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
@@ -61,3 +61,9 @@ config :pay_pal,
   client_id: System.get_env("PAYPAL_CLIENT_ID") || "AbdL0pqJgcqd5cKzzHJEsJ-qE6fUHq1IOYBrjnoWPzHlZUoivEZdnUP9ttie0Zzp1Fcv4Ic1VKD-qhrG",
   client_secret: System.get_env("PAYPAL_CLIENT_SECRET") || "EFqoDG-hQHswDzmjyWrNhTCBONRK3Ybdn_QWba5IddOG7WRMHkj72UU_dcTYYJ1HwVOCX8PLUmzGISaL",
   environment: :sandbox
+
+config :peerage, via: Peerage.Via.List, node_list: [
+    :"node1@127.0.0.1",
+    :"node2@127.0.0.1"
+  ],
+  log_results: false

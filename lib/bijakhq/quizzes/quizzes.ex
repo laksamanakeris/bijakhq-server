@@ -11,6 +11,7 @@ defmodule Bijakhq.Quizzes do
   alias Bijakhq.Quizzes.QuizGameQuestion
   alias Bijakhq.Quizzes.QuizScore
   alias Bijakhq.Accounts.User
+  alias Bijakhq.Accounts
 
   @doc """
   Returns the list of quiz_categories.
@@ -449,8 +450,8 @@ defmodule Bijakhq.Quizzes do
     game_questions = Quizzes.get_questions_by_game_id(game_id)
                     |> Quizzes.process_questions
 
-    IO.inspect game_details
-    IO.inspect game_questions
+    #IO.inspect game_details
+    #IO.inspect game_questions
   end
 
   def randomize_answer(quiz_question) do
@@ -496,7 +497,7 @@ defmodule Bijakhq.Quizzes do
   def update_game_questions_random_answers do
     questions = Quizzes.get_game_questions_with_empty_answers_sequence
     Enum.map(questions, fn(quest) ->
-        IO.inspect quest
+        #IO.inspect quest
         # question_randomized = Quizzes.randomize_answer(quest.question);
         # Quizzes.update_game_question(quest, %{answers_sequence: question_randomized, sequence: quest.sequence})
     end)
@@ -509,7 +510,7 @@ defmodule Bijakhq.Quizzes do
     game_questions = Enum.map(game_details.game_questions, fn(quest) ->
         atomized = Bijakhq.MapHelpers.atomize_keys(quest.answers_sequence)
         quest = Map.put(quest, :answers_sequence, atomized)
-        # IO.inspect quest
+        # #IO.inspect quest
       end)
 
     %{
@@ -568,6 +569,20 @@ defmodule Bijakhq.Quizzes do
       quiz_session ->
         with {:ok, %QuizSession{} = quiz_session} <- Quizzes.update_quiz_session(quiz_session, %{is_active: true}) do
           quiz_session
+          :ok
+        end
+    end
+
+  end
+
+  def complete_game_session(game_id) do
+    quiz_session = Quizzes.get_quiz_session!(game_id)
+    case quiz_session do
+      nil -> nil
+      quiz_session ->
+        with {:ok, %QuizSession{} = quiz_session} <- Quizzes.update_quiz_session(quiz_session, %{is_completed: true}) do
+          quiz_session
+          :ok
         end
     end
 
@@ -731,7 +746,7 @@ defmodule Bijakhq.Quizzes do
         %{amounts: 0, rank: 101, user_id: user_id}
       _ ->
         list = list_quiz_scores_weekly()
-        # IO.inspect list
+        # #IO.inspect list
         dash = Enum.find(list, fn(x) -> x.user_id == user_data.user_id end)
         case dash do
           nil ->
@@ -750,7 +765,7 @@ defmodule Bijakhq.Quizzes do
         %{amounts: 0, rank: 101, user_id: user_id}
       _ ->
         list = list_quiz_scores_all_time()
-        # IO.inspect list
+        # #IO.inspect list
         dash = Enum.find(list, fn(x) -> x.user_id == user_data.user_id end)
         case dash do
           nil ->
@@ -761,5 +776,143 @@ defmodule Bijakhq.Quizzes do
         end
     end
   end
+
+
+  alias Bijakhq.Quizzes.QuizUser
+
+  @doc """
+  Returns the list of quiz_game_users.
+
+  ## Examples
+
+      iex> list_quiz_game_users()
+      [%QuizUser{}, ...]
+
+  """
+  def list_quiz_game_users do
+    Repo.all(QuizUser)
+  end
+
+  @doc """
+  Gets a single quiz_user.
+
+  Raises `Ecto.NoResultsError` if the Quiz user does not exist.
+
+  ## Examples
+
+      iex> get_quiz_user!(123)
+      %QuizUser{}
+
+      iex> get_quiz_user!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_quiz_user!(id), do: Repo.get!(QuizUser, id)
+
+  @doc """
+  Creates a quiz_user.
+
+  ## Examples
+
+      iex> create_quiz_user(%{field: value})
+      {:ok, %QuizUser{}}
+
+      iex> create_quiz_user(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_quiz_user(attrs \\ %{}) do
+    %QuizUser{}
+    |> QuizUser.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a quiz_user.
+
+  ## Examples
+
+      iex> update_quiz_user(quiz_user, %{field: new_value})
+      {:ok, %QuizUser{}}
+
+      iex> update_quiz_user(quiz_user, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_quiz_user(%QuizUser{} = quiz_user, attrs) do
+    quiz_user
+    |> QuizUser.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a QuizUser.
+
+  ## Examples
+
+      iex> delete_quiz_user(quiz_user)
+      {:ok, %QuizUser{}}
+
+      iex> delete_quiz_user(quiz_user)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_quiz_user(%QuizUser{} = quiz_user) do
+    Repo.delete(quiz_user)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking quiz_user changes.
+
+  ## Examples
+
+      iex> change_quiz_user(quiz_user)
+      %Ecto.Changeset{source: %QuizUser{}}
+
+  """
+  def change_quiz_user(%QuizUser{} = quiz_user) do
+    QuizUser.changeset(quiz_user, %{})
+  end
+
+  def insert_or_update_game_user(%{game_id: game_id, user_id: user_id} = quiz_user) do
+    case game_id do
+      nil -> nil #do nothing
+      game_id ->
+        case item = Repo.get_by(QuizUser, %{game_id: game_id, user_id: user_id}) do
+          nil -> Quizzes.create_quiz_user(quiz_user)
+          _ -> Quizzes.update_quiz_user(item, quiz_user)
+        end
+    end
+
+  end
+
+  def get_players_by_game_id(game_id) do
+    
+      query =
+          from u in QuizUser,
+          where: u.game_id == ^game_id,
+          preload: [:user]
+  
+      Repo.all(query)
+  end
+
+  def add_extra_life_to_players_by_game(game_id) do
+    
+    # get user_ids from quiz_user
+    #  go through each user id and get user life
+    #  increment life by 1
+    #  update user table
+    players = get_players_by_game_id(game_id)
+    
+    Enum.each players, fn player ->       
+      # IO.inspect player
+      Task.start(Bijakhq.Accounts, :update_user, [player.user, %{lives: player.user.lives + 1}])
+    end
+
+    # just return players
+    players
+  end
+
+
 
 end

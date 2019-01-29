@@ -3,14 +3,14 @@ defmodule Bijakhq.Payments.PaymentBatchItem do
   import Ecto.Changeset
 
 
-  alias Bijakhq.Payments.Payment
+  alias Bijakhq.Payments.PaymentRequest
   alias Bijakhq.Payments.PaymentBatch
 
   schema "payment_batch_items" do
     
     field :status, :integer, default: 1  #1=pending, 2=accepted, 3=rejected
 
-    belongs_to :payment, Payment, foreign_key: :payment_id
+    belongs_to :payment, PaymentRequest, foreign_key: :payment_id
     belongs_to :batch, PaymentBatch, foreign_key: :batch_id
     # field :batch_id, :integer
     # field :payment_id, :integer

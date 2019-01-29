@@ -47,7 +47,7 @@ defmodule BijakhqWeb.Api.QuizSessionController do
   end
 
   def now(%Plug.Conn{assigns: %{current_user: user}} = conn,_params) do
-    IO.inspect user
+    #IO.inspect user
     valid_show = show_hidden_game(user)
     game = Quizzes.get_game_now_status(valid_show)
     render(conn, "now.json", game: game)

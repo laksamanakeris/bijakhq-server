@@ -2,11 +2,12 @@ run.config:
   # elixir runtime
   engine: elixir
   engine.config:
-    runtime: elixir-1.6
-    erlang_runtime: erlang-20
+    runtime: elixir
+    # erlang_runtime: erlang-20
   
   extra_packages:
     - ImageMagick
+    - git
 
   # we need nodejs in development
   # ensure inotify exists for hot-code reloading
@@ -47,3 +48,5 @@ web.main:
   writable_dirs:          # Timex and TZData need to write into its priv/ folder
     - priv
     - app/_build/prod/lib
+  log_watch:
+    admin[error]: /app/logs/app_error.log

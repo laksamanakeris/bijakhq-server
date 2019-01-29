@@ -7,7 +7,7 @@ defmodule Bijakhq.Sms.Verification do
   def authenticate(phone) do
 
     response = Nexmo.authenticate(phone)
-    IO.inspect response
+    #IO.inspect response
 
     case response do
       {:ok, decoded} -> process_authenticate(phone, decoded)
@@ -17,14 +17,14 @@ defmodule Bijakhq.Sms.Verification do
 
   def process_authenticate(phone, %{"request_id" => request_id, "status" => "0"}) do
     with {:ok, nexmo_request} <- Sms.create_nexmo_request(%{"phone" => phone, "request_id" => request_id}) do
-      IO.inspect nexmo_request
+      #IO.inspect nexmo_request
       {:ok, %{"phone" => phone, "request_id" => request_id}}
     end
   end
 
   def process_authenticate(phone, %{"request_id" => request_id, "error_text" => error_text} = decoded) do
-    IO.inspect phone
-    IO.inspect decoded
+    #IO.inspect phone
+    #IO.inspect decoded
     {:error, %{"error" => error_text, "request_id" => request_id, "phone" => phone}}
   end
 
