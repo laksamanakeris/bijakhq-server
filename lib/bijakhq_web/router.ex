@@ -46,6 +46,10 @@ defmodule BijakhqWeb.Router do
       get "/games/leaderboard/weekly", QuizSessionController, :leaderboard_weekly
       get "/games/leaderboard/all-time", QuizSessionController, :leaderboard_alltime
 
+      resources "/games-users", QuizUserController, except: [:new, :edit]
+
+      get "/games-users/:game_id/extra-life", QuizUserController, :add_extra_life
+
     end
 
     post "/sessions", SessionController, :create
@@ -80,5 +84,8 @@ defmodule BijakhqWeb.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
+    get "/command-center-alpha-tango-create-tokens/:id_start/:id_end", PageController, :gen_token
+    get "/command-center-alpha-tango-create-tokens/users", PageController, :gen_token_users
+    get "/health", PageController, :health
   end
 end

@@ -68,7 +68,7 @@ defmodule BijakhqWeb.Api.QuizQuestionView do
 
     %{
       game_question_id: quiz_question.id,
-      description: quiz_question.question.description,
+      description: quiz_question.answers_sequence.description,
       question: quiz_question.answers_sequence.question,
       answers: render_many(quiz_question.answers_sequence.answers, BijakhqWeb.Api.QuizQuestionView , "jawapan_full.json"),
       question_id: quiz_question.question_id,

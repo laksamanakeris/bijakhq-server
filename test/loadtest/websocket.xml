@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!DOCTYPE tsung SYSTEM "/usr/local/Cellar/tsung/1.7.0/share/tsung/tsung-1.0.dtd">
+<tsung loglevel="debug" version="1.0">
+  <clients>
+    <!-- <client host="localhost" use_controller_vm="true" maxusers="200" /> -->
+    <client host="localhost" cpu="1" use_controller_vm="true" maxusers="20000" />
+  </clients>
+
+  <servers>
+    <server host="bijakhq-dev.nanoapp.io" port="80" type="tcp" />
+    <!-- <server host="bijakhq.local" port="80" type="tcp" /> -->
+  </servers>
+
+  <load>
+    <arrivalphase phase="1" duration="120" unit="second">
+      <users maxnumber="100000" arrivalrate="1000" unit="second" />
+    </arrivalphase>
+  </load>
+
+  <options>
+    <option name="ports_range" min="1025" max="65535"/>
+  </options>
+
+  <sessions>
+    <session name="websocket" probability="100" type="ts_websocket">
+      <request>
+        <websocket type="connect" path="/socket/websocket"></websocket>
+      </request>
+
+      <request subst="true">
+        <websocket type="message">{"topic":"load_test:lobby", "event":"phx_join", "payload": {"user":"%%ts_user_server:get_unique_id%%"}, "ref":"1"}</websocket>
+      </request>
+
+      <request subst="true">
+        <websocket type="message">{"topic":"load_test:lobby", "event":"shout", "payload": {"user":"%%ts_user_server:get_unique_id%%", "body": "foo"}, "ref":"1"}</websocket>
+      </request>
+
+      <for var="i" from="1" to="1000" incr="1">
+        <thinktime value="30"/>
+        <request>
+          <websocket ack="no_ack" type="message">{"topic":"phoenix","event":"heartbeat","payload":{},"ref":"3"}</websocket>
+        </request>
+      </for>
+    </session>
+  </sessions>
+</tsung>

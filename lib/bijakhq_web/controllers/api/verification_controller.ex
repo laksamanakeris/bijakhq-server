@@ -12,8 +12,8 @@ defmodule BijakhqWeb.Api.VerificationController do
   action_fallback Bijakhq.Api.FallbackController
 
   def authenticate(conn, %{"phone" => phone} = params) do
-    IO.inspect params
-    IO.puts "Phone number #{phone}"
+    #IO.inspect params
+    #IO.puts "Phone number #{phone}"
 
     response = Nexmo.authenticate(phone);
 
@@ -28,12 +28,12 @@ defmodule BijakhqWeb.Api.VerificationController do
       {:ok, %{"status" => "0"} = decoded} ->
         %{"request_id" => request_id } = decoded
         with {:ok, nexmo_request} <- Sms.create_nexmo_request(%{"phone" => phone, "request_id" => request_id}) do
-          IO.inspect nexmo_request
+          #IO.inspect nexmo_request
           render(conn, "authentication.json", %{data: %{phone: phone, request_id: request_id} } )
         end
       {:ok, %{"error_text" => error_text, "request_id" => request_id, "status" => status} } ->
-        IO.inspect request_id
-        IO.inspect status
+        #IO.inspect request_id
+        #IO.inspect status
         render(conn, "error.json", error: error_text)
     end
   end
@@ -45,17 +45,17 @@ defmodule BijakhqWeb.Api.VerificationController do
   # ================================================================================
 
   def verify(conn, %{"request_id" => request_id, "code" => code} = params) do
-    IO.inspect params
+    #IO.inspect params
 
     response = Nexmo.verify(request_id, code)
-    IO.inspect response
+    #IO.inspect response
 
     case response do
       {:ok, %{"request_id" => request_id, "status" => "0"} = params } ->
         # get nexmo request by request ID
         # update nexmo request
         # create tokens & login
-        IO.inspect params
+        #IO.inspect params
         nexmo_request = Sms.get_nexmo_request_by!(%{request_id: request_id})
         case nexmo_request do
           nil ->
@@ -74,10 +74,10 @@ defmodule BijakhqWeb.Api.VerificationController do
             render(conn, "authentication.json", %{data: %{phone: phone, request_id: request_id} } )
         end
       {:ok, %{"error_text" => error_text, "status" => status}} ->
-        IO.inspect status
+        #IO.inspect status
         render(conn, "error.json", error: error_text)
       {:error, error} ->
-        IO.inspect error
+        #IO.inspect error
         render(conn, "error.json", error: "Error sending out SMS")
     end
   end
@@ -90,8 +90,8 @@ defmodule BijakhqWeb.Api.VerificationController do
   end
 
   def cancel(conn, %{"request_id" => request_id} = params) do
-    IO.inspect params
-    IO.inspect request_id
+    #IO.inspect params
+    #IO.inspect request_id
 
     Nexmo.cancel_next_request(request_id)
 

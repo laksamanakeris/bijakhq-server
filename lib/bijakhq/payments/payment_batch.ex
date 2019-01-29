@@ -2,9 +2,9 @@ defmodule Bijakhq.Payments.PaymentBatch do
   use Ecto.Schema
   import Ecto.Changeset
 
-  # alias Bijakhq.Payments.Payment
+  # alias Bijakhq.Payments.PaymentRequest
   alias Bijakhq.Payments.PaymentBatchItem
-  alias Bijakhq.Payments.Payment
+  alias Bijakhq.Payments.PaymentRequest
 
 
   schema "payment_batches" do
@@ -15,8 +15,8 @@ defmodule Bijakhq.Payments.PaymentBatch do
     field :generated_request, :map
 
     has_many :items, PaymentBatchItem, foreign_key: :batch_id
-    # Batch can have many payments - this will happen when there's issue processing the Paypal Payment 
-    many_to_many :payments, Payment, join_through: "payment_batch_items", join_keys: [payment_id: :id, batch_id: :id]
+    # Batch can have many payments - this will happen when there's issue processing the Paypal PaymentRequest 
+    many_to_many :payments, PaymentRequest, join_through: "payment_batch_items", join_keys: [payment_id: :id, batch_id: :id]
 
     timestamps()
   end
