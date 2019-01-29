@@ -575,6 +575,19 @@ defmodule Bijakhq.Quizzes do
 
   end
 
+  def complete_game_session(game_id) do
+    quiz_session = Quizzes.get_quiz_session!(game_id)
+    case quiz_session do
+      nil -> nil
+      quiz_session ->
+        with {:ok, %QuizSession{} = quiz_session} <- Quizzes.update_quiz_session(quiz_session, %{is_completed: true}) do
+          quiz_session
+          :ok
+        end
+    end
+
+  end
+
   def stop_game_session do
     from(p in QuizSession, where: p.is_active == true)
     |> Repo.update_all(set: [is_active: false])
