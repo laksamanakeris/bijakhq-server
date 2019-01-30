@@ -182,8 +182,8 @@ defmodule Bijakhq.Game.Server do
       Quizzes.complete_game_session(session_id)
     end
     Quizzes.stop_game_session()
-    reset_table();
-    Players.reset_table()
+    # reset_table();
+    # Players.reset_table()
   end
 
   # UTILS
