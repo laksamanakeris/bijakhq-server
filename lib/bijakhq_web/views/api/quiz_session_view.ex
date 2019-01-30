@@ -1,7 +1,8 @@
 defmodule BijakhqWeb.Api.QuizSessionView do
   use BijakhqWeb, :view
   alias BijakhqWeb.Api.QuizSessionView
-  alias Bijakhq.Game.Server
+  # alias Bijakhq.Game.Server
+  alias Bijakhq.Game.GameManager
   alias BijakhqWeb.Api.UserView
 
   def render("index.json", %{quiz_sessions: quiz_sessions}) do
@@ -15,7 +16,7 @@ defmodule BijakhqWeb.Api.QuizSessionView do
   def render("quiz_session.json", %{quiz_session: quiz_session}) do
 
     questions_count = Enum.count(quiz_session.game_questions)
-    IO.inspect questions_count
+    #IO.inspect questions_count
 
     %{id: quiz_session.id,
       name: quiz_session.name,
@@ -25,6 +26,7 @@ defmodule BijakhqWeb.Api.QuizSessionView do
       total_questions: questions_count,
       time: quiz_session.time,
       is_active: quiz_session.is_active,
+      is_hidden: quiz_session.is_hidden,
       is_completed: quiz_session.is_completed,
       stream_url: quiz_session.stream_url,
       completed_at: quiz_session.completed_at}
@@ -89,9 +91,11 @@ defmodule BijakhqWeb.Api.QuizSessionView do
       case current do
           nil   -> current
           _ ->
-            game_state = Server.get_game_state;
-            %{game_started: game_started} = game_state
-            Map.put(current, :game_started, game_started)
+            game_started = GameManager.server_lookup(:game_started)
+            case game_started do
+              nil -> Map.put(current, :game_started, false)
+              _ -> Map.put(current, :game_started, game_started)
+            end
       end
     %{
       data: %{

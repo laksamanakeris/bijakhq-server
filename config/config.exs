@@ -19,6 +19,7 @@ config :bijakhq, BijakhqWeb.Endpoint,
 
 # Phauxth authentication configuration
 config :phauxth,
+  log_level: :warn,
   token_salt: "CPTV+oxZ",
   endpoint: BijakhqWeb.Endpoint
 
@@ -38,6 +39,9 @@ config :arc,
 
 config :goth,
   json: "keys/bijakhq-dev-6a9c509c6c90.json" |> Path.expand |> File.read!
+
+config :bijakhq, :bad_words,
+  "resources/profanity/profanity.json"  
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

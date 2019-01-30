@@ -27,12 +27,16 @@ defmodule BijakhqWeb.Api.GameQuestionView do
   end
 
   def render("game_start_question.json", %{game_question: game_question}) do
+    answers_sequence = game_question.answers_sequence
+    # answers_sequence = Map.put(answers_sequence, :description, game_question.question.description)
+    #IO.puts "================================"
+    #IO.inspect answers_sequence
     %{
       id: game_question.id,
       sequence: game_question.sequence,
       is_completed: game_question.is_completed,
       total_correct: game_question.total_correct,
-      answers_sequence: game_question.answers_sequence,
+      answers_sequence: answers_sequence,
       answers_totals: game_question.answers_totals
     }
   end
