@@ -19,17 +19,17 @@ defmodule BijakhqWeb.PaymentTypeControllerTest do
 
   describe "index" do
     test "lists all payment_types", %{conn: conn} do
-      conn = get conn, payment_type_path(conn, :index)
+      conn = get conn, api_payment_type_path(conn, :index)
       assert json_response(conn, 200)["data"] == []
     end
   end
 
   describe "create payment_type" do
     test "renders payment_type when data is valid", %{conn: conn} do
-      conn = post conn, payment_type_path(conn, :create), payment_type: @create_attrs
+      conn = post conn, api_payment_type_path(conn, :create), payment_type: @create_attrs
       assert %{"id" => id} = json_response(conn, 201)["data"]
 
-      conn = get conn, payment_type_path(conn, :show, id)
+      conn = get conn, api_payment_type_path(conn, :show, id)
       assert json_response(conn, 200)["data"] == %{
         "id" => id,
         "configuration" => "some configuration",
@@ -38,7 +38,7 @@ defmodule BijakhqWeb.PaymentTypeControllerTest do
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
-      conn = post conn, payment_type_path(conn, :create), payment_type: @invalid_attrs
+      conn = post conn, api_payment_type_path(conn, :create), payment_type: @invalid_attrs
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
@@ -47,10 +47,10 @@ defmodule BijakhqWeb.PaymentTypeControllerTest do
     setup [:create_payment_type]
 
     test "renders payment_type when data is valid", %{conn: conn, payment_type: %PaymentType{id: id} = payment_type} do
-      conn = put conn, payment_type_path(conn, :update, payment_type), payment_type: @update_attrs
+      conn = put conn, api_payment_type_path(conn, :update, payment_type), payment_type: @update_attrs
       assert %{"id" => ^id} = json_response(conn, 200)["data"]
 
-      conn = get conn, payment_type_path(conn, :show, id)
+      conn = get conn, api_payment_type_path(conn, :show, id)
       assert json_response(conn, 200)["data"] == %{
         "id" => id,
         "configuration" => "some updated configuration",
@@ -59,7 +59,7 @@ defmodule BijakhqWeb.PaymentTypeControllerTest do
     end
 
     test "renders errors when data is invalid", %{conn: conn, payment_type: payment_type} do
-      conn = put conn, payment_type_path(conn, :update, payment_type), payment_type: @invalid_attrs
+      conn = put conn, api_payment_type_path(conn, :update, payment_type), payment_type: @invalid_attrs
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
@@ -68,10 +68,10 @@ defmodule BijakhqWeb.PaymentTypeControllerTest do
     setup [:create_payment_type]
 
     test "deletes chosen payment_type", %{conn: conn, payment_type: payment_type} do
-      conn = delete conn, payment_type_path(conn, :delete, payment_type)
+      conn = delete conn, api_payment_type_path(conn, :delete, payment_type)
       assert response(conn, 204)
       assert_error_sent 404, fn ->
-        get conn, payment_type_path(conn, :show, payment_type)
+        get conn, api_payment_type_path(conn, :show, payment_type)
       end
     end
   end

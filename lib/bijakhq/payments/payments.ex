@@ -6,10 +6,10 @@ defmodule Bijakhq.Payments do
   import Ecto.Query, warn: false
   alias Bijakhq.Repo
 
-  alias Bijakhq.Payments.Payment
+  alias Bijakhq.Payments.PaymentRequest
   alias Bijakhq.Accounts
-  alias Bijakhq.Accounts.User
-  alias Bijakhq.Quizzes.QuizScore
+  # alias Bijakhq.Accounts.User
+  # alias Bijakhq.Quizzes.QuizScore
   alias Bijakhq.Quizzes
   alias Bijakhq.Payments
 
@@ -21,29 +21,29 @@ defmodule Bijakhq.Payments do
   ## Examples
 
       iex> list_payments()
-      [%Payment{}, ...]
+      [%PaymentRequest{}, ...]
 
   """
   def list_payments do
-    Repo.all(Payment) |> Repo.preload([:user, :update_by, :status, :type])
+    Repo.all(PaymentRequest) |> Repo.preload([:user, :update_by, :status, :type])
   end
 
   @doc """
   Gets a single payment.
 
-  Raises `Ecto.NoResultsError` if the Payment does not exist.
+  Raises `Ecto.NoResultsError` if the PaymentRequest does not exist.
 
   ## Examples
 
       iex> get_payment!(123)
-      %Payment{}
+      %PaymentRequest{}
 
       iex> get_payment!(456)
       ** (Ecto.NoResultsError)
 
   """
   def get_payment!(id) do
-    Repo.get(Payment, id) |> Repo.preload([:user, :update_by, :status, :type])
+    Repo.get(PaymentRequest, id) |> Repo.preload([:user, :update_by, :status, :type])
   end
 
   @doc """
@@ -52,15 +52,15 @@ defmodule Bijakhq.Payments do
   ## Examples
 
       iex> create_payment(%{field: value})
-      {:ok, %Payment{}}
+      {:ok, %PaymentRequest{}}
 
       iex> create_payment(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
   def create_payment(attrs \\ %{}) do
-    %Payment{}
-    |> Payment.changeset(attrs)
+    %PaymentRequest{}
+    |> PaymentRequest.changeset(attrs)
     |> Repo.insert()
   end
 
@@ -70,31 +70,31 @@ defmodule Bijakhq.Payments do
   ## Examples
 
       iex> update_payment(payment, %{field: new_value})
-      {:ok, %Payment{}}
+      {:ok, %PaymentRequest{}}
 
       iex> update_payment(payment, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_payment(%Payment{} = payment, attrs) do
+  def update_payment(%PaymentRequest{} = payment, attrs) do
     payment
-    |> Payment.changeset(attrs)
+    |> PaymentRequest.changeset(attrs)
     |> Repo.update()
   end
 
   @doc """
-  Deletes a Payment.
+  Deletes a PaymentRequest.
 
   ## Examples
 
       iex> delete_payment(payment)
-      {:ok, %Payment{}}
+      {:ok, %PaymentRequest{}}
 
       iex> delete_payment(payment)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_payment(%Payment{} = payment) do
+  def delete_payment(%PaymentRequest{} = payment) do
     Repo.delete(payment)
   end
 
@@ -104,16 +104,16 @@ defmodule Bijakhq.Payments do
   ## Examples
 
       iex> change_payment(payment)
-      %Ecto.Changeset{source: %Payment{}}
+      %Ecto.Changeset{source: %PaymentRequest{}}
 
   """
-  def change_payment(%Payment{} = payment) do
-    Payment.changeset(payment, %{})
+  def change_payment(%PaymentRequest{} = payment) do
+    PaymentRequest.changeset(payment, %{})
   end
 
   # get amount from score
   def get_total_payment_to_user_id(user_id) do
-    amount = Repo.one(from p in Payment, where: p.user_id == ^user_id, select: sum(p.amount))
+    amount = Repo.one(from p in PaymentRequest, where: p.user_id == ^user_id, select: sum(p.amount))
     case amount do
       nil -> 0
       _ -> amount
@@ -323,17 +323,209 @@ defmodule Bijakhq.Payments do
 
   def request_payment(user, paypal_email) do
     balance = Payments.get_balance_by_user_id(user.id)
-    if balance < 50 do
+    if balance < @minimum_payment do
       {:error, :unauthorized, error: "Balance should be more than RM#{@minimum_payment}" }
     else
       with {:ok, user} <- Accounts.update_paypal_email(user, %{"paypal_email" => paypal_email}) do
-        # Paypel ID = 1
-        params = %{amount: balance, updated_by: user.id, user_id: user.id, payment_type: 1}
-        with {:ok, payment} <- Payments.create_payment(params) do
+        # Paypal ID = 1
+        params = %{amount: balance, updated_by: user.id, user_id: user.id, payment_type: 1, paypal_email: paypal_email}
+        with {:ok, _payment} <- Payments.create_payment(params) do
           balance = Payments.get_balance_by_user_id(user.id)
           {:ok, balance}
         end
       end
     end
+  end
+
+  alias Bijakhq.Payments.PaymentBatch
+
+  @doc """
+  Returns the list of payment_batches.
+
+  ## Examples
+
+      iex> list_payment_batches()
+      [%PaymentBatch{}, ...]
+
+  """
+  def list_payment_batches do
+    Repo.all(PaymentBatch)
+  end
+
+  @doc """
+  Gets a single payment_batch.
+
+  Raises `Ecto.NoResultsError` if the Payment batch does not exist.
+
+  ## Examples
+
+      iex> get_payment_batch!(123)
+      %PaymentBatch{}
+
+      iex> get_payment_batch!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_payment_batch!(id), do: Repo.get!(PaymentBatch, id)
+
+  @doc """
+  Creates a payment_batch.
+
+  ## Examples
+
+      iex> create_payment_batch(%{field: value})
+      {:ok, %PaymentBatch{}}
+
+      iex> create_payment_batch(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_payment_batch(attrs \\ %{}) do
+    %PaymentBatch{}
+    |> PaymentBatch.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a payment_batch.
+
+  ## Examples
+
+      iex> update_payment_batch(payment_batch, %{field: new_value})
+      {:ok, %PaymentBatch{}}
+
+      iex> update_payment_batch(payment_batch, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_payment_batch(%PaymentBatch{} = payment_batch, attrs) do
+    payment_batch
+    |> PaymentBatch.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a PaymentBatch.
+
+  ## Examples
+
+      iex> delete_payment_batch(payment_batch)
+      {:ok, %PaymentBatch{}}
+
+      iex> delete_payment_batch(payment_batch)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_payment_batch(%PaymentBatch{} = payment_batch) do
+    Repo.delete(payment_batch)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking payment_batch changes.
+
+  ## Examples
+
+      iex> change_payment_batch(payment_batch)
+      %Ecto.Changeset{source: %PaymentBatch{}}
+
+  """
+  def change_payment_batch(%PaymentBatch{} = payment_batch) do
+    PaymentBatch.changeset(payment_batch, %{})
+  end
+
+  alias Bijakhq.Payments.PaymentBatchItem
+
+  @doc """
+  Returns the list of payment_batch_items.
+
+  ## Examples
+
+      iex> list_payment_batch_items()
+      [%PaymentBatchItem{}, ...]
+
+  """
+  def list_payment_batch_items do
+    Repo.all(PaymentBatchItem)
+  end
+
+  @doc """
+  Gets a single payment_batch_item.
+
+  Raises `Ecto.NoResultsError` if the Payment batch item does not exist.
+
+  ## Examples
+
+      iex> get_payment_batch_item!(123)
+      %PaymentBatchItem{}
+
+      iex> get_payment_batch_item!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_payment_batch_item!(id), do: Repo.get!(PaymentBatchItem, id)
+
+  @doc """
+  Creates a payment_batch_item.
+
+  ## Examples
+
+      iex> create_payment_batch_item(%{field: value})
+      {:ok, %PaymentBatchItem{}}
+
+      iex> create_payment_batch_item(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_payment_batch_item(attrs \\ %{}) do
+    %PaymentBatchItem{}
+    |> PaymentBatchItem.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a payment_batch_item.
+
+  ## Examples
+
+      iex> update_payment_batch_item(payment_batch_item, %{field: new_value})
+      {:ok, %PaymentBatchItem{}}
+
+      iex> update_payment_batch_item(payment_batch_item, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_payment_batch_item(%PaymentBatchItem{} = payment_batch_item, attrs) do
+    payment_batch_item
+    |> PaymentBatchItem.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a PaymentBatchItem.
+
+  ## Examples
+
+      iex> delete_payment_batch_item(payment_batch_item)
+      {:ok, %PaymentBatchItem{}}
+
+      iex> delete_payment_batch_item(payment_batch_item)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_payment_batch_item(%PaymentBatchItem{} = payment_batch_item) do
+    Repo.delete(payment_batch_item)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking payment_batch_item changes.
+
+  ## Examples
+
+      iex> change_payment_batch_item(payment_batch_item)
+      %Ecto.Changeset{source: %PaymentBatchItem{}}
+
+  """
+  def change_payment_batch_item(%PaymentBatchItem{} = payment_batch_item) do
+    PaymentBatchItem.changeset(payment_batch_item, %{})
   end
 end

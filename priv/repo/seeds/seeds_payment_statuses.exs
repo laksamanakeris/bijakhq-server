@@ -10,7 +10,8 @@ statuses = [
   %{name: "Processed", description: "Payment request is being processed"},
   %{name: "Pending confirmation", description: "Pending confirmation from Payment Provider"},
   %{name: "Paid", description: "Paid"},
-  %{name: "Failed", description: "Payment request failed"}
+  %{name: "Failed", description: "Payment request failed"},
+  %{name: "Canceled", description: "Payment request has been canceled"}
 ]
 
 for status <- statuses do

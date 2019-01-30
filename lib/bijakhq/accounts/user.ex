@@ -4,6 +4,8 @@ defmodule Bijakhq.Accounts.User do
   alias Bijakhq.Accounts.User
   alias Bijakhq.Quizzes.QuizScore
   use Arc.Ecto.Schema
+  
+  alias Bijakhq.Utils.WordFilter
 
   schema "users" do
     field :email, :string
@@ -18,7 +20,8 @@ defmodule Bijakhq.Accounts.User do
     field :confirmed_at, :utc_datetime
     field :reset_sent_at, :utc_datetime
 
-    field :role, :string, default: "user"
+    field :role, :string, default: "user" # user or admin
+    field :is_tester, :boolean, default: false 
 
     field :country, :string, default: "MY"
     field :language, :string, default: "en"
@@ -46,10 +49,11 @@ defmodule Bijakhq.Accounts.User do
 
   def changeset(%User{} = user, attrs) do
     user
-    |> cast(attrs, [:email, :username, :phone, :profile_picture, :confirmed_at, :role, :country, :language, :games_played, :has_phone, :high_score, :lives, :referral_url, :referred, :referring_user_id, :win_count, :verification_id, :rank_weekly, :rank_alltime])
+    |> cast(attrs, [:email, :username, :phone, :profile_picture, :confirmed_at, :role, :is_tester, :country, :language, :games_played, :has_phone, :high_score, :lives, :referral_url, :referred, :referring_user_id, :win_count, :verification_id, :rank_weekly, :rank_alltime])
     |> validate_required([:username])
     |> unique_email
     |> unique_username
+    |> validate_filter_word_username(:username)
   end
 
   def create_changeset(%User{} = user, attrs) do
@@ -58,6 +62,7 @@ defmodule Bijakhq.Accounts.User do
     |> validate_required([:email, :password])
     |> unique_email
     |> unique_username
+    |> validate_filter_word_username(:username)
     |> validate_password(:password)
     |> put_pass_hash
   end
@@ -67,6 +72,7 @@ defmodule Bijakhq.Accounts.User do
     |> cast(attrs, [:phone, :language, :country, :verification_id, :username])
     |> validate_required([:phone, :language, :country, :verification_id, :username])
     |> unique_username
+    |> validate_filter_word_username(:username)
     |> unique_phone
   end
 
@@ -85,6 +91,7 @@ defmodule Bijakhq.Accounts.User do
     |> cast(attrs, [:username])
     |> validate_required([:username])
     |> unique_username
+    |> validate_filter_word_username(:username)
   end
 
   def update_paypal_email_changeset(%User{} = user, attrs)do
@@ -97,6 +104,7 @@ defmodule Bijakhq.Accounts.User do
 
   defp unique_username(changeset) do
     validate_length(changeset, :username, min: 3)
+    |> validate_format(:username, ~r/^[0-9A-Za-z]+$/) # only allow alphanumeric withput space
     |> unique_constraint(:username)
     |> downcase_username
   end
@@ -164,4 +172,13 @@ defmodule Bijakhq.Accounts.User do
   end
 
   defp strong_password?(_), do: {:error, "The password is too short"}
+
+  def validate_filter_word_username(changeset, field, options \\ []) do
+    validate_change(changeset, field, fn _, username ->
+      case WordFilter.has_profanity?(username) do
+        false -> []
+        true -> [{field, options[:message] || "This name contains a word that isn't allowed, Please enter different name"}]
+      end
+    end)
+  end
 end
