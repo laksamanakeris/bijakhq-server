@@ -46,6 +46,7 @@ defmodule Bijakhq.Game.Players do
     case info do
       :undefined -> :ets.new(ets_table_name, [:set, :public, :named_table, read_concurrency: true, write_concurrency: true])
       _ ->
+        :ets.tab2file(ets_table_name, ~c[#{ets_table_name}_#{DateTime.utc_now}_.txt])
         :ets.delete(ets_table_name)
         :ets.new(ets_table_name, [:set, :public, :named_table, read_concurrency: true, write_concurrency: true])
     end
