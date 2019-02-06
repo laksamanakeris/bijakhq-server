@@ -28,6 +28,15 @@ defmodule Bijakhq.Payments do
     Repo.all(PaymentRequest) |> Repo.preload([:user, :update_by, :status, :type])
   end
 
+  def list_payments_by_type_status(type \\ 1, status \\ 1) do
+    query = 
+      from p in PaymentRequest,
+      where: p.payment_type == ^type,
+      where: p.payment_status == ^status
+
+    Repo.all(query) |> Repo.preload([:user, :update_by, :status, :type])
+  end
+
   @doc """
   Gets a single payment.
 
@@ -368,6 +377,11 @@ defmodule Bijakhq.Payments do
   """
   def get_payment_batch!(id), do: Repo.get!(PaymentBatch, id)
 
+  def get_payment_batch_details(batch_id) do
+    Payments.get_payment_batch!(batch_id) 
+    |> Repo.preload([items: [payment: [:user, :update_by, :status, :type] ]])
+  end
+
   @doc """
   Creates a payment_batch.
 
@@ -528,4 +542,60 @@ defmodule Bijakhq.Payments do
   def change_payment_batch_item(%PaymentBatchItem{} = payment_batch_item) do
     PaymentBatchItem.changeset(payment_batch_item, %{})
   end
+  
+  
+  def create_batch_items(batch, requests_list) do
+    # status
+    # 1=pending, 2=accepted, 3=rejected
+    status = 1
+    batch_items = 
+     Enum.map(requests_list, fn(request) ->
+      ref_id = "#{batch.name}-#{request.id}"
+       %{batch_id: batch.id, payment_id: request.id, inserted_at: DateTime.utc_now, updated_at: DateTime.utc_now, status: status, ref_id: ref_id}
+     end)
+     {count, _} = Repo.insert_all(PaymentBatchItem, batch_items)
+    {:ok, count}
+  end
+
+  def update_payments_status(requests_list, status) do
+
+    payment_requests_id = Enum.map(requests_list, &(&1.id))
+    new_query = 
+      from p in PaymentRequest, 
+      where: p.id in ^payment_requests_id
+    
+    {count, _} = Repo.update_all(new_query, set: [updated_at: DateTime.utc_now, payment_status: status])
+    {:ok, count}
+  end
+
+  def generate_paypal_payload_request(batch_details) do
+    
+  end
+
+
+  # New batch processing flow
+  # - create new batch
+  # - get list new request
+  # - create batch items from list
+  # - update item status in list to - processing
+  # - generate payload
+  # - submit to API
+  def create_new_batch_request do
+    # create batch name
+    batch_name = PaymentBatch.generate_batch_name()
+    {:ok, batch} = Payments.create_payment_batch(%{name: batch_name})
+
+    payment_type = 1 # paypal
+    payment_status = 1 # new request
+    payment_requests_new = Payments.list_payments_by_type_status(payment_type,payment_status)
+    {:ok, count} = Payments.create_batch_items(batch, payment_requests_new)
+    
+    payment_status_update = 2 #processed
+    {:ok, count} = Payments.update_payments_status(payment_requests_new, payment_status_update)
+
+    # get batch details n batch items
+    batch_details = Payments.get_payment_batch_details(batch.id)
+
+  end
+
 end
