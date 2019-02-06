@@ -28,4 +28,10 @@ defmodule Bijakhq.Payments.PaymentBatch do
     |> validate_required([:name])
     # |> validate_required([:date_processed, :description, :is_processed, :generated_request])
   end
+
+  def generate_batch_name do
+    time = Timex.now("Asia/Kuala_Lumpur")
+    {:ok, time_str} = Timex.format(time, "%Y%m%d_%H%M", :strftime)
+    batch_name = "batch_#{time_str}"
+  end
 end
