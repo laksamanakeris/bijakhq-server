@@ -8,7 +8,10 @@ defmodule Bijakhq.Payments.Paypal do
 
   
   def process_batch_id(batch_id) do
+    payload = Paypal.prepare_payload(batch_id)
+  end
 
+  def prepare_payload(batch_id) do
     batch = Payments.get_payment_batch!(batch_id) |> Repo.preload(items: :payment)
     #IO.inspect batch
 
@@ -21,7 +24,7 @@ defmodule Bijakhq.Payments.Paypal do
 
   def create_header(batch) do
     %{
-      sender_batch_id: batch.id,
+      sender_batch_id: batch.name,
       email_subject: "You have a payout!",
       email_message: "You have received a payment! Thanks for playing BijakTrivia!"
     }
@@ -39,12 +42,47 @@ defmodule Bijakhq.Payments.Paypal do
       recipient_type: "EMAIL",
       amount: %{
         value: Float.to_string(item.payment.amount, decimals: 2),
-        currency: "RM"
+        currency: "MYR"
       },
       note: "Thanks for playing BijakTrivia!",
       sender_item_id: item.ref_id,
       receiver: item.payment.paypal_email
     }
+  end
+
+  # process payout batch response
+  # %{
+  #   batch_header: %{
+  #     batch_status: "PENDING",
+  #     payout_batch_id: "NJBA6EWB3NJVL",
+  #     sender_batch_header: %{
+  #       email_message: "You have received a payment! Thanks for playing BijakTrivia!",
+  #       email_subject: "You have a payout!",
+  #       sender_batch_id: "batch_20190210_0625"
+  #     }
+  #   },
+  #   links: [
+  #     %{
+  #       encType: "application/json",
+  #       href: "https://api.sandbox.paypal.com/v1/payments/payouts/NJBA6EWB3NJVL",
+  #       method: "GET",
+  #       rel: "self"
+  #     }
+  #   ]
+  # }
+  def process_payout_batch_response(response) do
+    sender_batch_id = response.batch_header.sender_batch_header.sender_batch_id
+    batch_status = response.batch_header.batch_status
+    payout_batch_id = response.batch_header.payout_batch_id
+
+    batch = Repo.get_by(PaymentBatch, name: sender_batch_id)
+    case batch do
+      nil -> nil
+      _ ->
+        batch
+        |> Ecto.Changeset.change(%{batch_status: batch_status, payout_batch_id: payout_batch_id, is_processed: true, date_processed: DateTime.utc_now})
+        |> Repo.update
+    end
   end
   
 end
