@@ -42,7 +42,7 @@ defmodule BijakhqWeb.Router do
       scope "/payment"do
         resources "/requests", PaymentController, except: [:new, :edit]
         resources "/batches", PaymentBatchController, except: [:new, :edit] do
-          resources "/items", PaymentBatchItemController, except: [:new, :edit]
+          resources "/items", PaymentBatchItemController, only: [:index]
         end
         resources "/statuses", PaymentStatusController, except: [:new, :edit]
         resources "/types", PaymentTypeController, except: [:new, :edit]
