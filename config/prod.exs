@@ -94,6 +94,6 @@ config :bijakhq, Bijakhq.Repo,
 
 
 config :pay_pal,
-  client_id: "${PAYPAL_CLIENT_ID}" || "AbdL0pqJgcqd5cKzzHJEsJ-qE6fUHq1IOYBrjnoWPzHlZUoivEZdnUP9ttie0Zzp1Fcv4Ic1VKD-qhrG",
-  client_secret: "${PAYPAL_CLIENT_SECRET}" || "EFqoDG-hQHswDzmjyWrNhTCBONRK3Ybdn_QWba5IddOG7WRMHkj72UU_dcTYYJ1HwVOCX8PLUmzGISaL",
+  client_id: "${PAYPAL_CLIENT_ID}" || "AWxMCa2Ovi1wPWTfqOqnaLkkPwYfNEZj_kmStwP83UEJ5cT37mCC_dLS-3OSRzs70N4jpNHlqsC6ygFl",
+  client_secret: "${PAYPAL_CLIENT_SECRET}" || "EFydo2p3fb05MQ6gtMgHSzAzLCtW_1xEVVcEIwwgOOLlcU-GEDQX0AaKFS7tHiSs0EKfuNn6rE12zvdp",
   environment: :sandbox
