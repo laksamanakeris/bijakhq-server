@@ -625,7 +625,8 @@ defmodule Bijakhq.Payments do
         {:ok, paypal_response} ->
           # process payload
           Paypal.process_payout_batch_response(paypal_response)
-          {:ok, paypal_response}
+          payment_batch = Payments.get_payment_batch!(batch.id)
+          {:ok, payment_batch}
       end
       
     else
