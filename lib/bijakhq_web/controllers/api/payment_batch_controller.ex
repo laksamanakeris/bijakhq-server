@@ -39,4 +39,32 @@ defmodule BijakhqWeb.Api.PaymentBatchController do
       send_resp(conn, :no_content, "")
     end
   end
+
+  def create_new_batch(conn, _params) do
+    result = Payments.create_new_batch_request()
+    case result do
+      {:error, msg} ->
+        conn
+        |> put_status(:not_found)
+        |> put_view(BijakhqWeb.ErrorView)
+        |> render("error.json", msg)
+      {:ok, batch} ->
+        render(conn, "show.json", payment_batch: batch)
+    end
+  end
+
+  def get_paypal_update(conn, %{"id" => id}) do
+    result = Payments.update_batch_status(id)
+    case result do
+      {:error, msg} ->
+        conn
+        |> put_status(:not_found)
+        |> put_view(BijakhqWeb.ErrorView)
+        |> render("error.json", msg)
+      {:ok, payload} ->
+        json(conn, %{
+          paypal: payload
+        })
+    end
+  end
 end
