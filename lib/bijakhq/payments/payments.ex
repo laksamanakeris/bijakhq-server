@@ -630,6 +630,16 @@ defmodule Bijakhq.Payments do
     batch = Payments.get_payment_batch!(batch_id)
     payout_batch_id = batch.payout_batch_id
     response = PayPal.Payments.Payouts.show(payout_batch_id)
+
+    case response do
+      {:error, error_reason} ->
+        Logger.warn "Payments :: update_batch_status - time:#{DateTime.utc_now} - #{error_reason}"
+        {:error, error: "Error updating batch - #{error_reason}" }
+      {:ok, paypal_response} ->
+        # process payload
+        Paypal.update_payout_batch_status(paypal_response)
+        {:ok, paypal_response}
+    end
   end
 
 end
