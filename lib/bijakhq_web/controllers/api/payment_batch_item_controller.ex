@@ -15,7 +15,7 @@ defmodule BijakhqWeb.Api.PaymentBatchItemController do
     with {:ok, %PaymentBatchItem{} = payment_batch_item} <- Payments.create_payment_batch_item(payment_batch_item_params) do
       conn
       |> put_status(:created)
-      |> put_resp_header("location", api_payment_batch_item_path(conn, :show, payment_batch_item))
+      # |> put_resp_header("location", api_payment_batch_item_path(conn, :show, payment_batch_item))
       |> render("show.json", payment_batch_item: payment_batch_item)
     end
   end
