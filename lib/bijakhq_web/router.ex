@@ -33,11 +33,20 @@ defmodule BijakhqWeb.Router do
       resources "/categories", QuizCategoryController, except: [:new, :edit]
       resources "/questions", QuizQuestionController, except: [:new, :edit]
 
-      resources "/payments", PaymentController, except: [:new, :edit]
-      resources "/payment-statuses", PaymentStatusController, except: [:new, :edit]
-      resources "/payment-types", PaymentTypeController, except: [:new, :edit]
-      resources "/payment-batches", PaymentBatchController, except: [:new, :edit]
-      resources "/payment-batch-items", PaymentBatchItemController, except: [:new, :edit]
+      # resources "/payments", PaymentController, except: [:new, :edit]
+      # resources "/payment-statuses", PaymentStatusController, except: [:new, :edit]
+      # resources "/payment-types", PaymentTypeController, except: [:new, :edit]
+      # resources "/payment-batches", PaymentBatchController, except: [:new, :edit]
+      # resources "/payment-batch-items", PaymentBatchItemController, except: [:new, :edit]
+
+      scope "/payment"do
+        resources "/requests", PaymentController, except: [:new, :edit]
+        resources "/batches", PaymentBatchController, except: [:new, :edit] do
+          resources "/items", PaymentBatchItemController, except: [:new, :edit]
+        end
+        resources "/statuses", PaymentStatusController, except: [:new, :edit]
+        resources "/types", PaymentTypeController, except: [:new, :edit]
+      end
 
       resources "/games", QuizSessionController, except: [:new, :edit] do
         get "/questions/:id/randomize_answers", GameQuestionController, :randomize_answers
