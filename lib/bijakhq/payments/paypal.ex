@@ -84,5 +84,24 @@ defmodule Bijakhq.Payments.Paypal do
         |> Repo.update
     end
   end
+
+  def update_payout_batch_status(response) do
+    sender_batch_id = response.batch_header.sender_batch_header.sender_batch_id
+    batch_status = response.batch_header.batch_status
+    amount = response.batch_header.amount.value
+    fees = response.batch_header.fees.value
+
+    {amount, _} = Float.parse(amount)
+    {fees, _} = Float.parse(fees)
+
+    batch = Repo.get_by(PaymentBatch, name: sender_batch_id)
+    case batch do
+      nil -> nil
+      _ ->
+        batch
+        |> Ecto.Changeset.change(%{batch_status: batch_status, amount: amount, fees: fees})
+        |> Repo.update
+    end
+  end
   
 end
