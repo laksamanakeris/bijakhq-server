@@ -696,7 +696,7 @@ defmodule Bijakhq.Quizzes do
           username: dri.username,
           user_id: dri.id,
           amounts: sum(res.amount),
-          rank: 101
+          rank: 0
           },
         group_by: dri.id,
         order_by: [desc: sum(res.amount)]
@@ -719,7 +719,7 @@ defmodule Bijakhq.Quizzes do
           username: dri.username,
           user_id: dri.id,
           amounts: sum(res.amount),
-          rank: 101
+          rank: 0
           },
         group_by: dri.id,
         order_by: [desc: sum(res.amount)]
