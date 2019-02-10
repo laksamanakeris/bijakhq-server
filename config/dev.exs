@@ -58,8 +58,8 @@ config :bijakhq, Bijakhq.Repo,
   pool_size: 10
 
 config :pay_pal,
-  client_id: System.get_env("PAYPAL_CLIENT_ID") || "AbdL0pqJgcqd5cKzzHJEsJ-qE6fUHq1IOYBrjnoWPzHlZUoivEZdnUP9ttie0Zzp1Fcv4Ic1VKD-qhrG",
-  client_secret: System.get_env("PAYPAL_CLIENT_SECRET") || "EFqoDG-hQHswDzmjyWrNhTCBONRK3Ybdn_QWba5IddOG7WRMHkj72UU_dcTYYJ1HwVOCX8PLUmzGISaL",
+  client_id: System.get_env("PAYPAL_CLIENT_ID") || "AQrHTPurQsSerpEwnHRND6YBHMY-5K9BY-6Hp6jLrd8JhV9b7AAfC9cbcq316NXU8k582OGfQgUKIBCk",
+  client_secret: System.get_env("PAYPAL_CLIENT_SECRET") || "EFr5kTOvmBV2RghsNtyucmai3odt31hYgAL5cSMfNLcwug_V5rlxeAbwNyUhe3I1nxFuKV8P9mSCYubE",
   environment: :sandbox
 
 config :peerage, via: Peerage.Via.List, node_list: [

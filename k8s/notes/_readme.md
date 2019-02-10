@@ -279,7 +279,7 @@ kubectl get ingress --namespace=bijakhq
 # connect to pod
 
 kubectl get pods -n=bijakhq
-kubectl -n=bijakhq exec -it bijakhq-cbf4f9d66-pwb94 -c bijakhq sh
+kubectl -n=bijakhq exec -it bijakhq-76f974c5cc-wjwws -c bijakhq sh
 
 $ vi releases/0.0.1/vm.args
 or
@@ -293,6 +293,9 @@ kubectl -n bijakhq exec -t bijakhq-746db8c55d-k2nlf -c bijakhq -- env | grep MY_
 
 sudo iptables -t nat -A OUTPUT -d 10.40.22.15 -j DNAT --to-destination 127.0.0.1
 sudo iptables -t nat -A OUTPUT -d 10.40.22.15 -j DNAT --to-destination 127.0.0.1
+
+# copy paste files
+kubectl cp bijakhq/bijakhq-76f974c5cc-frdpp:/opt/app /Goblin/dev/bijak-hq/backups/games
 
 # https://www.mendrugory.com/post/remote-elixir-node-kubernetes/
 # https://stackoverflow.com/questions/41998083/running-observer-for-a-remote-erlang-node-making-it-simpler

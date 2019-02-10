@@ -13,6 +13,11 @@ defmodule Bijakhq.Payments.PaymentBatch do
     field :is_processed, :boolean, default: false
     field :date_processed, :utc_datetime
     field :generated_request, :map
+    # paypal related columns
+    field :payout_batch_id, :string 
+    field :batch_status, :string
+    field :amount, :float
+    field :fees, :float
 
     has_many :items, PaymentBatchItem, foreign_key: :batch_id
     # Batch can have many payments - this will happen when there's issue processing the Paypal PaymentRequest 
@@ -24,8 +29,14 @@ defmodule Bijakhq.Payments.PaymentBatch do
   @doc false
   def changeset(payment_batch, attrs) do
     payment_batch
-    |> cast(attrs, [:name, :date_processed, :description, :is_processed, :generated_request])
+    |> cast(attrs, [:name, :date_processed, :description, :is_processed, :generated_request, :payout_batch_id, :batch_status, :amount, :fees])
     |> validate_required([:name])
     # |> validate_required([:date_processed, :description, :is_processed, :generated_request])
+  end
+
+  def generate_batch_name do
+    time = Timex.now("Asia/Kuala_Lumpur")
+    {:ok, time_str} = Timex.format(time, "%Y%m%d_%H%M", :strftime)
+    batch_name = "batch_#{time_str}"
   end
 end

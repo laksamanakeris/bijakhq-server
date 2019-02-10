@@ -33,11 +33,22 @@ defmodule BijakhqWeb.Router do
       resources "/categories", QuizCategoryController, except: [:new, :edit]
       resources "/questions", QuizQuestionController, except: [:new, :edit]
 
-      resources "/payments", PaymentController, except: [:new, :edit]
-      resources "/payment-statuses", PaymentStatusController, except: [:new, :edit]
-      resources "/payment-types", PaymentTypeController, except: [:new, :edit]
-      resources "/payment-batches", PaymentBatchController, except: [:new, :edit]
-      resources "/payment-batch-items", PaymentBatchItemController, except: [:new, :edit]
+      # resources "/payments", PaymentController, except: [:new, :edit]
+      # resources "/payment-statuses", PaymentStatusController, except: [:new, :edit]
+      # resources "/payment-types", PaymentTypeController, except: [:new, :edit]
+      # resources "/payment-batches", PaymentBatchController, except: [:new, :edit]
+      # resources "/payment-batch-items", PaymentBatchItemController, except: [:new, :edit]
+
+      scope "/payment"do
+        resources "/requests", PaymentController, except: [:new, :edit]
+        resources "/batches", PaymentBatchController, only: [:index, :show] do
+          resources "/items", PaymentBatchItemController, only: [:index]
+        end
+        post "/batches/new", PaymentBatchController, :create_new_batch
+        get "/batches/:id/paypal", PaymentBatchController, :get_paypal_update
+        resources "/statuses", PaymentStatusController, except: [:new, :edit]
+        resources "/types", PaymentTypeController, except: [:new, :edit]
+      end
 
       resources "/games", QuizSessionController, except: [:new, :edit] do
         get "/questions/:id/randomize_answers", GameQuestionController, :randomize_answers
@@ -87,5 +98,8 @@ defmodule BijakhqWeb.Router do
     get "/command-center-alpha-tango-create-tokens/:id_start/:id_end", PageController, :gen_token
     get "/command-center-alpha-tango-create-tokens/users", PageController, :gen_token_users
     get "/health", PageController, :health
+
+    get "/command-center-alpha-tango/cache/players", PageController, :extract_cache_players
+    get "/command-center-alpha-tango/cache/winners", PageController, :extract_cache_winners
   end
 end
