@@ -91,6 +91,17 @@ defmodule Bijakhq.Game.GameManager do
     GenServer.call(pid, {:players_check_last_question, question_id})
   end
 
+  # extract from cache
+  def players_get_game_winner_list() do
+    pid = :global.whereis_name({Bijakhq.Game.GameManager, 1})
+    GenServer.call(pid, {:players_get_game_winner_list})
+  end
+
+  def players_get_game_player_list() do
+    pid = :global.whereis_name({Bijakhq.Game.GameManager, 1})
+    GenServer.call(pid, {:players_get_game_player_list})
+  end
+
 
   # CAST
 
@@ -185,6 +196,18 @@ defmodule Bijakhq.Game.GameManager do
 
   def handle_call({:players_check_last_question, question_id}, _from, state) do
     response = Players.check_last_question(question_id)
+    {:reply, response, state}
+  end
+
+  # players_get_game_winner_list
+  def handle_call({:players_get_game_winner_list}, _from, state) do
+    response = Players.get_game_winner_list()
+    {:reply, response, state}
+  end
+
+  # players_get_game_winner_list
+  def handle_call({:players_get_game_player_list}, _from, state) do
+    response = Players.get_game_player_list()
     {:reply, response, state}
   end
 

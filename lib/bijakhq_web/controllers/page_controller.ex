@@ -2,6 +2,7 @@ defmodule BijakhqWeb.PageController do
   use BijakhqWeb, :controller
 
   alias Bijakhq.Accounts
+  alias Bijakhq.Game.GameManager
 
   def index(conn, _params) do
     conn = put_layout conn, false
@@ -43,6 +44,20 @@ defmodule BijakhqWeb.PageController do
       node: Node.self(),
       connected_to: Node.list()
       }) 
+  end
+
+  def extract_cache_winners(conn, _params) do
+    game_details = GameManager.server_get_game_details()
+    winners = GameManager.players_get_game_winner_list()
+    json(conn, %{
+      game: game_details,
+      winners: winners
+    })
+  end
+
+  def extract_cache_players(conn, _params) do
+    players = GameManager.players_get_game_player_list()
+    json(conn, players)
   end
 
 end

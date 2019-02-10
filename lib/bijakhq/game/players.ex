@@ -46,6 +46,7 @@ defmodule Bijakhq.Game.Players do
     case info do
       :undefined -> :ets.new(ets_table_name, [:set, :public, :named_table, read_concurrency: true, write_concurrency: true])
       _ ->
+        :ets.tab2file(ets_table_name, ~c[#{ets_table_name}_#{DateTime.utc_now}_.txt])
         :ets.delete(ets_table_name)
         :ets.new(ets_table_name, [:set, :public, :named_table, read_concurrency: true, write_concurrency: true])
     end
@@ -270,8 +271,22 @@ defmodule Bijakhq.Game.Players do
     end
   end
 
-  def get_game_result do
-    Logger.warn "============================== Players :: get_game_result"
+  # This to extract all players from cache
+  def get_game_player_list do
+    Logger.warn "============================== Players :: get_game_player_list - from cache"
+    list = :ets.tab2list(@ets_name)
+    players =
+      list
+      |> Enum.reduce([], fn obj, list ->
+        {_id, player} = obj
+        list = list ++ [player]
+      end)
+    players
+  end
+  
+  # This to extract all winners from cache
+  def get_game_winner_list do
+    Logger.warn "============================== Players :: get_game_winner_list - from cache"
     list = :ets.tab2list(@ets_winners)
     players =
       list
@@ -279,6 +294,13 @@ defmodule Bijakhq.Game.Players do
         {_id, player} = obj
         list = list ++ [player]
       end)
+    players
+  end
+
+  # This to extract winners from cache - limit to 100
+  def get_game_result do
+    Logger.warn "============================== Players :: get_game_result"
+    players = get_game_winner_list()
     players = Enum.take_random(players, 100)
   end
 
@@ -290,7 +312,7 @@ defmodule Bijakhq.Game.Players do
 
   def game_save_scores(game_id) do
     Logger.warn "============================== Game_save_scores :: #{game_id}"
-    results = get_game_result()
+    results = get_game_winner_list()
     Enum.map(results, fn(subj) ->
       score = %{amount: subj.amounts, user_id: subj.id, game_id: game_id, completed_at: DateTime.utc_now}
       #  save to database
