@@ -327,3 +327,9 @@ Node.connect(:"bijakhq@10.40.22.16")
 
 iex --name console@10.40.22.18 --cookie bijakhqcookie --remsh "bijakhq@10.40.22.18"
 epmd -names
+
+# to run migration
+# https://hexdocs.pm/distillery/guides/running_migrations.html
+kubectl get pods -n=bijakhq
+kubectl -n=bijakhq exec -it bijakhq-878565df-ln474 -c bijakhq sh
+./bin/start_server migrate
