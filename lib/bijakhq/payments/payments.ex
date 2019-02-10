@@ -379,7 +379,7 @@ defmodule Bijakhq.Payments do
       ** (Ecto.NoResultsError)
 
   """
-  def get_payment_batch!(id), do: Repo.get!(PaymentBatch, id)
+  def get_payment_batch!(id), do: Repo.get!(PaymentBatch, id) |> Repo.preload([items: [payment: [:user, :update_by, :status, :type] ]])
 
   def get_payment_batch_details(batch_id) do
     Payments.get_payment_batch!(batch_id) 
@@ -463,7 +463,15 @@ defmodule Bijakhq.Payments do
 
   """
   def list_payment_batch_items do
-    Repo.all(PaymentBatchItem)
+    Repo.all(PaymentBatchItem) |> Repo.preload([payment: [:user, :update_by, :status, :type]])
+  end
+
+  def list_payment_batch_items_by_batch_id(batch_id) do
+    query = 
+      from p in PaymentBatchItem,
+      where: p.batch_id == ^batch_id
+
+    Repo.all(query) |> Repo.preload([payment: [:user, :update_by, :status, :type]])
   end
 
   @doc """

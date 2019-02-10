@@ -6,8 +6,15 @@ defmodule BijakhqWeb.Api.PaymentBatchItemController do
 
   action_fallback BijakhqWeb.FallbackController
 
-  def index(conn, _params) do
-    payment_batch_items = Payments.list_payment_batch_items()
+  def action(conn, _) do
+    batch = Payments.get_payment_batch!(conn.params["payment_batch_id"])
+    args = [conn, conn.params, batch]
+    apply(__MODULE__, action_name(conn), args)
+  end
+
+  def index(conn, _params, batch) do
+    payment_batch_items = Payments.list_payment_batch_items_by_batch_id(batch.id)
+    IO.inspect payment_batch_items
     render(conn, "index.json", payment_batch_items: payment_batch_items)
   end
 
