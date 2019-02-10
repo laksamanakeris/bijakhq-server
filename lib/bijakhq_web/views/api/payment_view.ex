@@ -23,6 +23,7 @@ defmodule BijakhqWeb.Api.PaymentView do
       inserted_at: payment.inserted_at,
       updated_at: payment.updated_at,
       payment_status: payment.payment_status,
+      paypal_email: payment.paypal_email,
       status: render_one(payment.status, PaymentStatusView, "payment_status.json"),
       payment_type: payment.payment_type,
       type: render_one(payment.type, PaymentTypeView, "payment_type.json"),
