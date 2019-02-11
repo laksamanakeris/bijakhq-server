@@ -23,7 +23,9 @@ defmodule Bijakhq.Quizzes do
 
   """
   def list_quiz_categories do
-    Repo.all(QuizCategory)
+    # Repo.all(QuizCategory)
+    from(p in QuizCategory, order_by: [desc: p.id])
+    |> Repo.all()
   end
 
   @doc """
@@ -119,7 +121,10 @@ defmodule Bijakhq.Quizzes do
 
   """
   def list_quiz_questions do
-    Repo.all(QuizQuestion) |> Repo.preload([:games])
+    # Repo.all(QuizQuestion) |> Repo.preload([:games])
+    from(p in QuizQuestion, order_by: [desc: p.id])
+    |> Repo.all()
+    |> Repo.preload([:games])
   end
 
   @doc """
@@ -225,7 +230,10 @@ defmodule Bijakhq.Quizzes do
 
   """
   def list_quiz_sessions do
-    Repo.all(QuizSession) |> Repo.preload([:game_questions])
+    from(p in QuizSession, order_by: [desc: p.id])
+    |> Repo.all()
+    |> Repo.preload([:game_questions])
+    # Repo.all(QuizSession) |> Repo.preload([:game_questions])
   end
 
   @doc """
