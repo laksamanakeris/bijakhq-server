@@ -318,7 +318,9 @@ defmodule BijakhqWeb.GameSessionChannel do
     msg = Map.merge(msg, %{user: player})
     msg = Map.merge(msg, %{ts: DateTime.utc_now})
 
-    Logger.warn "GameSessionChannel :: game:result:show  - #{player.username}"
+    if player != nil do
+      Logger.warn "GameSessionChannel :: game:result:show  - #{player.username}"
+    end
 
     push(socket, "game:result:show", msg)
     {:noreply, socket}
