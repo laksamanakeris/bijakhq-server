@@ -20,6 +20,8 @@ defmodule BijakhqWeb.Api.GameView do
     %{id: user.id,
       email: user.email,
       username: user.username,
+      eliminated: user.eliminated,
+      is_playing: user.is_playing,
       # is_tester: user.is_tester,
       # role: user.role,
       profile_picture: GameView.check_profile_picture(user.profile_picture)
