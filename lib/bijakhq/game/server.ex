@@ -42,7 +42,7 @@ defmodule Bijakhq.Game.Server do
     case info do
       :undefined -> :ets.new(@ets_name, [:set, :public, :named_table, read_concurrency: true, write_concurrency: true])
       _ ->
-        :ets.tab2file(@ets_name, ~c[server_#{DateTime.utc_now}_.txt])
+        :ets.tab2file(@ets_name, ~c[server_#{DateTime.utc_now}.txt])
 
         :ets.delete(@ets_name)
         :ets.new(@ets_name, [:set, :public, :named_table, read_concurrency: true, write_concurrency: true])
@@ -78,6 +78,9 @@ defmodule Bijakhq.Game.Server do
     :ets.insert(@ets_name, {:prize, game_details.prize})
     :ets.insert(@ets_name, {:is_hidden, game_details.is_hidden})
     :ets.insert(@ets_name, {:prize_text, "RM #{game_details.prize}"})
+
+    :ets.insert(@ets_name, {:ts_start, DateTime.utc_now})
+    :ets.insert(@ets_name, {:ts_end, nil})
 
     questions = game_questions
     
@@ -122,6 +125,8 @@ defmodule Bijakhq.Game.Server do
     prize = lookup(:prize)
     is_hidden = lookup(:is_hidden)
     prize_text = lookup(:prize_text)
+    ts_start = lookup(:ts_start)
+    ts_end = lookup(:ts_end)
 
     count = total_questions - 1
 
@@ -139,7 +144,9 @@ defmodule Bijakhq.Game.Server do
       current_question: current_question,
       questions: questions,
       prize: prize,
-      prize_text: prize_text
+      prize_text: prize_text,
+      ts_start: ts_start,
+      ts_end: ts_end
     }
 
   end
@@ -148,6 +155,7 @@ defmodule Bijakhq.Game.Server do
     # game started true
     :ets.insert(@ets_name, {:game_started, true})
     :ets.insert(@ets_name, {:current_question, question_number})
+    :ets.insert(@ets_name, {"ts:question:#{question_number}", DateTime.utc_now})
     question = lookup("question:#{question_number}")
   end
 
@@ -160,6 +168,7 @@ defmodule Bijakhq.Game.Server do
   end
 
   def get_question_results(question_id) do
+    :ets.insert(@ets_name, {"ts:process:start:question:#{question_id}", DateTime.utc_now})
     result = Players.process_players_answers(question_id)
   end
 
@@ -178,6 +187,11 @@ defmodule Bijakhq.Game.Server do
   end
 
   def game_end() do
+    Logger.warn "Bijakhq.Game.Server :: game_end"
+    ts = DateTime.utc_now()
+    :ets.insert(@ets_name, {:ts_end, ts})
+    :ets.tab2file(@ets_name, ~c[game_end_#{ts}.txt])
+
     session_id = lookup(:session_id)
     if session_id do
       IO.inspect session_id
