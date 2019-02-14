@@ -46,7 +46,7 @@ defmodule Bijakhq.Game.Players do
     case info do
       :undefined -> :ets.new(ets_table_name, [:set, :public, :named_table, read_concurrency: true, write_concurrency: true])
       _ ->
-        :ets.tab2file(ets_table_name, ~c[#{ets_table_name}_#{DateTime.utc_now}_.txt])
+        :ets.tab2file(ets_table_name, ~c[#{ets_table_name}_#{DateTime.utc_now}.txt])
         :ets.delete(ets_table_name)
         :ets.new(ets_table_name, [:set, :public, :named_table, read_concurrency: true, write_concurrency: true])
     end
@@ -156,7 +156,7 @@ defmodule Bijakhq.Game.Players do
             true -> map
             false ->
               user_answer = Player.get_answer(player, question_id)
-              Task.start(Bijakhq.Game.Player, :process_answer, [player, user_answer, answers_sequence, is_test_game, is_last_question])
+              Task.start(Bijakhq.Game.Player, :process_answer, [question_id, player, user_answer, answers_sequence, is_test_game, is_last_question])
               Map.update(map, user_answer, 1, & &1 + 1)
           end
         end)
