@@ -25,7 +25,7 @@ defmodule BijakhqWeb.UserSocket do
         {:ok, user_id} ->
           socket = assign(socket, :user, %{id: user_id})
           # Logger.warn "SOCKET connected :: id:#{user_id} - time:#{DateTime.utc_now}"
-          Logger.warn "event::socket:connect:ok time:#{DateTime.utc_now} user:#{user_id}"
+          Logger.warn "event::socket:connect:ok | user:#{user_id} | time:#{DateTime.utc_now}"
           Semaphore.release(@semaphore_name)
           {:ok, socket}
         {:error, something} ->

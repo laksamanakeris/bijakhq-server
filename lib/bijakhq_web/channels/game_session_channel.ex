@@ -18,7 +18,7 @@ defmodule BijakhqWeb.GameSessionChannel do
 
   def join("game_session:lobby", payload, socket) do
     user = socket.assigns.user
-    Logger.warn "event::GameSessionChannel:game_session:lobby time:#{DateTime.utc_now} user:#{user.id}"
+    Logger.warn "event::GameSessionChannel:game_session:lobby | user:#{user.id} | time:#{DateTime.utc_now}"
 
     if Semaphore.acquire(@semaphore_name, @semaphore_max) do
       if authorized?(socket) do
@@ -39,7 +39,7 @@ defmodule BijakhqWeb.GameSessionChannel do
   # by sending replies to requests from the client
   def handle_in("ping", payload, socket) do
     user = socket.assigns.user
-    Logger.warn "event::GameSessionChannel:ping time:#{DateTime.utc_now} user:#{user.id}"
+    Logger.warn "event::GameSessionChannel:ping | user:#{user.id} | time:#{DateTime.utc_now}"
     {:reply, {:ok, payload}, socket}
   end
 
@@ -47,7 +47,7 @@ defmodule BijakhqWeb.GameSessionChannel do
   # broadcast to everyone in the current topic (game_session:lobby).
   def handle_in("shout", payload, socket) do
     user = socket.assigns.user
-    Logger.warn "event::GameSessionChannel:shout time:#{DateTime.utc_now} user:#{user.id}"
+    Logger.warn "event::GameSessionChannel:shout | user:#{user.id} | time:#{DateTime.utc_now}"
     broadcast socket, "shout", payload
     {:noreply, socket, :hibernate}
   end
@@ -69,14 +69,14 @@ defmodule BijakhqWeb.GameSessionChannel do
       response = Phoenix.View.render_one(response, BijakhqWeb.Api.QuizSessionView, "game_start_details.json")
       # {:noreply, socket}
       # Logger.warn "GameSessionChannel game:start :: time:#{DateTime.utc_now}"
-      Logger.warn "event::GameSessionChannel:handle_in:game:start time:#{DateTime.utc_now} user:#{user.id} game_id:#{game_id}"
+      Logger.warn "event::GameSessionChannel:handle_in:game:start | user:#{user.id} | time:#{DateTime.utc_now} game_id:#{game_id}"
       {:reply, {:ok, response}, socket}
     end
   end
 
   def handle_in("game:details:admin:show", _payload, socket) do
     user = socket.assigns.user
-    Logger.warn "event::GameSessionChannel:handle_in:game:details:admin:show time:#{DateTime.utc_now} user:#{user.id}"
+    Logger.warn "event::GameSessionChannel:handle_in:game:details:admin:show | user:#{user.id} | time:#{DateTime.utc_now}"
     # game_started = Server.lookup(:game_started)
     game_started = GameManager.server_lookup(:game_started)
     case game_started do
@@ -100,7 +100,7 @@ defmodule BijakhqWeb.GameSessionChannel do
   def handle_in("question:show", payload, socket) do
     user = socket.assigns.user
     %{"question_id" => question_id} = payload
-    Logger.warn "event::GameSessionChannel:handle_in:question:show time:#{DateTime.utc_now} user:#{user.id} question_id:#{question_id}"
+    Logger.warn "event::GameSessionChannel:handle_in:question:show | user:#{user.id} | time:#{DateTime.utc_now} question_id:#{question_id}"
 
     # with question = Server.set_current_question(question_id) do
     with question = GameManager.server_set_current_question(question_id) do
@@ -144,7 +144,7 @@ defmodule BijakhqWeb.GameSessionChannel do
       response = Phoenix.View.render_one(question, BijakhqWeb.Api.QuizQuestionView, "soalan_details.json")
       broadcast socket, "question:admin:show", response
       # Logger.warn "GameSessionChannel question:admin:show :: - question_id:#{question_id} - time:#{DateTime.utc_now}"
-      Logger.warn "event::GameSessionChannel:handle_in:question:admin:show time:#{DateTime.utc_now} user:#{user.id} question_id:#{question_id}"
+      Logger.warn "event::GameSessionChannel:handle_in:question:admin:show | user:#{user.id} | time:#{DateTime.utc_now} question_id:#{question_id}"
       {:reply, {:ok, response}, socket}
     end
   end
@@ -160,7 +160,7 @@ defmodule BijakhqWeb.GameSessionChannel do
 
     broadcast socket, "question:end", payload
     # Logger.warn "GameSessionChannel question:end :: - time:#{DateTime.utc_now}"
-    Logger.warn "event::GameSessionChannel:handle_in:question:end time:#{DateTime.utc_now} user:#{user.id}"
+    Logger.warn "event::GameSessionChannel:handle_in:question:end | user:#{user.id} | time:#{DateTime.utc_now}"
     {:reply, {:ok, payload}, socket}
   end
 
@@ -176,7 +176,7 @@ defmodule BijakhqWeb.GameSessionChannel do
 
       response = Phoenix.View.render_one(question, BijakhqWeb.Api.QuizQuestionView, "soalan_jawapan.json")
       # Logger.warn "GameSessionChannel question:result:get :: - question_id:#{question_id} - time:#{DateTime.utc_now}"
-      Logger.warn "event::GameSessionChannel:handle_in:question:result:get time:#{DateTime.utc_now} user:#{user.id} question_id:#{question_id}"
+      Logger.warn "event::GameSessionChannel:handle_in:question:result:get | user:#{user.id} | time:#{DateTime.utc_now} question_id:#{question_id}"
       {:reply, {:ok, response}, socket}
     end
   end
@@ -194,7 +194,7 @@ defmodule BijakhqWeb.GameSessionChannel do
       response = Phoenix.View.render_one(question, BijakhqWeb.Api.QuizQuestionView, "soalan_jawapan.json")
       broadcast socket, "question:result:admin:show", response
       # Logger.warn "GameSessionChannel question:result:admin:show :: - question_id:#{question_id} - time:#{DateTime.utc_now}"
-      Logger.warn "event::GameSessionChannel:handle_in:question:result:admin:show time:#{DateTime.utc_now} user:#{user.id} question_id:#{question_id}"
+      Logger.warn "event::GameSessionChannel:handle_in:question:result:admin:show | user:#{user.id} | time:#{DateTime.utc_now} question_id:#{question_id}"
       {:reply, {:ok, response}, socket}
     end
   end
@@ -217,7 +217,7 @@ defmodule BijakhqWeb.GameSessionChannel do
       broadcast socket, "question:result:show", response
       send(socket.transport_pid, :garbage_collect)
       # Logger.warn "GameSessionChannel question:result:show :: - question_id:#{question_id} - time:#{DateTime.utc_now}"
-      Logger.warn "event::GameSessionChannel:handle_in:question:result:show time:#{DateTime.utc_now} user:#{user.id} question_id:#{question_id}"
+      Logger.warn "event::GameSessionChannel:handle_in:question:result:show | user:#{user.id} | time:#{DateTime.utc_now} question_id:#{question_id}"
       {:noreply, socket, :hibernate}
     end
   end
@@ -231,7 +231,7 @@ defmodule BijakhqWeb.GameSessionChannel do
 
     broadcast socket, "question:result:end", payload
     # Logger.warn "GameSessionChannel question:result:end :: time:#{DateTime.utc_now}"
-    Logger.warn "event::GameSessionChannel:handle_in:question:result:end time:#{DateTime.utc_now} user:#{user.id}"
+    Logger.warn "event::GameSessionChannel:handle_in:question:result:end | user:#{user.id} | time:#{DateTime.utc_now}"
     {:noreply, socket, :hibernate}
   end
 
@@ -246,7 +246,7 @@ defmodule BijakhqWeb.GameSessionChannel do
       
       broadcast socket, "game:result:process", response
       # Logger.warn "GameSessionChannel game:result:process :: time:#{DateTime.utc_now}"
-      Logger.warn "event::GameSessionChannel:handle_in:game:result:process time:#{DateTime.utc_now} user:#{user.id}"
+      Logger.warn "event::GameSessionChannel:handle_in:game:result:process | user:#{user.id} | time:#{DateTime.utc_now}"
       {:reply, {:ok, response}, socket}
     end
     # {:noreply, socket}
@@ -263,7 +263,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     
     broadcast socket, "game:result:admin:show", response
     # Logger.warn "GameSessionChannel game:result:admin:show :: time:#{DateTime.utc_now}"
-    Logger.warn "event::GameSessionChannel:handle_in:game:result:admin:show time:#{DateTime.utc_now} user:#{user.id}"
+    Logger.warn "event::GameSessionChannel:handle_in:game:result:admin:show | user:#{user.id} | time:#{DateTime.utc_now}"
     send(socket.transport_pid, :garbage_collect)
 
     {:reply, {:ok, response}, socket}
@@ -287,7 +287,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     broadcast socket, "game:result:show", response
     send(socket.transport_pid, :garbage_collect)
     # Logger.warn "GameSessionChannel game:result:show :: time:#{DateTime.utc_now}"
-    Logger.warn "event::GameSessionChannel:handle_in:game:result:show time:#{DateTime.utc_now} user:#{user.id}"
+    Logger.warn "event::GameSessionChannel:handle_in:game:result:show | user:#{user.id} | time:#{DateTime.utc_now}"
 
     {:noreply, socket, :hibernate}
   end
@@ -304,7 +304,7 @@ defmodule BijakhqWeb.GameSessionChannel do
 
     broadcast socket, "game:result:end", %{}
     # Logger.warn "GameSessionChannel game:result:end :: time:#{DateTime.utc_now}"
-    Logger.warn "event::GameSessionChannel:handle_in:game:result:end time:#{DateTime.utc_now} user:#{user.id}"
+    Logger.warn "event::GameSessionChannel:handle_in:game:result:end | user:#{user.id} | time:#{DateTime.utc_now}"
     {:noreply, socket, :hibernate}
   end
 
@@ -319,7 +319,7 @@ defmodule BijakhqWeb.GameSessionChannel do
 
     broadcast socket, "game:end", %{}
     # Logger.warn "GameSessionChannel game:end :: time:#{DateTime.utc_now}"
-    Logger.warn "event::GameSessionChannel:handle_in:game:end time:#{DateTime.utc_now} user:#{user.id}"
+    Logger.warn "event::GameSessionChannel:handle_in:game:end | user:#{user.id} | time:#{DateTime.utc_now}"
     {:noreply, socket, :hibernate}
   end
 
@@ -329,7 +329,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     %{"question_id" => question_id, "answer_id" => answer_id} = payload
     user = socket.assigns.user
     GameManager.players_player_answered(user, question_id, answer_id)
-    Logger.warn "event::GameSessionChannel:handle_in:user:answer time:#{DateTime.utc_now} user:#{user.id} question_id:#{question_id} answer_id:#{answer_id}"
+    Logger.warn "event::GameSessionChannel:handle_in:user:answer | user:#{user.id} | time:#{DateTime.utc_now} question_id:#{question_id} answer_id:#{answer_id}"
     {:reply, {:ok, payload}, socket}
   end
 
@@ -338,7 +338,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     Task.start(Bijakhq.Game.Chat, :add_message, [user, payload])
     
     send(socket.transport_pid, :garbage_collect)
-    Logger.warn "event::GameSessionChannel:handle_in:user:chat time:#{DateTime.utc_now} user:#{user.id}"
+    Logger.warn "event::GameSessionChannel:handle_in:user:chat | user:#{user.id} | time:#{DateTime.utc_now}"
     {:reply, {:ok, payload}, socket}
   end
 
@@ -368,7 +368,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     if player != nil do
       Logger.warn "GameSessionChannel :: game:result:show  - #{player.username}"
     end
-    Logger.warn "event::GameSessionChannel:handle_out:game:result:show time:#{DateTime.utc_now} user:#{user.id}"
+    Logger.warn "event::GameSessionChannel:handle_out:game:result:show | user:#{user.id} | time:#{DateTime.utc_now}"
     push(socket, "game:result:show", msg)
     {:noreply, socket}
   end
@@ -376,9 +376,10 @@ defmodule BijakhqWeb.GameSessionChannel do
   # customize payload based on user
   # add in user game progress
   def handle_out("question:show", msg, socket) do
-
+    question_id = msg.question_id
     user = socket.assigns.user
-    Logger.warn "event::GameSessionChannel:handle_out:question:show time:#{DateTime.utc_now} user:#{user.id}"
+    Logger.warn "event::GameSessionChannel:handle_out:question:show time:#{DateTime.utc_now} | user:#{user.id} | question_id:#{question_id}"
+    
     case GameManager.players_lookup(user.id) do
       {:ok, player} ->
         data = %{
@@ -403,8 +404,9 @@ defmodule BijakhqWeb.GameSessionChannel do
 
   def handle_out("question:result:show", msg, socket) do
     question_id = msg.question_id
-
     user = socket.assigns.user
+    Logger.warn "event::GameSessionChannel:handle_out:question:result:show | user:#{user.id} | time:#{DateTime.utc_now} question_id:#{question_id}"
+
     case GameManager.players_lookup(user.id) do
       {:ok, player} ->
         user_answer = player.answers[question_id]
@@ -420,14 +422,11 @@ defmodule BijakhqWeb.GameSessionChannel do
         
         msg = Map.merge(msg, %{user: data})
         msg = Map.merge(msg, %{ts: DateTime.utc_now})
-        
         push(socket, "question:result:show", msg)
-        Logger.warn "event::GameSessionChannel:handle_out:question:result:show time:#{DateTime.utc_now} user:#{user.id} question_id:#{question_id}"
         {:noreply, socket}
       _ ->
         msg = Map.merge(msg, %{ts: DateTime.utc_now})
         push(socket, "question:result:show", msg)
-        Logger.warn "event::GameSessionChannel:handle_out:question:result:show time:#{DateTime.utc_now} user:#{user.id} question_id:#{question_id}"
         {:noreply, socket}
     end
   end
@@ -461,7 +460,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     # release semaphore to allow next process
     Semaphore.release(@semaphore_name)
     # Logger.warn "GameSessionChannel after_join :: release semaphore - time:#{DateTime.utc_now} - #{Semaphore.count(@semaphore_name)}"
-    Logger.warn "event::GameSessionChannel:handle_info:after_join time:#{DateTime.utc_now} user:#{user.id}"
+    Logger.warn "event::GameSessionChannel:handle_info:after_join | user:#{user.id} | time:#{DateTime.utc_now}"
 
     {:noreply, socket, :hibernate}
   end
@@ -474,7 +473,7 @@ defmodule BijakhqWeb.GameSessionChannel do
     user = socket.assigns.user
     # Logger.warn "Player::leave - #{user.id} - #{user.username} - #{user.role}"
     # Logger.warn "CHANNEL leave :: id:#{user.id} - time:#{DateTime.utc_now}"
-    Logger.warn "event::GameSessionChannel:terminate time:#{DateTime.utc_now} user:#{user.id}"
+    Logger.warn "event::GameSessionChannel:terminate | user:#{user.id} | time:#{DateTime.utc_now}"
     {:noreply, socket, :hibernate}
   end
 
