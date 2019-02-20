@@ -97,7 +97,7 @@ defmodule Bijakhq.Game.Player do
           Task.start(Bijakhq.Game.Player, :player_minus_life, [player])
         end
       else
-        player = Map.merge(player, %{extra_lives_remaining: 0,eliminated: true, question_eliminated: question_id})
+        player = Map.merge(player, %{eliminated: true, question_eliminated: question_id})
         :ets.insert(@ets_name, {player.id, player})
       end
   end
