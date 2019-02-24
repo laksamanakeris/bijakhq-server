@@ -53,11 +53,11 @@ spec:
               name: epmd8
           resources:
             limits:
-              cpu: 7500m
-              memory: 50000Mi
+              cpu: 6400m
+              memory: 45000Mi
             requests:
               cpu: 6000m
-              memory: 45000Mi
+              memory: 40000Mi
           livenessProbe:
             httpGet:
               path: /health
