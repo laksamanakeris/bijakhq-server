@@ -94,9 +94,9 @@ spec:
             - name: DB_HOSTNAME
               value: "127.0.0.1"
             - name: PAYPAL_CLIENT_ID
-              value: "AbdL0pqJgcqd5cKzzHJEsJ-qE6fUHq1IOYBrjnoWPzHlZUoivEZdnUP9ttie0Zzp1Fcv4Ic1VKD-qhrG"
+              value: "AWxMCa2Ovi1wPWTfqOqnaLkkPwYfNEZj_kmStwP83UEJ5cT37mCC_dLS-3OSRzs70N4jpNHlqsC6ygFl"
             - name: PAYPAL_CLIENT_SECRET
-              value: "EFqoDG-hQHswDzmjyWrNhTCBONRK3Ybdn_QWba5IddOG7WRMHkj72UU_dcTYYJ1HwVOCX8PLUmzGISaL"
+              value: "EFydo2p3fb05MQ6gtMgHSzAzLCtW_1xEVVcEIwwgOOLlcU-GEDQX0AaKFS7tHiSs0EKfuNn6rE12zvdp"
         - name: cloudsql-proxy
           image: gcr.io/cloudsql-docker/gce-proxy:1.11
           command: ["/cloud_sql_proxy",
