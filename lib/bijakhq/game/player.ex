@@ -23,7 +23,8 @@ defmodule Bijakhq.Game.Player do
     saved_by_extra_life: false,
     is_winner: false,
     amounts: 0,
-    answers: %{}
+    answers: %{},
+    ts_joined: nil
   ]
 
   def new(user, is_playing \\ false, eliminated \\ true) do
@@ -42,7 +43,8 @@ defmodule Bijakhq.Game.Player do
       saved_by_extra_life: false,
       is_winner: false,
       amounts: 0,
-      extra_lives_remaining: extra_life(user.lives, is_playing)
+      extra_lives_remaining: extra_life(user.lives, is_playing),
+      ts_joined: DateTime.utc_now
     }
 
   end
@@ -68,34 +70,34 @@ defmodule Bijakhq.Game.Player do
 
   end
 
-  def process_answer(player, user_answer, question, is_test_game, is_last_question) do
+  def process_answer(question_id, player, user_answer, question, is_test_game, is_last_question) do
     # Logger.warn "============================== Process_answer #{player.username} :: #{user_answer}"
     selected_answer = Enum.find(question.answers, fn u -> u.id == user_answer end)
     # IO.inspect selected_answer
     case selected_answer do
       nil -> 
         # meaning user not answering the question
-        player_have_wrong_answer(player, is_test_game, is_last_question)
+        player_have_wrong_answer(question_id,player, is_test_game, is_last_question)
       _ -> 
         if selected_answer.answer == false do
-          player_have_wrong_answer(player, is_test_game, is_last_question)
+          player_have_wrong_answer(question_id,player, is_test_game, is_last_question)
         else
           player
         end
     end
   end
 
-  def player_have_wrong_answer(player, is_test_game, is_last_question) do
+  def player_have_wrong_answer(question_id, player, is_test_game, is_last_question) do
     # Logger.warn "============================== Player_have_wrong_answer #{player.username} - is_last_question = #{is_last_question}"
     player = 
       if player.extra_lives_remaining > 0 && is_last_question == false do
-        player = Map.merge(player, %{extra_lives_remaining: 0,saved_by_extra_life: true})
+        player = Map.merge(player, %{extra_lives_remaining: 0,saved_by_extra_life: true, question_xl: question_id})
         :ets.insert(@ets_name, {player.id, player})
         if is_test_game == false do
           Task.start(Bijakhq.Game.Player, :player_minus_life, [player])
         end
       else
-        player = Map.merge(player, %{extra_lives_remaining: 0,eliminated: true})
+        player = Map.merge(player, %{eliminated: true, question_eliminated: question_id})
         :ets.insert(@ets_name, {player.id, player})
       end
   end
