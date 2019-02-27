@@ -21,8 +21,10 @@ defmodule BijakhqWeb.Api.UserController do
   # plug :id_check when action in [:update, :delete]
   plug :user_check when action in [:upload_image_profile, :show_me, :update_me]
 
-  def index(conn, _) do
-    users = Accounts.list_users()
+  def index(conn, params) do
+    page_num = params["page"]
+    search = params["query"]
+    users = Accounts.list_users(page_num, search)
     render(conn, "index.json", users: users)
   end
 
