@@ -14,15 +14,15 @@ spec:
     serviceName: bijakhq-backend
     servicePort: 8080
   tls:
-  - hosts:
+  - secretName: bijaktrivia-xyz-tls
+    hosts:
     - bijaktrivia.xyz
-    secretName: bijaktrivia-xyz-tls
-  - hosts:
+  - secretName: www-bijaktrivia-xyz-tls
+    hosts:
     - www.bijaktrivia.xyz
-    secretName: www-bijaktrivia-xyz-tls
-  - hosts:
+  - secretName: api.bijaktrivia-xyz-tls
+    hosts:
     - api.bijaktrivia.xyz
-    secretName: api.bijaktrivia-xyz-tls
 ---
 apiVersion: v1
 kind: Service
