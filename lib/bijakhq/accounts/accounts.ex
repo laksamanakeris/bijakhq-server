@@ -7,9 +7,16 @@ defmodule Bijakhq.Accounts do
   alias Phauxth.Log
   alias Bijakhq.{Accounts.User, Repo}
   alias Bijakhq.Accounts.Referral
+  
 
   def list_users do
     Repo.all(User)
+  end
+
+  def list_users(page_num \\ 1, search \\ "") do
+    query = from u in User,
+            where: like(u.username, ^"%#{search}%")
+    page = Repo.paginate(query, page: page_num)
   end
 
   def get(id), do: Repo.get(User, id)

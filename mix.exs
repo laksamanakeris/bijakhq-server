@@ -58,6 +58,7 @@ defmodule Bijakhq.Mixfile do
       {:distillery, "~> 2.0"},
       {:observer_cli, "~> 1.4"},
       {:semaphore, "~> 1.0"},
+      {:scrivener_ecto, "~> 1.3.0"},
     ]
   end
 
