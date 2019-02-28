@@ -127,7 +127,7 @@ defmodule Bijakhq.Quizzes do
     |> Repo.preload([:games])
   end
   
-  def list_quiz_questions(page) do
+  def list_quiz_questions(page \\ 1) do
     query = from q in QuizQuestion,
             order_by: [desc: q.id],
             preload: [:games]
