@@ -11,8 +11,9 @@ defmodule BijakhqWeb.Api.QuizSessionController do
   plug :role_check, [roles: ["admin"]] when action in [:index, :create, :show, :update, :delete, :list_questions, :show_question, :update_question]
   plug :user_check when action in [:leaderboard_weekly, :leaderboard_alltime]
 
-  def index(conn, _params) do
-    quiz_sessions = Quizzes.list_quiz_sessions()
+  def index(conn, params) do
+    page = params["page"]
+    quiz_sessions = Quizzes.list_quiz_sessions(page)
     render(conn, "index.json", quiz_sessions: quiz_sessions)
   end
 

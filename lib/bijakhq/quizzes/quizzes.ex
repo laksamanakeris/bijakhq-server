@@ -233,7 +233,13 @@ defmodule Bijakhq.Quizzes do
     from(p in QuizSession, order_by: [desc: p.id])
     |> Repo.all()
     |> Repo.preload([:game_questions])
-    # Repo.all(QuizSession) |> Repo.preload([:game_questions])
+  end
+
+  def list_quiz_sessions(page \\ 1) do
+    query = from q in QuizSession,
+            order_by: [desc: q.id],
+            preload: [:game_questions]
+    page = Repo.paginate(query, page: page)
   end
 
   @doc """
