@@ -13,7 +13,8 @@ defmodule BijakhqWeb.Api.QuizQuestionController do
 
   def index(conn, params) do
     page = params["page"]
-    quiz_questions = Quizzes.list_quiz_questions(page)
+    query = params["query"]
+    quiz_questions = Quizzes.list_quiz_questions(page, query)
     render(conn, "index.json", quiz_questions: quiz_questions)
   end
 

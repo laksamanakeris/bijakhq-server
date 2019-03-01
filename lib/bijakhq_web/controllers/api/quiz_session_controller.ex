@@ -13,7 +13,8 @@ defmodule BijakhqWeb.Api.QuizSessionController do
 
   def index(conn, params) do
     page = params["page"]
-    quiz_sessions = Quizzes.list_quiz_sessions(page)
+    query = params["query"]
+    quiz_sessions = Quizzes.list_quiz_sessions(page, query)
     render(conn, "index.json", quiz_sessions: quiz_sessions)
   end
 
