@@ -127,9 +127,14 @@ defmodule Bijakhq.Quizzes do
     |> Repo.preload([:games])
   end
   
-  def list_quiz_questions(page \\ 1) do
+  def list_quiz_questions(page \\ 1, keyword \\ "") do
     query = from q in QuizQuestion,
             order_by: [desc: q.id],
+            where: ilike(q.question, ^"%#{keyword}%"),
+            or_where: ilike(q.optionB, ^"%#{keyword}%"),
+            or_where: ilike(q.optionC, ^"%#{keyword}%"),
+            or_where: ilike(q.description, ^"%#{keyword}%"),
+            or_where: ilike(q.answer, ^"%#{keyword}%"),
             preload: [:games]
     page = Repo.paginate(query, page: page)
   end
@@ -242,9 +247,12 @@ defmodule Bijakhq.Quizzes do
     |> Repo.preload([:game_questions])
   end
 
-  def list_quiz_sessions(page \\ 1) do
+  def list_quiz_sessions(page \\ 1, keyword \\ "") do
     query = from q in QuizSession,
             order_by: [desc: q.id],
+            where: ilike(q.name, ^"%#{keyword}%"),
+            or_where: ilike(q.prize_description, ^"%#{keyword}%"),
+            or_where: ilike(q.description, ^"%#{keyword}%"),
             preload: [:game_questions]
     page = Repo.paginate(query, page: page)
   end
