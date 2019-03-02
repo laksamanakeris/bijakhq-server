@@ -94,7 +94,9 @@ defmodule Bijakhq.Accounts do
   end
 
   def delete_user(%User{} = user) do
-    Repo.delete(user)
+    user
+    |> Ecto.Changeset.change(%{is_deleted: true})
+    |> Repo.update
   end
 
   def change_user(%User{} = user) do

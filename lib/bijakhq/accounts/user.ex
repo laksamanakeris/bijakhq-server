@@ -40,6 +40,7 @@ defmodule Bijakhq.Accounts.User do
     field :rank_alltime, :integer
 
     field :paypal_email, :string
+    field :is_deleted, :boolean, default: false
 
     timestamps()
 
