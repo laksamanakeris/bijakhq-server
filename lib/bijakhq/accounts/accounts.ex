@@ -13,9 +13,9 @@ defmodule Bijakhq.Accounts do
     Repo.all(User)
   end
 
-  def list_users(page_num \\ 1, search \\ "") do
+  def list_users(page_num \\ 1, keyword \\ "") do
     query = from u in User,
-            where: like(u.username, ^"%#{search}%"),
+            where: ilike(u.username, ^"%#{keyword}%"),
             order_by: [asc: u.id]
     page = Repo.paginate(query, page: page_num)
   end

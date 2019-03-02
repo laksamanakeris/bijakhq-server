@@ -6,7 +6,11 @@ defmodule BijakhqWeb.Api.QuizSessionView do
   alias BijakhqWeb.Api.UserView
 
   def render("index.json", %{quiz_sessions: quiz_sessions}) do
-    %{data: render_many(quiz_sessions, QuizSessionView, "quiz_session.json")}
+    %{data: render_many(quiz_sessions, QuizSessionView, "quiz_session.json"),
+      page_number: quiz_sessions.page_number, 
+      page_size: quiz_sessions.page_size,
+      total_pages: quiz_sessions.total_pages,
+      total_entries: quiz_sessions.total_entries}
   end
 
   def render("show.json", %{quiz_session: quiz_session}) do
@@ -16,7 +20,6 @@ defmodule BijakhqWeb.Api.QuizSessionView do
   def render("quiz_session.json", %{quiz_session: quiz_session}) do
 
     questions_count = Enum.count(quiz_session.game_questions)
-    #IO.inspect questions_count
 
     %{id: quiz_session.id,
       name: quiz_session.name,
