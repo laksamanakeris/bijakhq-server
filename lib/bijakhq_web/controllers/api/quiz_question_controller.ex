@@ -11,8 +11,10 @@ defmodule BijakhqWeb.Api.QuizQuestionController do
   # plug :user_check when action in [:index, :show]
   plug :role_check, [roles: ["admin"]] when action in [:index, :create, :show,:update, :delete]
 
-  def index(conn, _params) do
-    quiz_questions = Quizzes.list_quiz_questions()
+  def index(conn, params) do
+    page = params["page"]
+    query = params["query"]
+    quiz_questions = Quizzes.list_quiz_questions(page, query)
     render(conn, "index.json", quiz_questions: quiz_questions)
   end
 
