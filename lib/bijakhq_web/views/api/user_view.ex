@@ -3,7 +3,7 @@ defmodule BijakhqWeb.Api.UserView do
   alias BijakhqWeb.Api.UserView
 
   def render("index.json", %{users: users}) do
-    %{data: render_many(users, UserView, "user.json"), 
+    %{data: render_many(users, UserView, "user.json"),
       page_number: users.page_number, 
       page_size: users.page_size,
       total_pages: users.total_pages,
@@ -17,6 +17,8 @@ defmodule BijakhqWeb.Api.UserView do
 
   def render("user.json", %{user: user}) do
     %{id: user.id,
+      lives: user.lives, 
+      balance: user.balance,
       email: user.email,
       username: user.username,
       phone: user.phone,
