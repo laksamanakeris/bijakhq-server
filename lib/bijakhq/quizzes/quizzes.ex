@@ -242,9 +242,12 @@ defmodule Bijakhq.Quizzes do
 
   """
   def list_quiz_sessions do
-    from(p in QuizSession, order_by: [desc: p.id])
-    |> Repo.all()
-    |> Repo.preload([:game_questions])
+    query = from q in QuizSession,
+            where: q.is_deleted == false,
+            order_by: [desc: q.id], 
+            preload: [:game_questions]
+
+    Repo.all(query)
   end
 
   def list_quiz_sessions(page \\ 1, keyword \\ "") do
@@ -253,7 +256,9 @@ defmodule Bijakhq.Quizzes do
             where: ilike(q.name, ^"%#{keyword}%"),
             or_where: ilike(q.prize_description, ^"%#{keyword}%"),
             or_where: ilike(q.description, ^"%#{keyword}%"),
+            where: q.is_deleted == false,
             preload: [:game_questions]
+            
     page = Repo.paginate(query, page: page)
   end
 
@@ -326,7 +331,9 @@ defmodule Bijakhq.Quizzes do
 
   """
   def delete_quiz_session(%QuizSession{} = quiz_session) do
-    Repo.delete(quiz_session)
+    quiz_session
+    |> Ecto.Changeset.change(%{is_deleted: true})
+    |> Repo.update
   end
 
   @doc """
