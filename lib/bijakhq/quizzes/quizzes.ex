@@ -12,7 +12,7 @@ defmodule Bijakhq.Quizzes do
   alias Bijakhq.Quizzes.QuizScore
   alias Bijakhq.Accounts.User
   alias Bijakhq.Accounts
-
+  alias Bijakhq.Quizzes.QuizSession
   @doc """
   Returns the list of quiz_categories.
 
@@ -153,8 +153,17 @@ defmodule Bijakhq.Quizzes do
       ** (Ecto.NoResultsError)
 
   """
-  def get_quiz_question!(id), do: Repo.get(QuizQuestion, id) |> Repo.preload([:games])
+  def get_quiz_question!(id) do
+    session_query = from q in QuizSession,
+            where: q.is_deleted == false
 
+    query = from q in QuizQuestion,
+            where: q.id == ^id,
+            preload: [games: ^session_query]
+
+    Repo.one(query)
+    
+  end
   @doc """
   Creates a quiz_question.
 
@@ -230,7 +239,7 @@ defmodule Bijakhq.Quizzes do
     Repo.one(query)
   end
 
-  alias Bijakhq.Quizzes.QuizSession
+
 
   @doc """
   Returns the list of quiz_sessions.
