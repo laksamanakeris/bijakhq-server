@@ -20,7 +20,8 @@ defmodule Bijakhq.Quizzes.QuizSession do
     field :time, :utc_datetime
     field :total_questions, :integer
     field :stream_url, :string
-
+    field :is_deleted, :boolean, default: false
+    
     has_many :game_questions, QuizGameQuestion, foreign_key: :session_id
     has_many :scores, QuizScore, foreign_key: :game_id
     many_to_many :questions, QuizQuestion, join_through: "quiz_session_question", join_keys: [session_id: :id, question_id: :id]
