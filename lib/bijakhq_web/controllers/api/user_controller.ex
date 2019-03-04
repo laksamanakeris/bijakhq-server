@@ -67,7 +67,9 @@ defmodule BijakhqWeb.Api.UserController do
   end
 
   def show(conn, %{"id" => id}) do
+    balance = Payments.get_balance_by_user_id(id)
     user = Accounts.get(id)
+    |> Map.put(:balance, balance)
     render(conn, "show.json", user: user)
   end
 
