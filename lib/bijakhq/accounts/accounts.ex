@@ -110,7 +110,13 @@ defmodule Bijakhq.Accounts do
 
 
   def list_referrals do
-    Repo.all(Referral) |> Repo.preload([:user, :referrer])
+    Repo.all from r in Referral,
+           join: u in assoc(r, :user),
+           join: re in assoc(r, :referrer),
+           where: u.is_deleted == false,
+           where: re.is_deleted == false,
+           preload: [:user, :referrer],
+           order_by: [asc: r.id]
   end
   def get_referral!(id), do: Repo.get!(Referral, id) |> Repo.preload([:user, :referrer])
 
