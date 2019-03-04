@@ -10,12 +10,16 @@ defmodule Bijakhq.Accounts do
   
 
   def list_users do
-    Repo.all(User)
+    query = from u in User,
+            where: [is_deleted: false],
+            order_by: [asc: u.id]
+    Repo.all(query)
   end
 
   def list_users(page_num \\ 1, keyword \\ "") do
     query = from u in User,
             where: ilike(u.username, ^"%#{keyword}%"),
+            where: [is_deleted: false],
             order_by: [asc: u.id]
     page = Repo.paginate(query, page: page_num)
   end
@@ -95,7 +99,7 @@ defmodule Bijakhq.Accounts do
 
   def delete_user(%User{} = user) do
     user
-    |> Ecto.Changeset.change(%{is_deleted: true})
+    |> Ecto.Changeset.change(%{is_deleted: true, username: nil, phone: nil})
     |> Repo.update
   end
 
