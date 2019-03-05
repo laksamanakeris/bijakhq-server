@@ -13,6 +13,8 @@ defmodule Bijakhq.Quizzes do
   alias Bijakhq.Accounts.User
   alias Bijakhq.Accounts
   alias Bijakhq.Quizzes.QuizSession
+  alias Bijakhq.Quizzes.AliveQuizSession
+  
   @doc """
   Returns the list of quiz_categories.
 
@@ -251,8 +253,7 @@ defmodule Bijakhq.Quizzes do
 
   """
   def list_quiz_sessions do
-    query = from q in QuizSession,
-            where: q.is_deleted == false,
+    query = from q in AliveQuizSession,
             order_by: [desc: q.id], 
             preload: [:game_questions]
 
@@ -260,12 +261,11 @@ defmodule Bijakhq.Quizzes do
   end
 
   def list_quiz_sessions(page \\ 1, keyword \\ "") do
-    query = from q in QuizSession,
+    query = from q in AliveQuizSession,
             order_by: [desc: q.id],
             where: ilike(q.name, ^"%#{keyword}%"),
             or_where: ilike(q.prize_description, ^"%#{keyword}%"),
             or_where: ilike(q.description, ^"%#{keyword}%"),
-            where: q.is_deleted == false,
             preload: [:game_questions]
             
     page = Repo.paginate(query, page: page)
@@ -341,7 +341,7 @@ defmodule Bijakhq.Quizzes do
   """
   def delete_quiz_session(%QuizSession{} = quiz_session) do
     quiz_session
-    |> Ecto.Changeset.change(%{is_deleted: true})
+    |> QuizSession.mark_for_deletion_changeset()
     |> Repo.update
   end
 
