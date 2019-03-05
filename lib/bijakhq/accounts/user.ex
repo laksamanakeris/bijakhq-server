@@ -125,6 +125,11 @@ defmodule Bijakhq.Accounts.User do
     update_change(changeset, :username, &String.downcase/1)
   end
 
+  def mark_for_deletion_changeset(changeset) do
+    changeset
+    |> change(%{is_deleted: true, username: nil, phone: nil})
+  end
+
   defp add_timestamp(%{"profile_picture" => %Plug.Upload{filename: name} = image} = attrs) do
     image = %Plug.Upload{image | filename: prepend_timestamp(name)}
     %{attrs | "profile_picture" => image}
