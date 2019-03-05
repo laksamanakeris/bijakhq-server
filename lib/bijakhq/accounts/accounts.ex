@@ -5,21 +5,19 @@ defmodule Bijakhq.Accounts do
 
   import Ecto.{Query, Changeset}, warn: false
   alias Phauxth.Log
-  alias Bijakhq.{Accounts.User, Repo}
+  alias Bijakhq.{Accounts.User, Repo, Accounts.AliveUser}
   alias Bijakhq.Accounts.Referral
   
 
   def list_users do
-    query = from u in User,
-            where: [is_deleted: false],
+    query = from u in AliveUser,
             order_by: [asc: u.id]
     Repo.all(query)
   end
 
   def list_users(page_num \\ 1, keyword \\ "") do
-    query = from u in User,
+    query = from u in AliveUser,
             where: ilike(u.username, ^"%#{keyword}%"),
-            where: [is_deleted: false],
             order_by: [asc: u.id]
     page = Repo.paginate(query, page: page_num)
   end
@@ -99,7 +97,7 @@ defmodule Bijakhq.Accounts do
 
   def delete_user(%User{} = user) do
     user
-    |> Ecto.Changeset.change(%{is_deleted: true, username: nil, phone: nil})
+    |> User.mark_for_deletion_changeset
     |> Repo.update
   end
 
@@ -110,13 +108,12 @@ defmodule Bijakhq.Accounts do
 
 
   def list_referrals do
-    Repo.all from r in Referral,
-           join: u in assoc(r, :user),
-           join: re in assoc(r, :referrer),
-           where: u.is_deleted == false,
-           where: re.is_deleted == false,
-           preload: [:user, :referrer],
-           order_by: [asc: r.id]
+    user_query = from u in AliveUser
+    query = from r in Referral,
+            preload: [user: ^user_query, referrer: ^user_query],
+            order_by: [asc: r.id]
+    Repo.all(query)
+           
   end
   def get_referral!(id), do: Repo.get!(Referral, id) |> Repo.preload([:user, :referrer])
 
