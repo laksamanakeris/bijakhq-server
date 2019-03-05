@@ -1,4 +1,4 @@
-defmodule Bijakhq.Quizzes.QuizSession do
+defmodule Bijakhq.Quizzes.AliveQuizSession do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -8,7 +8,7 @@ defmodule Bijakhq.Quizzes.QuizSession do
 
 
 
-  schema "quiz_sessions" do
+  schema "alive_quiz_sessions" do
     field :completed_at, :utc_datetime
     field :description, :string
     field :is_active, :boolean, default: false
@@ -20,7 +20,6 @@ defmodule Bijakhq.Quizzes.QuizSession do
     field :time, :utc_datetime
     field :total_questions, :integer
     field :stream_url, :string
-    field :is_deleted, :boolean, default: false
      
     has_many :game_questions, QuizGameQuestion, foreign_key: :session_id
     has_many :scores, QuizScore, foreign_key: :game_id
@@ -29,15 +28,4 @@ defmodule Bijakhq.Quizzes.QuizSession do
     timestamps()
   end
 
-  @doc false
-  def changeset(quiz_session, attrs) do
-    quiz_session
-    |> cast(attrs, [:name, :description, :prize, :prize_description, :total_questions, :time, :is_active, :is_completed, :is_hidden, :completed_at, :stream_url])
-    |> validate_required([:name, :prize, :time])
-  end
-
-  def mark_for_deletion_changeset(changeset) do
-    changeset
-    |> change(%{is_deleted: true})
-  end
 end
