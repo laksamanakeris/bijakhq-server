@@ -112,6 +112,17 @@ defmodule BijakhqWeb.Api.UserController do
     user |> Map.put(:balance, balance)
   end
 
+  def add_extra_life_to_user(conn, %{"id" => id} = param)do
+    with user when user != nil <- Accounts.get(id),
+        {:ok, user} <- Accounts.add_extra_lives_to_user(user)
+    do
+      show(conn, param)
+    else 
+      nil -> send_resp(conn, :not_found, "")
+      {:error, error} -> send_resp(conn, :bad_request, "")
+    end
+  end
+
   def add_leaderboard(user) do
     weekly = Quizzes.get_user_leaderboard_weekly(user.id)
     alltime = Quizzes.get_user_leaderboard_all_time(user.id)
