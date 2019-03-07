@@ -13,7 +13,7 @@ defmodule Bijakhq.Quizzes do
   alias Bijakhq.Accounts.User
   alias Bijakhq.Accounts
   alias Bijakhq.Quizzes.QuizSession
-  alias Bijakhq.Quizzes.AliveQuizSession
+  alias Bijakhq.Quizzes.ViewQuizSession
   
   @doc """
   Returns the list of quiz_categories.
@@ -156,13 +156,11 @@ defmodule Bijakhq.Quizzes do
 
   """
   def get_quiz_question!(id) do
-    session_query = from q in QuizSession,
-            where: q.is_deleted == false
+    session_query = from q in ViewQuizSession
 
     query = from q in QuizQuestion,
             where: q.id == ^id,
             preload: [games: ^session_query]
-
     Repo.one(query)
     
   end
@@ -253,7 +251,7 @@ defmodule Bijakhq.Quizzes do
 
   """
   def list_quiz_sessions do
-    query = from q in AliveQuizSession,
+    query = from q in ViewQuizSession,
             order_by: [desc: q.id], 
             preload: [:game_questions]
 
@@ -261,7 +259,7 @@ defmodule Bijakhq.Quizzes do
   end
 
   def list_quiz_sessions(page \\ 1, keyword \\ "") do
-    query = from q in AliveQuizSession,
+    query = from q in ViewQuizSession,
             order_by: [desc: q.id],
             where: ilike(q.name, ^"%#{keyword}%"),
             or_where: ilike(q.prize_description, ^"%#{keyword}%"),

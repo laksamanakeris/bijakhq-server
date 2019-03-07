@@ -1,9 +1,9 @@
-defmodule Bijakhq.Accounts.AliveUser do
+defmodule Bijakhq.Accounts.ViewUser do
   use Ecto.Schema
-  alias Bijakhq.Accounts.AliveUser
+  alias Bijakhq.Accounts.ViewUser
   alias Bijakhq.Quizzes.QuizScore
 
-  schema "alive_users" do
+  schema "view_users" do
     field :username, :string
     field :email, :string
     field :phone, :string
@@ -28,6 +28,6 @@ defmodule Bijakhq.Accounts.AliveUser do
     timestamps()
 
     has_many :scores, QuizScore, foreign_key: :user_id
-    belongs_to :referrer, AliveUser, foreign_key: :referring_user_id
+    belongs_to :referrer, ViewUser, foreign_key: :referring_user_id
   end
 end
