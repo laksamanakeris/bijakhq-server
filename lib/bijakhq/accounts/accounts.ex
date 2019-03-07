@@ -5,18 +5,18 @@ defmodule Bijakhq.Accounts do
 
   import Ecto.{Query, Changeset}, warn: false
   alias Phauxth.Log
-  alias Bijakhq.{Accounts.User, Repo, Accounts.AliveUser}
+  alias Bijakhq.{Accounts.User, Repo, Accounts.ViewUser}
   alias Bijakhq.Accounts.Referral
   
 
   def list_users do
-    query = from u in AliveUser,
+    query = from u in ViewUser,
             order_by: [asc: u.id]
     Repo.all(query)
   end
 
   def list_users(page_num \\ 1, keyword \\ "") do
-    query = from u in AliveUser,
+    query = from u in ViewUser,
             where: ilike(u.username, ^"%#{keyword}%"),
             order_by: [asc: u.id]
     page = Repo.paginate(query, page: page_num)
@@ -108,7 +108,7 @@ defmodule Bijakhq.Accounts do
 
 
   def list_referrals do
-    user_query = from u in AliveUser
+    user_query = from u in ViewUser
     query = from r in Referral,
             preload: [user: ^user_query, referrer: ^user_query],
             order_by: [asc: r.id]

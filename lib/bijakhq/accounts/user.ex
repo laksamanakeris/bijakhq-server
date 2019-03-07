@@ -40,7 +40,7 @@ defmodule Bijakhq.Accounts.User do
     field :rank_alltime, :integer
 
     field :paypal_email, :string
-    field :is_deleted, :boolean, default: false
+    field :deleted_at, :utc_datetime
 
     timestamps()
 
@@ -127,7 +127,7 @@ defmodule Bijakhq.Accounts.User do
 
   def mark_for_deletion_changeset(changeset) do
     changeset
-    |> change(%{is_deleted: true, username: nil, phone: nil})
+    |> change(%{deleted_at: DateTime.utc_now, username: nil, phone: nil})
   end
 
   defp add_timestamp(%{"profile_picture" => %Plug.Upload{filename: name} = image} = attrs) do

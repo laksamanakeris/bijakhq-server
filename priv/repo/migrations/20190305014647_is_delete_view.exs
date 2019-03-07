@@ -1,7 +1,7 @@
 defmodule Bijakhq.Repo.Migrations.IsDeleteView do
   use Ecto.Migration
 
-  @up "CREATE VIEW alive_users AS select 
+  @up "CREATE VIEW view_users AS select 
       id, 
       inserted_at,
       updated_at,
@@ -27,8 +27,8 @@ defmodule Bijakhq.Repo.Migrations.IsDeleteView do
       rank_alltime,
       paypal_email,
       referring_user_id
-      from users where not is_deleted;"
-  @down "DROP VIEW IF EXISTS alive_users;"
+      from users where deleted_at is null;"
+  @down "DROP VIEW IF EXISTS view_users;"
 
   def change do
     execute(@up, @down)

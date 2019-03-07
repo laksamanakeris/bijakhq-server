@@ -14,7 +14,7 @@ defmodule Bijakhq.Quizzes.QuizQuestion do
     field :selected, :boolean, default: false
     # field :category_id, :id
     field :description, :string
-    field :is_deleted, :boolean, default: false
+    field :deleted_at, :utc_datetime
     
     belongs_to :category, QuizCategory, foreign_key: :category_id
     # has_many :games, QuizGameQuestion, foreign_key: :user_id

@@ -1,4 +1,4 @@
-defmodule Bijakhq.Quizzes.AliveQuizSession do
+defmodule Bijakhq.Quizzes.ViewQuizSession do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -8,7 +8,7 @@ defmodule Bijakhq.Quizzes.AliveQuizSession do
 
 
 
-  schema "alive_quiz_sessions" do
+  schema "view_quiz_sessions" do
     field :completed_at, :utc_datetime
     field :description, :string
     field :is_active, :boolean, default: false

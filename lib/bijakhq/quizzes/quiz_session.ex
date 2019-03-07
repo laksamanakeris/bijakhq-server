@@ -20,7 +20,7 @@ defmodule Bijakhq.Quizzes.QuizSession do
     field :time, :utc_datetime
     field :total_questions, :integer
     field :stream_url, :string
-    field :is_deleted, :boolean, default: false
+    field :deleted_at, :utc_datetime
      
     has_many :game_questions, QuizGameQuestion, foreign_key: :session_id
     has_many :scores, QuizScore, foreign_key: :game_id
@@ -38,6 +38,6 @@ defmodule Bijakhq.Quizzes.QuizSession do
 
   def mark_for_deletion_changeset(changeset) do
     changeset
-    |> change(%{is_deleted: true})
+    |> change(%{deleted_at: DateTime.utc_now})
   end
 end
