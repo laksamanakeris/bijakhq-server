@@ -77,6 +77,7 @@ defmodule BijakhqWeb.Router do
     post "/users/me/payment", PaymentController, :request_payment
     get "/users/me", UserController, :show_me
     put "/users/me", UserController, :update_me
+    post "/users/me/token", ExpoTokenController, :add_token
 
     get "/confirm", ConfirmController, :index
     post "/password_resets", PasswordResetController, :create
