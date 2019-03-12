@@ -15,8 +15,9 @@ defmodule BijakhqWeb.Api.PushMessageController do
   end
 
   def create(%Plug.Conn{assigns: %{current_user: admin}} = conn, %{"notification" => push_message_params}) do
-    Map.put(push_message_params, :author_id, admin.id)
+    push_message_params = Map.put(push_message_params, "author_id", admin.id)
     with {:ok, %PushMessage{} = push_message} <- PushNotifications.create_push_message(push_message_params) do
+      push_message = PushNotifications.get_push_message!(push_message.id)
       conn
       |> put_status(:created)
       |> put_resp_header("location", api_push_message_path(conn, :show, push_message))

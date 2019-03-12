@@ -7,7 +7,9 @@ defmodule Bijakhq.PushNotifications.ExpoToken do
     field :is_active, :boolean, default: true
     field :platform, :string
     field :token, :string
-    field :user_id, :id
+    # field :user_id, :id
+
+    belongs_to :user, User, foreign_key: :user_id
 
     timestamps()
   end
@@ -15,7 +17,7 @@ defmodule Bijakhq.PushNotifications.ExpoToken do
   @doc false
   def changeset(expo_token, attrs) do
     expo_token
-    |> cast(attrs, [:token, :platform, :is_active])
-    |> validate_required([:token, :platform, :is_active])
+    |> cast(attrs, [:token, :platform, :is_active, :user_id])
+    |> validate_required([:token, :platform, :user_id])
   end
 end

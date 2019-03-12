@@ -6,6 +6,7 @@ defmodule Bijakhq.PushNotifications do
   import Ecto.Query, warn: false
   alias Bijakhq.Repo
 
+  alias Bijakhq.PushNotifications
   alias Bijakhq.PushNotifications.ExpoToken
 
   @doc """
@@ -55,6 +56,40 @@ defmodule Bijakhq.PushNotifications do
     |> Repo.insert()
   end
 
+  def create_expo_token(user, attrs) do
+
+    %{"token" => token, "platform" => platform} = attrs
+
+    result = check_user_token_exist(user.id, token)
+    case result do
+      nil -> 
+        attrs = Map.put(attrs, "user_id", user.id)
+        PushNotifications.create_expo_token(attrs)
+      _ ->
+        {:ok, result}
+    end
+
+    
+    # balance = Payments.get_balance_by_user_id(user.id)
+    # if balance < @minimum_payment do
+    #   {:error, :unauthorized, error: "Balance should be more than RM#{@minimum_payment}" }
+    # else
+    #   with {:ok, user} <- Accounts.update_paypal_email(user, %{"paypal_email" => paypal_email}) do
+    #     # Paypal ID = 1
+    #     params = %{amount: balance, updated_by: user.id, user_id: user.id, payment_type: 1, paypal_email: paypal_email}
+    #     with {:ok, _payment} <- Payments.create_payment(params) do
+    #       balance = Payments.get_balance_by_user_id(user.id)
+    #       {:ok, balance}
+    #     end
+    #   end
+    # end
+  end
+
+  def check_user_token_exist(user_id, token) do
+    from(u in ExpoToken, where: u.user_id == ^user_id and u.token == ^token)
+    |> Repo.one
+  end
+
   @doc """
   Updates a expo_token.
 
@@ -101,6 +136,27 @@ defmodule Bijakhq.PushNotifications do
   def change_expo_token(%ExpoToken{} = expo_token) do
     ExpoToken.changeset(expo_token, %{})
   end
+
+
+  @doc """
+  Add new expo token.
+
+  ## Examples
+
+      iex> add_expo_token(%{field: value})
+      {:ok, %ExpoToken{}}
+
+      iex> create_expo_token(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def add_expo_token(attrs \\ %{}) do
+    %ExpoToken{}
+    |> ExpoToken.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  
 
   alias Bijakhq.PushNotifications.PushMessage
 
