@@ -40,6 +40,7 @@ defmodule Bijakhq.Accounts.User do
     field :rank_alltime, :integer
 
     field :paypal_email, :string
+    field :deleted_at, :utc_datetime
 
     timestamps()
 
@@ -128,6 +129,11 @@ defmodule Bijakhq.Accounts.User do
 
   defp downcase_username(changeset) do
     update_change(changeset, :username, &String.downcase/1)
+  end
+
+  def mark_for_deletion_changeset(changeset) do
+    changeset
+    |> change(%{deleted_at: DateTime.utc_now, username: nil, phone: nil})
   end
 
   defp add_timestamp(%{"profile_picture" => %Plug.Upload{filename: name} = image} = attrs) do

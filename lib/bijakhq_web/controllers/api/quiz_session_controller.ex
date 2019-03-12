@@ -42,9 +42,13 @@ defmodule BijakhqWeb.Api.QuizSessionController do
   end
 
   def delete(conn, %{"id" => id}) do
-    quiz_session = Quizzes.get_quiz_session!(id)
-    with {:ok, %QuizSession{}} <- Quizzes.delete_quiz_session(quiz_session) do
+    with quiz when quiz != nil <- Quizzes.get_quiz_session!(id),
+         {:ok, _struct} <- Quizzes.delete_quiz_session(quiz)
+    do
       send_resp(conn, :no_content, "")
+    else
+      nil -> send_resp(conn, :not_found, "")
+      {:error, _changeset} -> send_resp(conn, :bad_request, "")
     end
   end
 
