@@ -16,9 +16,12 @@ defmodule BijakhqWeb.Api.UserView do
   end
 
   def render("user.json", %{user: user}) do
+
+    balance = check_balance(user)
+
     %{id: user.id,
       lives: user.lives, 
-      balance: user.balance,
+      balance: balance,
       email: user.email,
       username: user.username,
       phone: user.phone,
@@ -71,6 +74,13 @@ defmodule BijakhqWeb.Api.UserView do
 
   def check_profile_picture(file) do
     "https://storage.googleapis.com/bijakhq_avatars/uploads/user/avatars/#{file.file_name}"
+  end
+
+  def check_balance(user) do
+    case val = Map.has_key?(user, :balance) do
+      true -> user.balance
+      false -> nil
+    end
   end
 
 end

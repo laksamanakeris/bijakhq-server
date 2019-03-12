@@ -66,4 +66,68 @@ defmodule Bijakhq.PushNotificationsTest do
       assert %Ecto.Changeset{} = PushNotifications.change_expo_token(expo_token)
     end
   end
+
+  describe "push_messages" do
+    alias Bijakhq.PushNotifications.PushMessage
+
+    @valid_attrs %{is_completed: true, messages: "some messages", total_tokens: 42}
+    @update_attrs %{is_completed: false, messages: "some updated messages", total_tokens: 43}
+    @invalid_attrs %{is_completed: nil, messages: nil, total_tokens: nil}
+
+    def push_message_fixture(attrs \\ %{}) do
+      {:ok, push_message} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> PushNotifications.create_push_message()
+
+      push_message
+    end
+
+    test "list_push_messages/0 returns all push_messages" do
+      push_message = push_message_fixture()
+      assert PushNotifications.list_push_messages() == [push_message]
+    end
+
+    test "get_push_message!/1 returns the push_message with given id" do
+      push_message = push_message_fixture()
+      assert PushNotifications.get_push_message!(push_message.id) == push_message
+    end
+
+    test "create_push_message/1 with valid data creates a push_message" do
+      assert {:ok, %PushMessage{} = push_message} = PushNotifications.create_push_message(@valid_attrs)
+      assert push_message.is_completed == true
+      assert push_message.messages == "some messages"
+      assert push_message.total_tokens == 42
+    end
+
+    test "create_push_message/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = PushNotifications.create_push_message(@invalid_attrs)
+    end
+
+    test "update_push_message/2 with valid data updates the push_message" do
+      push_message = push_message_fixture()
+      assert {:ok, push_message} = PushNotifications.update_push_message(push_message, @update_attrs)
+      assert %PushMessage{} = push_message
+      assert push_message.is_completed == false
+      assert push_message.messages == "some updated messages"
+      assert push_message.total_tokens == 43
+    end
+
+    test "update_push_message/2 with invalid data returns error changeset" do
+      push_message = push_message_fixture()
+      assert {:error, %Ecto.Changeset{}} = PushNotifications.update_push_message(push_message, @invalid_attrs)
+      assert push_message == PushNotifications.get_push_message!(push_message.id)
+    end
+
+    test "delete_push_message/1 deletes the push_message" do
+      push_message = push_message_fixture()
+      assert {:ok, %PushMessage{}} = PushNotifications.delete_push_message(push_message)
+      assert_raise Ecto.NoResultsError, fn -> PushNotifications.get_push_message!(push_message.id) end
+    end
+
+    test "change_push_message/1 returns a push_message changeset" do
+      push_message = push_message_fixture()
+      assert %Ecto.Changeset{} = PushNotifications.change_push_message(push_message)
+    end
+  end
 end
