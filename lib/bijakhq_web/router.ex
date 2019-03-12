@@ -61,6 +61,11 @@ defmodule BijakhqWeb.Router do
 
       get "/games-users/:game_id/extra-life", QuizUserController, :add_extra_life
       post "/users/:id/lives", UserController, :add_extra_life_to_user
+
+      scope "/notifications" do
+        resources "/tokens", ExpoTokenController
+      end
+
     end
 
     post "/sessions", SessionController, :create
