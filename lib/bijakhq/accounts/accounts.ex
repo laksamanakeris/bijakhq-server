@@ -100,6 +100,13 @@ defmodule Bijakhq.Accounts do
   def change_user(%User{} = user) do
     User.changeset(user, %{})
   end
+  
+  def add_extra_lives_to_user(%User{} = user) do
+    lives = user.lives + 1
+    user
+    |> User.add_lives_changeset(lives)
+    |> Repo.update
+  end
 
 
 

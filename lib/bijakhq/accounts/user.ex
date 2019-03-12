@@ -101,6 +101,12 @@ defmodule Bijakhq.Accounts.User do
     |> validate_format(:paypal_email, ~r/@/)
     |> validate_length(:paypal_email, max: 254)
   end
+  
+  def add_lives_changeset(changeset, lives)do
+    changeset
+    |> change(lives: lives)
+    |> validate_number(:lives, greater_than: 0)
+  end
 
   defp unique_username(changeset) do
     validate_length(changeset, :username, min: 3)
