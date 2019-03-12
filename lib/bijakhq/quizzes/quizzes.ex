@@ -12,7 +12,9 @@ defmodule Bijakhq.Quizzes do
   alias Bijakhq.Quizzes.QuizScore
   alias Bijakhq.Accounts.User
   alias Bijakhq.Accounts
-
+  alias Bijakhq.Quizzes.QuizSession
+  alias Bijakhq.Quizzes.ViewQuizSession
+  
   @doc """
   Returns the list of quiz_categories.
 
@@ -153,8 +155,15 @@ defmodule Bijakhq.Quizzes do
       ** (Ecto.NoResultsError)
 
   """
-  def get_quiz_question!(id), do: Repo.get(QuizQuestion, id) |> Repo.preload([:games])
+  def get_quiz_question!(id) do
+    session_query = from q in ViewQuizSession
 
+    query = from q in QuizQuestion,
+            where: q.id == ^id,
+            preload: [games: ^session_query]
+    Repo.one(query)
+    
+  end
   @doc """
   Creates a quiz_question.
 
@@ -230,7 +239,7 @@ defmodule Bijakhq.Quizzes do
     Repo.one(query)
   end
 
-  alias Bijakhq.Quizzes.QuizSession
+
 
   @doc """
   Returns the list of quiz_sessions.
@@ -242,18 +251,21 @@ defmodule Bijakhq.Quizzes do
 
   """
   def list_quiz_sessions do
-    from(p in QuizSession, order_by: [desc: p.id])
-    |> Repo.all()
-    |> Repo.preload([:game_questions])
+    query = from q in ViewQuizSession,
+            order_by: [desc: q.id], 
+            preload: [:game_questions]
+
+    Repo.all(query)
   end
 
   def list_quiz_sessions(page \\ 1, keyword \\ "") do
-    query = from q in QuizSession,
+    query = from q in ViewQuizSession,
             order_by: [desc: q.id],
             where: ilike(q.name, ^"%#{keyword}%"),
             or_where: ilike(q.prize_description, ^"%#{keyword}%"),
             or_where: ilike(q.description, ^"%#{keyword}%"),
             preload: [:game_questions]
+            
     page = Repo.paginate(query, page: page)
   end
 
@@ -326,7 +338,9 @@ defmodule Bijakhq.Quizzes do
 
   """
   def delete_quiz_session(%QuizSession{} = quiz_session) do
-    Repo.delete(quiz_session)
+    quiz_session
+    |> QuizSession.mark_for_deletion_changeset()
+    |> Repo.update
   end
 
   @doc """
