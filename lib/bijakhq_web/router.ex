@@ -61,6 +61,12 @@ defmodule BijakhqWeb.Router do
 
       get "/games-users/:game_id/extra-life", QuizUserController, :add_extra_life
       post "/users/:id/lives", UserController, :add_extra_life_to_user
+
+      scope "/notifications" do
+        resources "/tokens", ExpoTokenController
+        resources "/messages", PushMessageController
+      end
+
     end
 
     post "/sessions", SessionController, :create
@@ -71,6 +77,7 @@ defmodule BijakhqWeb.Router do
     post "/users/me/payment", PaymentController, :request_payment
     get "/users/me", UserController, :show_me
     put "/users/me", UserController, :update_me
+    post "/users/me/token", ExpoTokenController, :add_token
 
     get "/confirm", ConfirmController, :index
     post "/password_resets", PasswordResetController, :create
