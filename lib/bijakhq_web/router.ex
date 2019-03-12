@@ -60,7 +60,7 @@ defmodule BijakhqWeb.Router do
       resources "/games-users", QuizUserController, except: [:new, :edit]
 
       get "/games-users/:game_id/extra-life", QuizUserController, :add_extra_life
-
+      post "/users/:id/lives", UserController, :add_extra_life_to_user
     end
 
     post "/sessions", SessionController, :create
