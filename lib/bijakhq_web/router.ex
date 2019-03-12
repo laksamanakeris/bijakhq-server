@@ -64,6 +64,7 @@ defmodule BijakhqWeb.Router do
 
       scope "/notifications" do
         resources "/tokens", ExpoTokenController
+        resources "/messages", PushMessageController
       end
 
     end
