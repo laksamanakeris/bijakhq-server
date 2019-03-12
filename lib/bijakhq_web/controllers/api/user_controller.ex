@@ -81,10 +81,14 @@ defmodule BijakhqWeb.Api.UserController do
   end
 
   def delete(conn, %{"id" => id}) do
-    user = Accounts.get(id)
-    {:ok, _user} = Accounts.delete_user(user)
-
-    send_resp(conn, :no_content, "")
+    with user when user != nil <- Accounts.get(id),
+         {:ok, _struct} <- Accounts.delete_user(user)
+    do
+      send_resp(conn, :no_content, "")
+    else
+      nil -> send_resp(conn, :not_found, "")
+      {:error, _changeset} -> send_resp(conn, :bad_request, "")
+    end
   end
 
   def show_me(%Plug.Conn{assigns: %{current_user: user}} = conn, _) do
