@@ -292,6 +292,7 @@ defmodule Bijakhq.PushNotifications do
         {:ok, response} = ExponentServerSdk.PushNotification.push_list(messages)
         # IO.puts "Sending batch"
         Logger.warn "event::PushNotifications.send_push_messages | time:#{DateTime.utc_now}"
+        # TODO: process response from Expo
         response
       end)
   end
