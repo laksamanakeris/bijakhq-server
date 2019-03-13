@@ -25,9 +25,12 @@ defmodule Bijakhq.Accounts.ViewUser do
     field :rank_weekly, :integer
     field :rank_alltime, :integer
     field :paypal_email, :string
+    field :balance, :integer, default: nil, virtual: true
     timestamps()
 
     has_many :scores, QuizScore, foreign_key: :user_id
     belongs_to :referrer, ViewUser, foreign_key: :referring_user_id
   end
+  
+
 end

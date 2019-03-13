@@ -69,7 +69,7 @@ defmodule BijakhqWeb.Api.UserController do
   def show(conn, %{"id" => id}) do
     balance = Payments.get_balance_by_user_id(id)
     user = Accounts.get(id)
-    |> Map.put(:balance, balance)
+    |> add_balance_to_user
     render(conn, "show.json", user: user)
   end
 
@@ -95,14 +95,16 @@ defmodule BijakhqWeb.Api.UserController do
     # user = id == to_string(user.id) and user || Accounts.get(id)
     # profile = Accounts.get(user.id);
     # render(conn, "show_me.json", %{user: user, profile: profile})
-    user =
-        add_balance_to_user(user)
-        |> add_leaderboard
+    user = Accounts.get_user_with_referrer(user.id)
+           |> add_balance_to_user
+           |> add_leaderboard
     render(conn, "show_me.json", %{user: user})
   end
 
   def update_me(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"username" => username} = user_params) do
-    with {:ok, user} <- Accounts.update_username(user, user_params) do
+    with {:ok, user} <- Accounts.update_username(user, user_params), 
+         user <- Accounts.get_user_with_referrer(user.id)
+    do
       user =
         add_balance_to_user(user)
         |> add_leaderboard
@@ -111,7 +113,6 @@ defmodule BijakhqWeb.Api.UserController do
   end
 
   def add_balance_to_user(user)do
-    user = user |> Repo.preload(:referrer)
     balance = Payments.get_balance_by_user_id(user.id)
     user |> Map.put(:balance, balance)
   end
