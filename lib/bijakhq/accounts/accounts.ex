@@ -22,6 +22,14 @@ defmodule Bijakhq.Accounts do
     page = Repo.paginate(query, page: page_num)
   end
 
+  def list_ids(is_tester \\ false) do
+    query = from u in User,
+          select: u.id,
+          where: u.is_tester == ^is_tester,
+          order_by: [asc: u.id]
+    Repo.all(query)
+  end
+
   def get(id), do: Repo.get(User, id)
 
   def get_by(%{"email" => email}) do
