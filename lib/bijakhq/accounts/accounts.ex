@@ -24,6 +24,7 @@ defmodule Bijakhq.Accounts do
 
   def get(id), do: Repo.get(User, id)
 
+
   def get_by(%{"email" => email}) do
     Repo.get_by(User, email: email)
   end
@@ -38,6 +39,11 @@ defmodule Bijakhq.Accounts do
 
   def get_user_by_username(username) do
     get_by(%{"username" => username})
+  end
+
+  def get_user_with_referrer(id) do
+    Repo.get(User, id)
+    |> Repo.preload(:referrer)
   end
 
   def create_user(attrs) do
@@ -74,6 +80,7 @@ defmodule Bijakhq.Accounts do
     user
     |> User.update_username_changeset(attrs)
     |> Repo.update()
+    
   end
 
   def update_paypal_email(%User{} = user, attrs) do
