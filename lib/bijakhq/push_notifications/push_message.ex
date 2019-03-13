@@ -7,7 +7,9 @@ defmodule Bijakhq.PushNotifications.PushMessage do
 
   schema "pn_messages" do
     field :is_completed, :boolean, default: false
+    field :is_tester, :boolean, default: false
     field :message, :string
+    field :title, :string
     field :total_tokens, :integer
     # field :author_id, :id
 
@@ -19,7 +21,7 @@ defmodule Bijakhq.PushNotifications.PushMessage do
   @doc false
   def changeset(push_message, attrs) do
     push_message
-    |> cast(attrs, [:message, :is_completed, :total_tokens, :author_id])
-    |> validate_required([:message, :author_id])
+    |> cast(attrs, [:title, :message, :is_completed, :is_tester, :total_tokens, :author_id])
+    |> validate_required([:title, :message, :author_id])
   end
 end
