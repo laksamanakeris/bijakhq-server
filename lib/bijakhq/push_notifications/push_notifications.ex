@@ -293,6 +293,7 @@ defmodule Bijakhq.PushNotifications do
         # IO.puts "Sending batch"
         Logger.warn "event::PushNotifications.send_push_messages | time:#{DateTime.utc_now}"
         # TODO: process response from Expo
+        IO.inspect response
         response
       end)
   end
