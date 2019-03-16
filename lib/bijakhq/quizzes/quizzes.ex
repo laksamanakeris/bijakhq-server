@@ -786,7 +786,7 @@ defmodule Bijakhq.Quizzes do
     user_data = get_user_ranking_weekly(user_id)
     case user_data do
       nil ->
-        %{amounts: 0, rank: 101, user_id: user_id}
+        %{amounts: 0, rank: 0, user_id: user_id}
       _ ->
         list = list_quiz_scores_weekly()
         # #IO.inspect list
@@ -805,7 +805,7 @@ defmodule Bijakhq.Quizzes do
     user_data = get_user_ranking_alltime(user_id)
     case user_data do
       nil ->
-        %{amounts: 0, rank: 101, user_id: user_id}
+        %{amounts: 0, rank: 0, user_id: user_id}
       _ ->
         list = list_quiz_scores_all_time()
         # #IO.inspect list
