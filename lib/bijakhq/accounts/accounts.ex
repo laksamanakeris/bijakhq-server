@@ -42,11 +42,6 @@ defmodule Bijakhq.Accounts do
     get_by(%{"username" => username})
   end
 
-  def get_user_with_referrer(id) do
-    Repo.get(User, id)
-    |> Repo.preload(:referrer)
-  end
-
   def get_user_details(id) do
   
     balance = Payments.get_balance_by_user_id(id)
