@@ -12,27 +12,39 @@ defmodule BijakhqWeb.Api.UserView do
   end
 
   def render("show.json", %{user: user}) do
-    %{data: render_one(user, UserView, "user.json")}
+    %{data: render_one(user, UserView, "show_user.json")}
   end
 
   def render("user.json", %{user: user}) do
 
-    user_map = %{id: user.id,
+    %{id: user.id,
         lives: user.lives, 
-        email: user.email,
         username: user.username,
         phone: user.phone,
         is_tester: user.is_tester,
         role: user.role,
         profile_picture: UserView.check_profile_picture(user.profile_picture)
-      }
-    
-    case user.balance do
-      nil -> user_map
-      balance -> Map.put(user_map, :balance, user.balance)
-    end
+    }
 
   end
+  
+  def render("show_user.json", %{user: user}) do
+
+    %{id: user.id,
+        lives: user.lives, 
+        username: user.username,
+        phone: user.phone,
+        is_tester: user.is_tester,
+        role: user.role,
+        profile_picture: UserView.check_profile_picture(user.profile_picture),
+        balance: user.balance,
+        referred: user.referred,
+        referrer: render_one(user.referrer, UserView, "user.json"),
+        leaderboard: render_one(user.leaderboard, UserView, "leaderboard.json"),
+      }
+
+  end
+
 
   def render("show_me.json", %{user: user}) do
     %{

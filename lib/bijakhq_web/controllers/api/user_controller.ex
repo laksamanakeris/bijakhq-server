@@ -67,9 +67,7 @@ defmodule BijakhqWeb.Api.UserController do
   end
 
   def show(conn, %{"id" => id}) do
-    balance = Payments.get_balance_by_user_id(id)
-    user = Accounts.get(id)
-    |> add_balance_to_user
+    user = Accounts.get_user_details(id)
     render(conn, "show.json", user: user)
   end
 
@@ -95,26 +93,16 @@ defmodule BijakhqWeb.Api.UserController do
     # user = id == to_string(user.id) and user || Accounts.get(id)
     # profile = Accounts.get(user.id);
     # render(conn, "show_me.json", %{user: user, profile: profile})
-    user = Accounts.get_user_with_referrer(user.id)
-           |> add_balance_to_user
-           |> add_leaderboard
+    user = Accounts.get_user_details(user.id)
     render(conn, "show_me.json", %{user: user})
   end
 
   def update_me(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"username" => username} = user_params) do
     with {:ok, user} <- Accounts.update_username(user, user_params), 
-         user <- Accounts.get_user_with_referrer(user.id)
+         user <- Accounts.get_user_details(user.id)
     do
-      user =
-        add_balance_to_user(user)
-        |> add_leaderboard
       render(conn, "show_me.json", %{user: user})
     end
-  end
-
-  def add_balance_to_user(user)do
-    balance = Payments.get_balance_by_user_id(user.id)
-    user |> Map.put(:balance, balance)
   end
 
   def add_extra_life_to_user(conn, %{"id" => id} = param)do
@@ -128,13 +116,6 @@ defmodule BijakhqWeb.Api.UserController do
     end
   end
 
-  def add_leaderboard(user) do
-    weekly = Quizzes.get_user_leaderboard_weekly(user.id)
-    alltime = Quizzes.get_user_leaderboard_all_time(user.id)
-    leaderboard = %{alltime: alltime, weekly: weekly}
-    user |> Map.put(:leaderboard, leaderboard)
-  end
-
   def upload_image_profile(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"profile_picture" => _params} = user_params) do
     #IO.puts "===================================================================================="
     #IO.inspect user
@@ -145,9 +126,7 @@ defmodule BijakhqWeb.Api.UserController do
     # #IO.inspect uploaded
 
     with {:ok, user} <- Accounts.upload_image(user, user_params) do
-      user = 
-        add_balance_to_user(user)
-        |> add_leaderboard
+      user = Accounts.get_user_details(user.id)
       render(conn, "show_me.json", user: user)
     end
     # render(conn, "show_me.json", user: user)
