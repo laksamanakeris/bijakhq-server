@@ -31,9 +31,10 @@ defmodule BijakhqWeb.Api.UserController do
   def create(conn, %{"user" => %{"email" => email} = user_params}) do
     key = Phauxth.Token.sign(conn, %{"email" => email})
 
-    with {:ok, user} <- Accounts.create_user(user_params) do
+    with {:ok, user} <- Accounts.create_user(user_params),
+          user <- Accounts.get_user_details(user.id) 
+    do
       Log.info(%Log{user: user.id, message: "user created"})
-
       Accounts.Message.confirm_request(email, key)
       conn
       |> put_status(:created)
@@ -72,7 +73,7 @@ defmodule BijakhqWeb.Api.UserController do
   end
 
   def update(conn, %{"id" => id, "user" => user_params}) do
-    user = Accounts.get(id)
+    user = Accounts.get_user_details(id)
     with {:ok, user} <- Accounts.update_user(user, user_params) do
       render(conn, "show.json", user: user)
     end
