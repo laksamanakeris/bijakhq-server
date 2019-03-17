@@ -7,7 +7,8 @@ defmodule Bijakhq.Accounts do
   alias Phauxth.Log
   alias Bijakhq.{Accounts.User, Repo, Accounts.ViewUser}
   alias Bijakhq.Accounts.Referral
-  
+  alias Bijakhq.Quizzes
+  alias Bijakhq.Payments
 
   def list_users do
     query = from u in ViewUser,
@@ -32,6 +33,7 @@ defmodule Bijakhq.Accounts do
 
   def get(id), do: Repo.get(User, id)
 
+
   def get_by(%{"email" => email}) do
     Repo.get_by(User, email: email)
   end
@@ -46,6 +48,19 @@ defmodule Bijakhq.Accounts do
 
   def get_user_by_username(username) do
     get_by(%{"username" => username})
+  end
+
+  def get_user_details(id) do
+  
+    balance = Payments.get_balance_by_user_id(id)
+    weekly = Quizzes.get_user_leaderboard_weekly(id)
+    alltime = Quizzes.get_user_leaderboard_all_time(id)
+    leaderboard = %{alltime: alltime, weekly: weekly}
+
+    Repo.get(User, id)
+    |> Repo.preload(:referrer)
+    |> Map.put(:balance, balance)
+    |> Map.put(:leaderboard, leaderboard)
   end
 
   def create_user(attrs) do
@@ -82,6 +97,7 @@ defmodule Bijakhq.Accounts do
     user
     |> User.update_username_changeset(attrs)
     |> Repo.update()
+    
   end
 
   def update_paypal_email(%User{} = user, attrs) do

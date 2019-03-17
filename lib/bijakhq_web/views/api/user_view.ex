@@ -12,24 +12,39 @@ defmodule BijakhqWeb.Api.UserView do
   end
 
   def render("show.json", %{user: user}) do
-    %{data: render_one(user, UserView, "user.json")}
+    %{data: render_one(user, UserView, "show_user.json")}
   end
 
   def render("user.json", %{user: user}) do
 
-    balance = check_balance(user)
+    %{id: user.id,
+        lives: user.lives, 
+        username: user.username,
+        phone: user.phone,
+        is_tester: user.is_tester,
+        role: user.role,
+        profile_picture: UserView.check_profile_picture(user.profile_picture)
+    }
+
+  end
+  
+  def render("show_user.json", %{user: user}) do
 
     %{id: user.id,
-      lives: user.lives, 
-      balance: balance,
-      email: user.email,
-      username: user.username,
-      phone: user.phone,
-      is_tester: user.is_tester,
-      role: user.role,
-      profile_picture: UserView.check_profile_picture(user.profile_picture)
-    }
+        lives: user.lives, 
+        username: user.username,
+        phone: user.phone,
+        is_tester: user.is_tester,
+        role: user.role,
+        profile_picture: UserView.check_profile_picture(user.profile_picture),
+        balance: user.balance,
+        referred: user.referred,
+        referrer: render_one(user.referrer, UserView, "user.json"),
+        leaderboard: render_one(user.leaderboard, UserView, "leaderboard.json"),
+      }
+
   end
+
 
   def render("show_me.json", %{user: user}) do
     %{
@@ -74,13 +89,6 @@ defmodule BijakhqWeb.Api.UserView do
 
   def check_profile_picture(file) do
     "https://storage.googleapis.com/bijakhq_avatars/uploads/user/avatars/#{file.file_name}"
-  end
-
-  def check_balance(user) do
-    case val = Map.has_key?(user, :balance) do
-      true -> user.balance
-      false -> nil
-    end
   end
 
 end
