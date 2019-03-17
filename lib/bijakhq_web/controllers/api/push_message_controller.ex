@@ -9,8 +9,10 @@ defmodule BijakhqWeb.Api.PushMessageController do
 
   plug :role_check, [roles: ["admin"]] when action in [:index, :create, :show, :update, :delete]
 
-  def index(conn, _params) do
-    push_messages = PushNotifications.list_push_messages()
+  def index(conn, params) do
+    page = params["page"]
+    query = params["query"]
+    push_messages = PushNotifications.list_push_messages(page, query)
     render(conn, "index.json", push_messages: push_messages)
   end
 
