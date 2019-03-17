@@ -3,11 +3,15 @@ defmodule Bijakhq.PushNotifications do
   The PushNotifications context.
   """
 
+  require Logger
+
   import Ecto.Query, warn: false
   alias Bijakhq.Repo
 
+  alias Bijakhq.Accounts
   alias Bijakhq.PushNotifications
   alias Bijakhq.PushNotifications.ExpoToken
+  
 
   @doc """
   Returns the list of expo_tokens.
@@ -252,5 +256,45 @@ defmodule Bijakhq.PushNotifications do
   """
   def change_push_message(%PushMessage{} = push_message) do
     PushMessage.changeset(push_message, %{})
+  end
+
+  def push_blast_init(%PushMessage{} = push_message) do
+
+    Logger.warn "event::PushNotifications.push_blast_init - start | time:#{DateTime.utc_now}"
+    is_tester = push_message.is_tester
+    # get user ids
+    ids = Accounts.list_ids(is_tester)
+    # select tokens based on ids
+    tokens = ExpoToken |> where([p], p.user_id in ^ids) |> Repo.all
+    {:ok, push_message} = PushNotifications.update_push_message(push_message, %{total_tokens: Enum.count(tokens)})
+
+    # prepare messages
+    messages = prepare_push_messages(push_message, tokens)
+    # chunk tokens by 100
+    messages_chunked = Enum.chunk_every(messages, 100)
+    # process batch
+    send_push_messages(messages_chunked)
+    {:ok, push_message} = PushNotifications.update_push_message(push_message, %{is_completed: true})
+
+    Logger.warn "event::PushNotifications.push_blast_init - end | time:#{DateTime.utc_now}"
+  end
+
+  defp prepare_push_messages(push_message, tokens) do
+    maps = 
+      Enum.map(tokens, fn(item) ->
+        %{ to: item.token, title: push_message.title, body: push_message.message }
+      end)
+  end
+
+  defp send_push_messages(messages_chunked) do
+    results = 
+      Enum.map(messages_chunked, fn(messages) ->
+        {:ok, response} = ExponentServerSdk.PushNotification.push_list(messages)
+        # IO.puts "Sending batch"
+        Logger.warn "event::PushNotifications.send_push_messages | time:#{DateTime.utc_now}"
+        # TODO: process response from Expo
+        IO.inspect response
+        response
+      end)
   end
 end

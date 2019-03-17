@@ -14,6 +14,8 @@ defmodule BijakhqWeb.Api.PushMessageView do
   def render("push_message.json", %{push_message: push_message}) do
     %{id: push_message.id,
       message: push_message.message,
+      title: push_message.title,
+      is_tester: push_message.is_tester,
       is_completed: push_message.is_completed,
       total_tokens: push_message.total_tokens,
       inserted_at: push_message.inserted_at,
