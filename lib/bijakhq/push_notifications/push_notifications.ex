@@ -177,6 +177,15 @@ defmodule Bijakhq.PushNotifications do
     Repo.all(PushMessage) |> Repo.preload([:user])
   end
 
+  def list_push_messages(page \\ 1, keyword \\ "") do
+    query = from q in PushMessage,
+            order_by: [desc: q.id],
+            where: ilike(q.title, ^"%#{keyword}%"),
+            or_where: ilike(q.message, ^"%#{keyword}%"),
+            preload: [:user]
+    page = Repo.paginate(query, page: page)
+  end
+
   @doc """
   Gets a single push_message.
 

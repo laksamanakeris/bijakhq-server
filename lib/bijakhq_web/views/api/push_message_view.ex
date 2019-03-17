@@ -4,7 +4,12 @@ defmodule BijakhqWeb.Api.PushMessageView do
   alias BijakhqWeb.Api.UserView
 
   def render("index.json", %{push_messages: push_messages}) do
-    %{data: render_many(push_messages, PushMessageView, "push_message.json")}
+    %{data: render_many(push_messages, PushMessageView, "push_message.json"),
+    page_number: push_messages.page_number, 
+      page_size: push_messages.page_size,
+      total_pages: push_messages.total_pages,
+      total_entries: push_messages.total_entries
+    }
   end
 
   def render("show.json", %{push_message: push_message}) do
