@@ -31,9 +31,10 @@ defmodule BijakhqWeb.Api.UserController do
   def create(conn, %{"user" => %{"email" => email} = user_params}) do
     key = Phauxth.Token.sign(conn, %{"email" => email})
 
-    with {:ok, user} <- Accounts.create_user(user_params) do
+    with {:ok, user} <- Accounts.create_user(user_params),
+          user <- Accounts.get_user_details(user.id) 
+    do
       Log.info(%Log{user: user.id, message: "user created"})
-
       Accounts.Message.confirm_request(email, key)
       conn
       |> put_status(:created)
@@ -67,14 +68,12 @@ defmodule BijakhqWeb.Api.UserController do
   end
 
   def show(conn, %{"id" => id}) do
-    balance = Payments.get_balance_by_user_id(id)
-    user = Accounts.get(id)
-    |> Map.put(:balance, balance)
+    user = Accounts.get_user_details(id)
     render(conn, "show.json", user: user)
   end
 
   def update(conn, %{"id" => id, "user" => user_params}) do
-    user = Accounts.get(id)
+    user = Accounts.get_user_details(id)
     with {:ok, user} <- Accounts.update_user(user, user_params) do
       render(conn, "show.json", user: user)
     end
@@ -95,25 +94,16 @@ defmodule BijakhqWeb.Api.UserController do
     # user = id == to_string(user.id) and user || Accounts.get(id)
     # profile = Accounts.get(user.id);
     # render(conn, "show_me.json", %{user: user, profile: profile})
-    user =
-        add_balance_to_user(user)
-        |> add_leaderboard
+    user = Accounts.get_user_details(user.id)
     render(conn, "show_me.json", %{user: user})
   end
 
   def update_me(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"username" => username} = user_params) do
-    with {:ok, user} <- Accounts.update_username(user, user_params) do
-      user =
-        add_balance_to_user(user)
-        |> add_leaderboard
+    with {:ok, user} <- Accounts.update_username(user, user_params), 
+         user <- Accounts.get_user_details(user.id)
+    do
       render(conn, "show_me.json", %{user: user})
     end
-  end
-
-  def add_balance_to_user(user)do
-    user = user |> Repo.preload(:referrer)
-    balance = Payments.get_balance_by_user_id(user.id)
-    user |> Map.put(:balance, balance)
   end
 
   def add_extra_life_to_user(conn, %{"id" => id} = param)do
@@ -127,13 +117,6 @@ defmodule BijakhqWeb.Api.UserController do
     end
   end
 
-  def add_leaderboard(user) do
-    weekly = Quizzes.get_user_leaderboard_weekly(user.id)
-    alltime = Quizzes.get_user_leaderboard_all_time(user.id)
-    leaderboard = %{alltime: alltime, weekly: weekly}
-    user |> Map.put(:leaderboard, leaderboard)
-  end
-
   def upload_image_profile(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"profile_picture" => _params} = user_params) do
     #IO.puts "===================================================================================="
     #IO.inspect user
@@ -144,9 +127,7 @@ defmodule BijakhqWeb.Api.UserController do
     # #IO.inspect uploaded
 
     with {:ok, user} <- Accounts.upload_image(user, user_params) do
-      user = 
-        add_balance_to_user(user)
-        |> add_leaderboard
+      user = Accounts.get_user_details(user.id)
       render(conn, "show_me.json", user: user)
     end
     # render(conn, "show_me.json", user: user)

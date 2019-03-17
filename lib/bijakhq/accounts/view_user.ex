@@ -30,4 +30,6 @@ defmodule Bijakhq.Accounts.ViewUser do
     has_many :scores, QuizScore, foreign_key: :user_id
     belongs_to :referrer, ViewUser, foreign_key: :referring_user_id
   end
+  
+
 end
