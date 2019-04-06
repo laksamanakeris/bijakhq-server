@@ -1,6 +1,7 @@
 defmodule BijakhqWeb.Api.UserView do
   use BijakhqWeb, :view
   alias BijakhqWeb.Api.UserView
+  alias BijakhqWeb.Api.QuizSessionView
 
   def render("index.json", %{users: users}) do
     %{data: render_many(users, UserView, "user.json"),
@@ -29,7 +30,6 @@ defmodule BijakhqWeb.Api.UserView do
   end
   
   def render("show_user.json", %{user: user}) do
-
     %{id: user.id,
         lives: user.lives, 
         username: user.username,
@@ -40,9 +40,17 @@ defmodule BijakhqWeb.Api.UserView do
         balance: user.balance,
         referred: user.referred,
         referrer: render_one(user.referrer, UserView, "user.json"),
+        referred_users: render_many(user.referred_users, UserView, "user.json"),
         leaderboard: render_one(user.leaderboard, UserView, "leaderboard.json"),
+        total_paid: user.total_paid,
+        total_games_played: user.total_games_played,
+        total_game_won: user.total_game_won,
+        total_game_lost: user.total_game_lost,
+        games: render_many(user.games, QuizSessionView, "quiz_session.json")
+        
       }
 
+    
   end
 
 

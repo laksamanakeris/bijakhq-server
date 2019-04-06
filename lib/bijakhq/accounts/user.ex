@@ -46,6 +46,7 @@ defmodule Bijakhq.Accounts.User do
 
     has_many :scores, QuizScore, foreign_key: :user_id
     belongs_to :referrer, User, foreign_key: :referring_user_id
+    has_many :referred_users, User, foreign_key: :referring_user_id
   end
 
   def changeset(%User{} = user, attrs) do

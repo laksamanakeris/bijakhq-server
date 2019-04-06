@@ -646,12 +646,6 @@ defmodule Bijakhq.Quizzes do
     }
   end
 
-
-
-
-
-
-
   def list_quiz_scores do
     Repo.all(QuizScore)
   end
@@ -708,6 +702,16 @@ defmodule Bijakhq.Quizzes do
         limit: 100
 
     Repo.all query
+  end
+
+  def get_total_quiz_won(user_id) do
+            
+    query = from q in QuizScore,
+            join: game in assoc(q, :game), 
+            where: is_nil(game.deleted_at),
+            where: q.user_id == ^user_id
+
+    Repo.all(query)
   end
 
   def list_quiz_scores_all_time do
@@ -852,6 +856,26 @@ defmodule Bijakhq.Quizzes do
   """
   def get_quiz_user!(id), do: Repo.get!(QuizUser, id)
 
+  def get_user_quiz_list(id) do 
+
+    # query = from q in QuizUser,
+    #         join: game in assoc(q, :game),
+    #         where: q.user_id == ^id,
+    #         where: q.is_player == true,
+    #         where: game.is_hidden == false,
+    #         order_by: [desc: q.id],
+    #         preload: [game: :game_questions]
+    query = from q in ViewQuizSession,
+            join: quiz_users in assoc(q, :quiz_users),
+            where: q.is_hidden == false,
+            where: quiz_users.user_id == ^id,
+            where: quiz_users.is_player == true,
+            order_by: [desc: q.id],
+            preload: [:game_questions]
+
+
+    Repo.all(query)
+  end
   @doc """
   Creates a quiz_user.
 

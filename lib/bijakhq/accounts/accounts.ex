@@ -53,14 +53,29 @@ defmodule Bijakhq.Accounts do
   def get_user_details(id) do
   
     balance = Payments.get_balance_by_user_id(id)
+    total_paid = Payments.get_total_payment_to_user_id(id)
     weekly = Quizzes.get_user_leaderboard_weekly(id)
     alltime = Quizzes.get_user_leaderboard_all_time(id)
     leaderboard = %{alltime: alltime, weekly: weekly}
+    user_quiz_list = Quizzes.get_user_quiz_list(id)
+    total_user_quiz = length(user_quiz_list)
+    total_quiz_won = length(Quizzes.get_total_quiz_won(id))
+    total_quiz_lost = total_user_quiz - total_quiz_won
+    
+    additional_details = %{
+      balance: balance,
+      total_paid: total_paid,
+      leaderboard: leaderboard,
+      total_games_played: total_user_quiz,
+      games: user_quiz_list,
+      total_game_won: total_quiz_won,
+      total_game_lost: total_quiz_lost
+    }
+
 
     Repo.get(User, id)
-    |> Repo.preload(:referrer)
-    |> Map.put(:balance, balance)
-    |> Map.put(:leaderboard, leaderboard)
+    |> Repo.preload([:referrer, :referred_users])
+    |> Map.merge(additional_details)
   end
 
   def create_user(attrs) do
