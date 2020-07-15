@@ -313,11 +313,16 @@ defmodule Bijakhq.Game.Players do
   def game_save_scores(game_id) do
     Logger.warn "============================== Game_save_scores :: #{game_id}"
     results = get_game_winner_list()
-    Enum.map(results, fn(subj) ->
-      score = %{amount: subj.amounts, user_id: subj.id, game_id: game_id, completed_at: DateTime.utc_now}
-      #  save to database
-      Task.start(Bijakhq.Quizzes, :create_quiz_score, [score])
-    end)
+    score_items =
+      Enum.map(results, fn(subj) ->
+        date_time = DateTime.utc_now |> DateTime.truncate(:second)
+        score = %{amount: subj.amounts, user_id: subj.id, game_id: game_id, completed_at: date_time, inserted_at: date_time, updated_at: date_time}
+        #  save to database
+        # Task.start(Bijakhq.Quizzes, :create_quiz_score, [score])
+      end)
+    {count, _} = Repo.insert_all(QuizScore, score_items)
+    Logger.warn "============================== Game_save_scores :: #{game_id} | Count: #{count}"
+    {:ok, count}
   end
 
 

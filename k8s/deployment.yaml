@@ -29,7 +29,8 @@ spec:
       # restartPolicy: Never
       containers:
         - name: bijakhq
-          image: gcr.io/bijakhq-dev/bijakhq:v31
+          # image: gcr.io/bijakhq-dev/bijakhq:v31
+          image: gcr.io/bijakhq-dev/bijakhq:v64
           ports:
             - containerPort: 8080
               name: bijakhq-server
