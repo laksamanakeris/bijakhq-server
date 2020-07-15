@@ -12,7 +12,7 @@ defmodule Bijakhq.Quizzes.QuizUser do
 
     belongs_to :user, User, foreign_key: :user_id
     belongs_to :game, QuizSession, foreign_key: :game_id
-
+    
     timestamps()
   end
 

@@ -11,8 +11,10 @@ defmodule BijakhqWeb.Api.QuizSessionController do
   plug :role_check, [roles: ["admin"]] when action in [:index, :create, :show, :update, :delete, :list_questions, :show_question, :update_question]
   plug :user_check when action in [:leaderboard_weekly, :leaderboard_alltime]
 
-  def index(conn, _params) do
-    quiz_sessions = Quizzes.list_quiz_sessions()
+  def index(conn, params) do
+    page = params["page"]
+    query = params["query"]
+    quiz_sessions = Quizzes.list_quiz_sessions(page, query)
     render(conn, "index.json", quiz_sessions: quiz_sessions)
   end
 
@@ -40,9 +42,13 @@ defmodule BijakhqWeb.Api.QuizSessionController do
   end
 
   def delete(conn, %{"id" => id}) do
-    quiz_session = Quizzes.get_quiz_session!(id)
-    with {:ok, %QuizSession{}} <- Quizzes.delete_quiz_session(quiz_session) do
+    with quiz when quiz != nil <- Quizzes.get_quiz_session!(id),
+         {:ok, _struct} <- Quizzes.delete_quiz_session(quiz)
+    do
       send_resp(conn, :no_content, "")
+    else
+      nil -> send_resp(conn, :not_found, "")
+      {:error, _changeset} -> send_resp(conn, :bad_request, "")
     end
   end
 

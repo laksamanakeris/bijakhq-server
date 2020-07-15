@@ -12,7 +12,9 @@ defmodule Bijakhq.Quizzes do
   alias Bijakhq.Quizzes.QuizScore
   alias Bijakhq.Accounts.User
   alias Bijakhq.Accounts
-
+  alias Bijakhq.Quizzes.QuizSession
+  alias Bijakhq.Quizzes.ViewQuizSession
+  
   @doc """
   Returns the list of quiz_categories.
 
@@ -23,7 +25,9 @@ defmodule Bijakhq.Quizzes do
 
   """
   def list_quiz_categories do
-    Repo.all(QuizCategory)
+    # Repo.all(QuizCategory)
+    from(p in QuizCategory, order_by: [desc: p.id])
+    |> Repo.all()
   end
 
   @doc """
@@ -119,7 +123,22 @@ defmodule Bijakhq.Quizzes do
 
   """
   def list_quiz_questions do
-    Repo.all(QuizQuestion) |> Repo.preload([:games])
+    # Repo.all(QuizQuestion) |> Repo.preload([:games])
+    from(p in QuizQuestion, order_by: [desc: p.id])
+    |> Repo.all()
+    |> Repo.preload([:games])
+  end
+  
+  def list_quiz_questions(page \\ 1, keyword \\ "") do
+    query = from q in QuizQuestion,
+            order_by: [desc: q.id],
+            where: ilike(q.question, ^"%#{keyword}%"),
+            or_where: ilike(q.optionB, ^"%#{keyword}%"),
+            or_where: ilike(q.optionC, ^"%#{keyword}%"),
+            or_where: ilike(q.description, ^"%#{keyword}%"),
+            or_where: ilike(q.answer, ^"%#{keyword}%"),
+            preload: [:games]
+    page = Repo.paginate(query, page: page)
   end
 
   @doc """
@@ -136,8 +155,15 @@ defmodule Bijakhq.Quizzes do
       ** (Ecto.NoResultsError)
 
   """
-  def get_quiz_question!(id), do: Repo.get(QuizQuestion, id) |> Repo.preload([:games])
+  def get_quiz_question!(id) do
+    session_query = from q in ViewQuizSession
 
+    query = from q in QuizQuestion,
+            where: q.id == ^id,
+            preload: [games: ^session_query]
+    Repo.one(query)
+    
+  end
   @doc """
   Creates a quiz_question.
 
@@ -213,7 +239,7 @@ defmodule Bijakhq.Quizzes do
     Repo.one(query)
   end
 
-  alias Bijakhq.Quizzes.QuizSession
+
 
   @doc """
   Returns the list of quiz_sessions.
@@ -225,7 +251,22 @@ defmodule Bijakhq.Quizzes do
 
   """
   def list_quiz_sessions do
-    Repo.all(QuizSession) |> Repo.preload([:game_questions])
+    query = from q in ViewQuizSession,
+            order_by: [desc: q.id], 
+            preload: [:game_questions]
+
+    Repo.all(query)
+  end
+
+  def list_quiz_sessions(page \\ 1, keyword \\ "") do
+    query = from q in ViewQuizSession,
+            order_by: [desc: q.id],
+            where: ilike(q.name, ^"%#{keyword}%"),
+            or_where: ilike(q.prize_description, ^"%#{keyword}%"),
+            or_where: ilike(q.description, ^"%#{keyword}%"),
+            preload: [:game_questions]
+            
+    page = Repo.paginate(query, page: page)
   end
 
   @doc """
@@ -297,7 +338,9 @@ defmodule Bijakhq.Quizzes do
 
   """
   def delete_quiz_session(%QuizSession{} = quiz_session) do
-    Repo.delete(quiz_session)
+    quiz_session
+    |> QuizSession.mark_for_deletion_changeset()
+    |> Repo.update
   end
 
   @doc """
@@ -603,12 +646,6 @@ defmodule Bijakhq.Quizzes do
     }
   end
 
-
-
-
-
-
-
   def list_quiz_scores do
     Repo.all(QuizScore)
   end
@@ -665,6 +702,16 @@ defmodule Bijakhq.Quizzes do
         limit: 100
 
     Repo.all query
+  end
+
+  def get_total_quiz_won(user_id) do
+            
+    query = from q in QuizScore,
+            join: game in assoc(q, :game), 
+            where: is_nil(game.deleted_at),
+            where: q.user_id == ^user_id
+
+    Repo.all(query)
   end
 
   def list_quiz_scores_all_time do
@@ -743,7 +790,7 @@ defmodule Bijakhq.Quizzes do
     user_data = get_user_ranking_weekly(user_id)
     case user_data do
       nil ->
-        %{amounts: 0, rank: 101, user_id: user_id}
+        %{amounts: 0, rank: 0, user_id: user_id}
       _ ->
         list = list_quiz_scores_weekly()
         # #IO.inspect list
@@ -762,7 +809,7 @@ defmodule Bijakhq.Quizzes do
     user_data = get_user_ranking_alltime(user_id)
     case user_data do
       nil ->
-        %{amounts: 0, rank: 101, user_id: user_id}
+        %{amounts: 0, rank: 0, user_id: user_id}
       _ ->
         list = list_quiz_scores_all_time()
         # #IO.inspect list
@@ -809,6 +856,26 @@ defmodule Bijakhq.Quizzes do
   """
   def get_quiz_user!(id), do: Repo.get!(QuizUser, id)
 
+  def get_user_quiz_list(id) do 
+
+    # query = from q in QuizUser,
+    #         join: game in assoc(q, :game),
+    #         where: q.user_id == ^id,
+    #         where: q.is_player == true,
+    #         where: game.is_hidden == false,
+    #         order_by: [desc: q.id],
+    #         preload: [game: :game_questions]
+    query = from q in ViewQuizSession,
+            join: quiz_users in assoc(q, :quiz_users),
+            where: q.is_hidden == false,
+            where: quiz_users.user_id == ^id,
+            where: quiz_users.is_player == true,
+            order_by: [desc: q.id],
+            preload: [:game_questions]
+
+
+    Repo.all(query)
+  end
   @doc """
   Creates a quiz_user.
 

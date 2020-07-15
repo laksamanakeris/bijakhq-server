@@ -29,7 +29,9 @@ defmodule Bijakhq.Payments do
 
   """
   def list_payments do
-    Repo.all(PaymentRequest) |> Repo.preload([:user, :update_by, :status, :type])
+    # Repo.all(PaymentRequest) |> Repo.preload([:user, :update_by, :status, :type])
+    from(p in PaymentRequest, order_by: [desc: p.id])
+    |> Repo.all() |> Repo.preload([:user, :update_by, :status, :type])
   end
 
   def list_payments_by_type_status(type \\ 1, status \\ 1) do

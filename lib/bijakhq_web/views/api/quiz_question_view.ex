@@ -3,7 +3,12 @@ defmodule BijakhqWeb.Api.QuizQuestionView do
   alias BijakhqWeb.Api.QuizQuestionView
 
   def render("index.json", %{quiz_questions: quiz_questions}) do
-    %{data: render_many(quiz_questions, QuizQuestionView, "quiz_question.json")}
+    %{data: render_many(quiz_questions, QuizQuestionView, "quiz_question.json"),
+      page_number: quiz_questions.page_number, 
+      page_size: quiz_questions.page_size,
+      total_pages: quiz_questions.total_pages,
+      total_entries: quiz_questions.total_entries
+    }
   end
 
   def render("show.json", %{quiz_question: quiz_question}) do

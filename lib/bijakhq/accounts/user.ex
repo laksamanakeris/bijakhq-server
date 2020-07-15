@@ -40,11 +40,13 @@ defmodule Bijakhq.Accounts.User do
     field :rank_alltime, :integer
 
     field :paypal_email, :string
+    field :deleted_at, :utc_datetime
 
     timestamps()
 
     has_many :scores, QuizScore, foreign_key: :user_id
     belongs_to :referrer, User, foreign_key: :referring_user_id
+    has_many :referred_users, User, foreign_key: :referring_user_id
   end
 
   def changeset(%User{} = user, attrs) do
@@ -101,6 +103,12 @@ defmodule Bijakhq.Accounts.User do
     |> validate_format(:paypal_email, ~r/@/)
     |> validate_length(:paypal_email, max: 254)
   end
+  
+  def add_lives_changeset(changeset, lives)do
+    changeset
+    |> change(lives: lives)
+    |> validate_number(:lives, greater_than: 0)
+  end
 
   defp unique_username(changeset) do
     validate_length(changeset, :username, min: 3)
@@ -122,6 +130,11 @@ defmodule Bijakhq.Accounts.User do
 
   defp downcase_username(changeset) do
     update_change(changeset, :username, &String.downcase/1)
+  end
+
+  def mark_for_deletion_changeset(changeset) do
+    changeset
+    |> change(%{deleted_at: DateTime.utc_now, username: nil, phone: nil})
   end
 
   defp add_timestamp(%{"profile_picture" => %Plug.Upload{filename: name} = image} = attrs) do

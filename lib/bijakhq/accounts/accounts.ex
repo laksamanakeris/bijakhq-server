@@ -5,14 +5,34 @@ defmodule Bijakhq.Accounts do
 
   import Ecto.{Query, Changeset}, warn: false
   alias Phauxth.Log
-  alias Bijakhq.{Accounts.User, Repo}
+  alias Bijakhq.{Accounts.User, Repo, Accounts.ViewUser}
   alias Bijakhq.Accounts.Referral
+  alias Bijakhq.Quizzes
+  alias Bijakhq.Payments
 
   def list_users do
-    Repo.all(User)
+    query = from u in ViewUser,
+            order_by: [asc: u.id]
+    Repo.all(query)
+  end
+
+  def list_users(page_num \\ 1, keyword \\ "") do
+    query = from u in ViewUser,
+            where: ilike(u.username, ^"%#{keyword}%"),
+            order_by: [asc: u.id]
+    page = Repo.paginate(query, page: page_num)
+  end
+
+  def list_ids(is_tester \\ false) do
+    query = from u in User,
+          select: u.id,
+          where: u.is_tester == ^is_tester,
+          order_by: [asc: u.id]
+    Repo.all(query)
   end
 
   def get(id), do: Repo.get(User, id)
+
 
   def get_by(%{"email" => email}) do
     Repo.get_by(User, email: email)
@@ -28,6 +48,34 @@ defmodule Bijakhq.Accounts do
 
   def get_user_by_username(username) do
     get_by(%{"username" => username})
+  end
+
+  def get_user_details(id) do
+  
+    balance = Payments.get_balance_by_user_id(id)
+    total_paid = Payments.get_total_payment_to_user_id(id)
+    weekly = Quizzes.get_user_leaderboard_weekly(id)
+    alltime = Quizzes.get_user_leaderboard_all_time(id)
+    leaderboard = %{alltime: alltime, weekly: weekly}
+    user_quiz_list = Quizzes.get_user_quiz_list(id)
+    total_user_quiz = length(user_quiz_list)
+    total_quiz_won = length(Quizzes.get_total_quiz_won(id))
+    total_quiz_lost = total_user_quiz - total_quiz_won
+    
+    additional_details = %{
+      balance: balance,
+      total_paid: total_paid,
+      leaderboard: leaderboard,
+      total_games_played: total_user_quiz,
+      games: user_quiz_list,
+      total_game_won: total_quiz_won,
+      total_game_lost: total_quiz_lost
+    }
+
+
+    Repo.get(User, id)
+    |> Repo.preload([:referrer, :referred_users])
+    |> Map.merge(additional_details)
   end
 
   def create_user(attrs) do
@@ -64,6 +112,7 @@ defmodule Bijakhq.Accounts do
     user
     |> User.update_username_changeset(attrs)
     |> Repo.update()
+    
   end
 
   def update_paypal_email(%User{} = user, attrs) do
@@ -86,17 +135,31 @@ defmodule Bijakhq.Accounts do
   end
 
   def delete_user(%User{} = user) do
-    Repo.delete(user)
+    user
+    |> User.mark_for_deletion_changeset
+    |> Repo.update
   end
 
   def change_user(%User{} = user) do
     User.changeset(user, %{})
   end
+  
+  def add_extra_lives_to_user(%User{} = user) do
+    lives = user.lives + 1
+    user
+    |> User.add_lives_changeset(lives)
+    |> Repo.update
+  end
 
 
 
   def list_referrals do
-    Repo.all(Referral) |> Repo.preload([:user, :referrer])
+    user_query = from u in ViewUser
+    query = from r in Referral,
+            preload: [user: ^user_query, referrer: ^user_query],
+            order_by: [asc: r.id]
+    Repo.all(query)
+           
   end
   def get_referral!(id), do: Repo.get!(Referral, id) |> Repo.preload([:user, :referrer])
 

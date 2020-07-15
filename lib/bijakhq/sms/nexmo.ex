@@ -1,8 +1,8 @@
 defmodule Bijakhq.Sms.Nexmo do
 
   @nexmo_url "https://api.nexmo.com/verify"
-  @api_key "380f9c4d"
-  @api_secret "9ac0a59b360a3649"
+  @api_key "241d3eaa"
+  @api_secret "NHTVP8KwUgEr86O0"
   @brand "Bijak Trivia"
   @headers [{"content-type", "application/json; charset=utf-8"}]
   @pin_expiry 60 * 5
