@@ -94,7 +94,7 @@ defmodule Bijakhq.Game.GameManager do
   # extract from cache
   def players_get_game_winner_list() do
     pid = :global.whereis_name({Bijakhq.Game.GameManager, 1})
-    GenServer.call(pid, {:players_get_game_winner_list})
+    GenServer.call(pid, {:players_get_game_winner_list}, :infinity)
   end
 
   def players_get_game_player_list() do

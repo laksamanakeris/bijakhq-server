@@ -21,17 +21,20 @@ defmodule BijakhqWeb.Api.UserController do
   # plug :id_check when action in [:update, :delete]
   plug :user_check when action in [:upload_image_profile, :show_me, :update_me]
 
-  def index(conn, _) do
-    users = Accounts.list_users()
+  def index(conn, params) do
+    page_num = params["page"]
+    search = params["query"]
+    users = Accounts.list_users(page_num, search)
     render(conn, "index.json", users: users)
   end
 
   def create(conn, %{"user" => %{"email" => email} = user_params}) do
     key = Phauxth.Token.sign(conn, %{"email" => email})
 
-    with {:ok, user} <- Accounts.create_user(user_params) do
+    with {:ok, user} <- Accounts.create_user(user_params),
+          user <- Accounts.get_user_details(user.id) 
+    do
       Log.info(%Log{user: user.id, message: "user created"})
-
       Accounts.Message.confirm_request(email, key)
       conn
       |> put_status(:created)
@@ -65,54 +68,53 @@ defmodule BijakhqWeb.Api.UserController do
   end
 
   def show(conn, %{"id" => id}) do
-    user = Accounts.get(id)
+    user = Accounts.get_user_details(id)
     render(conn, "show.json", user: user)
   end
 
   def update(conn, %{"id" => id, "user" => user_params}) do
-    user = Accounts.get(id)
+    user = Accounts.get_user_details(id)
     with {:ok, user} <- Accounts.update_user(user, user_params) do
       render(conn, "show.json", user: user)
     end
   end
 
   def delete(conn, %{"id" => id}) do
-    user = Accounts.get(id)
-    {:ok, _user} = Accounts.delete_user(user)
-
-    send_resp(conn, :no_content, "")
+    with user when user != nil <- Accounts.get(id),
+         {:ok, _struct} <- Accounts.delete_user(user)
+    do
+      send_resp(conn, :no_content, "")
+    else
+      nil -> send_resp(conn, :not_found, "")
+      {:error, _changeset} -> send_resp(conn, :bad_request, "")
+    end
   end
 
   def show_me(%Plug.Conn{assigns: %{current_user: user}} = conn, _) do
     # user = id == to_string(user.id) and user || Accounts.get(id)
     # profile = Accounts.get(user.id);
     # render(conn, "show_me.json", %{user: user, profile: profile})
-    user =
-        add_balance_to_user(user)
-        |> add_leaderboard
+    user = Accounts.get_user_details(user.id)
     render(conn, "show_me.json", %{user: user})
   end
 
   def update_me(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"username" => username} = user_params) do
-    with {:ok, user} <- Accounts.update_username(user, user_params) do
-      user =
-        add_balance_to_user(user)
-        |> add_leaderboard
+    with {:ok, user} <- Accounts.update_username(user, user_params), 
+         user <- Accounts.get_user_details(user.id)
+    do
       render(conn, "show_me.json", %{user: user})
     end
   end
 
-  def add_balance_to_user(user)do
-    user = user |> Repo.preload(:referrer)
-    balance = Payments.get_balance_by_user_id(user.id)
-    user |> Map.put(:balance, balance)
-  end
-
-  def add_leaderboard(user) do
-    weekly = Quizzes.get_user_leaderboard_weekly(user.id)
-    alltime = Quizzes.get_user_leaderboard_all_time(user.id)
-    leaderboard = %{alltime: alltime, weekly: weekly}
-    user |> Map.put(:leaderboard, leaderboard)
+  def add_extra_life_to_user(conn, %{"id" => id} = param)do
+    with user when user != nil <- Accounts.get(id),
+        {:ok, user} <- Accounts.add_extra_lives_to_user(user)
+    do
+      show(conn, param)
+    else 
+      nil -> send_resp(conn, :not_found, "")
+      {:error, error} -> send_resp(conn, :bad_request, "")
+    end
   end
 
   def upload_image_profile(%Plug.Conn{assigns: %{current_user: user}} = conn, %{"profile_picture" => _params} = user_params) do
@@ -125,9 +127,7 @@ defmodule BijakhqWeb.Api.UserController do
     # #IO.inspect uploaded
 
     with {:ok, user} <- Accounts.upload_image(user, user_params) do
-      user = 
-        add_balance_to_user(user)
-        |> add_leaderboard
+      user = Accounts.get_user_details(user.id)
       render(conn, "show_me.json", user: user)
     end
     # render(conn, "show_me.json", user: user)

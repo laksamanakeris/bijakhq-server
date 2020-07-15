@@ -46,7 +46,7 @@ defmodule Bijakhq.Game.Players do
     case info do
       :undefined -> :ets.new(ets_table_name, [:set, :public, :named_table, read_concurrency: true, write_concurrency: true])
       _ ->
-        :ets.tab2file(ets_table_name, ~c[#{ets_table_name}_#{DateTime.utc_now}_.txt])
+        :ets.tab2file(ets_table_name, ~c[#{ets_table_name}_#{DateTime.utc_now}.txt])
         :ets.delete(ets_table_name)
         :ets.new(ets_table_name, [:set, :public, :named_table, read_concurrency: true, write_concurrency: true])
     end
@@ -156,7 +156,7 @@ defmodule Bijakhq.Game.Players do
             true -> map
             false ->
               user_answer = Player.get_answer(player, question_id)
-              Task.start(Bijakhq.Game.Player, :process_answer, [player, user_answer, answers_sequence, is_test_game, is_last_question])
+              Task.start(Bijakhq.Game.Player, :process_answer, [question_id, player, user_answer, answers_sequence, is_test_game, is_last_question])
               Map.update(map, user_answer, 1, & &1 + 1)
           end
         end)
@@ -313,11 +313,16 @@ defmodule Bijakhq.Game.Players do
   def game_save_scores(game_id) do
     Logger.warn "============================== Game_save_scores :: #{game_id}"
     results = get_game_winner_list()
-    Enum.map(results, fn(subj) ->
-      score = %{amount: subj.amounts, user_id: subj.id, game_id: game_id, completed_at: DateTime.utc_now}
-      #  save to database
-      Task.start(Bijakhq.Quizzes, :create_quiz_score, [score])
-    end)
+    score_items =
+      Enum.map(results, fn(subj) ->
+        date_time = DateTime.utc_now |> DateTime.truncate(:second)
+        score = %{amount: subj.amounts, user_id: subj.id, game_id: game_id, completed_at: date_time, inserted_at: date_time, updated_at: date_time}
+        #  save to database
+        # Task.start(Bijakhq.Quizzes, :create_quiz_score, [score])
+      end)
+    {count, _} = Repo.insert_all(QuizScore, score_items)
+    Logger.warn "============================== Game_save_scores :: #{game_id} | Count: #{count}"
+    {:ok, count}
   end
 
 

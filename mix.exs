@@ -20,7 +20,7 @@ defmodule Bijakhq.Mixfile do
   def application do
     [
       mod: {Bijakhq.Application, []},
-      extra_applications: [:logger, :runtime_tools, :httpoison, :timex, :faker, :arc_ecto, :pay_pal, :singleton, :peerage]
+      extra_applications: [:logger, :runtime_tools, :httpoison, :timex, :faker, :arc_ecto, :pay_pal, :singleton, :peerage, :exponent_server_sdk]
     ]
   end
 
@@ -58,6 +58,8 @@ defmodule Bijakhq.Mixfile do
       {:distillery, "~> 2.0"},
       {:observer_cli, "~> 1.4"},
       {:semaphore, "~> 1.0"},
+      {:scrivener_ecto, "~> 1.3.0"},
+      {:exponent_server_sdk, "~> 0.2.0"},
     ]
   end
 
